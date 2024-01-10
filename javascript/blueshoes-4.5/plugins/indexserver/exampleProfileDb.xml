@@ -1,0 +1,42 @@
+<bs:index>
+  <bs:type>db</bs:type>
+  <bs:minLength>3</bs:minLength>
+  <bs:maxLength>30</bs:maxLength>
+  <bs:languages>
+    <bs:value>de</bs:value>
+    <bs:value>fr</bs:value>
+  </bs:languages>
+  <bs:stopWords>
+    <bs:file lang="de" file="/some/path/to/stopWords.de.txt"/>
+    <bs:file lang="fr" file="/some/path/to/stopWords.fr.txt"/>
+  </bs:stopWords>
+  
+  <bs:dsn name="main" host="" port="" user="" pass="" type="" syntax=""/>
+  
+  <bs:fields>
+    <bs:field name="userID">
+      <bs:index>true</bs:index>
+      <bs:weight>100</bs:weight>
+      <bs:indexFiles>
+        <bs:type>pdf</bs:type>
+        <bs:type>doc</bs:type>
+        <bs:type>xls</bs:type>
+        <bs:type>txt</bs:type>
+      </bs:indexFiles>
+      <bs:indexUrls>
+        <bs:use    type="host">domain.com</bs:use>
+        <bs:ignore type="host">otherdomain.com</bs:ignore>
+        <bs:use    type="file">html</bs:use>
+        <bs:ignore type="file">php</bs:ignore>
+      </bs:indexUrls>
+      <bs:foreignKey>
+        <bs:source dsn="main" database="database" table="table" field="field"/>
+        <bs:fields>
+          ... (recursive loop)
+        </bs:fields>
+      </bs:foreignKey>
+    </bs:field>
+  </bs:fields>
+
+
+</bs:index>

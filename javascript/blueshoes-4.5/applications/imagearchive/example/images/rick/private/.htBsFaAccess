@@ -1,0 +1,5 @@
+[access]
+view    = u:rick
+add     = u:rick
+edit    = u:rick
+delete  = u:rick

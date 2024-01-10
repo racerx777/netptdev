@@ -1,0 +1,82 @@
+SSL Manager
+
+
+SSL Certificate
+
+
+Certificate generated!
+
+
+Generated Certificate
+
+-----BEGIN CERTIFICATE-----
+MIIDxTCCAy6gAwIBAgIJAM6l9YYeDDuuMA0GCSqGSIb3DQEBBQUAMIGeMQswCQYD
+VQQGEwJVUzELMAkGA1UECBMCQ0ExEDAOBgNVBAcTB0N5cHJlc3MxIjAgBgNVBAoT
+GVdlc3RTdGFyIFBoeXNpY2FsIFRoZXJhcHkxDjAMBgNVBAsTBU5ldFBUMRgwFgYD
+VQQDEw9uZXRwdC53c3B0bi5jb20xIjAgBgkqhkiG9w0BCQEWE3dlYm1hc3RlckB3
+c3B0bi5jb20wHhcNMDkwODI0MjA0MzQ3WhcNMTAwODI0MjA0MzQ3WjCBnjELMAkG
+A1UEBhMCVVMxCzAJBgNVBAgTAkNBMRAwDgYDVQQHEwdDeXByZXNzMSIwIAYDVQQK
+ExlXZXN0U3RhciBQaHlzaWNhbCBUaGVyYXB5MQ4wDAYDVQQLEwVOZXRQVDEYMBYG
+A1UEAxMPbmV0cHQud3NwdG4uY29tMSIwIAYJKoZIhvcNAQkBFhN3ZWJtYXN0ZXJA
+d3NwdG4uY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQColWcca1Vtio8H
+0uNMDnc/DCDTwx7+whNqUyGidMkxwSLpHO002h6wyNqlOqOxg2cEpr759USNaqpt
+R5JXLqdl3OKfd9w1jEcKDE6KI2E9zuF4p0hcw2hRmsmWjV5llmFLRrWspveo4yVc
+C2vZC28zf7xlZMmdq5SZnamuLeKXxwIDAQABo4IBBzCCAQMwHQYDVR0OBBYEFEst
+OQCY5a4i6M++euQaRsTAiB7gMIHTBgNVHSMEgcswgciAFEstOQCY5a4i6M++euQa
+RsTAiB7goYGkpIGhMIGeMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExEDAOBgNV
+BAcTB0N5cHJlc3MxIjAgBgNVBAoTGVdlc3RTdGFyIFBoeXNpY2FsIFRoZXJhcHkx
+DjAMBgNVBAsTBU5ldFBUMRgwFgYDVQQDEw9uZXRwdC53c3B0bi5jb20xIjAgBgkq
+hkiG9w0BCQEWE3dlYm1hc3RlckB3c3B0bi5jb22CCQDOpfWGHgw7rjAMBgNVHRME
+BTADAQH/MA0GCSqGSIb3DQEBBQUAA4GBAINPodyB8xVLI+kDJorSi+HvxxVgasc0
+CG2CsF/TnAwjOBkF5AC+b/7OpDMc2ZwyNRGYOafYcqJWAfIix6mpVS4ZVTZSs7Vq
+XQIAhSdlGagft5PtgRJl3AO6Se9YHulRnomn1PufruGKvO0MV6/f48u0QxiOC1Yt
+Dm1w2bX6KOdr
+-----END CERTIFICATE-----
+
+
+
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            ce:a5:f5:86:1e:0c:3b:ae
+        Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=US, ST=CA, L=Cypress, O=WestStar Physical Therapy, OU=NetPT, CN=netpt.wsptn.com/emailAddress=webmaster@wsptn.com
+        Validity
+            Not Before: Aug 24 20:43:47 2009 GMT
+            Not After : Aug 24 20:43:47 2010 GMT
+        Subject: C=US, ST=CA, L=Cypress, O=WestStar Physical Therapy, OU=NetPT, CN=netpt.wsptn.com/emailAddress=webmaster@wsptn.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+            RSA Public Key: (1024 bit)
+                Modulus (1024 bit):
+                    00:a8:95:67:1c:6b:55:6d:8a:8f:07:d2:e3:4c:0e:
+                    77:3f:0c:20:d3:c3:1e:fe:c2:13:6a:53:21:a2:74:
+                    c9:31:c1:22:e9:1c:ed:34:da:1e:b0:c8:da:a5:3a:
+                    a3:b1:83:67:04:a6:be:f9:f5:44:8d:6a:aa:6d:47:
+                    92:57:2e:a7:65:dc:e2:9f:77:dc:35:8c:47:0a:0c:
+                    4e:8a:23:61:3d:ce:e1:78:a7:48:5c:c3:68:51:9a:
+                    c9:96:8d:5e:65:96:61:4b:46:b5:ac:a6:f7:a8:e3:
+                    25:5c:0b:6b:d9:0b:6f:33:7f:bc:65:64:c9:9d:ab:
+                    94:99:9d:a9:ae:2d:e2:97:c7
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Subject Key Identifier: 
+                4B:2D:39:00:98:E5:AE:22:E8:CF:BE:7A:E4:1A:46:C4:C0:88:1E:E0
+            X509v3 Authority Key Identifier: 
+                keyid:4B:2D:39:00:98:E5:AE:22:E8:CF:BE:7A:E4:1A:46:C4:C0:88:1E:E0
+                DirName:/C=US/ST=CA/L=Cypress/O=WestStar Physical Therapy/OU=NetPT/CN=netpt.wsptn.com/emailAddress=webmaster@wsptn.com
+                serial:CE:A5:F5:86:1E:0C:3B:AE
+
+            X509v3 Basic Constraints: 
+                CA:TRUE
+    Signature Algorithm: sha1WithRSAEncryption
+        83:4f:a1:dc:81:f3:15:4b:23:e9:03:26:8a:d2:8b:e1:ef:c7:
+        15:60:6a:c7:34:08:6d:82:b0:5f:d3:9c:0c:23:38:19:05:e4:
+        00:be:6f:fe:ce:a4:33:1c:d9:9c:32:35:11:98:39:a7:d8:72:
+        a2:56:01:f2:22:c7:a9:a9:55:2e:19:55:36:52:b3:b5:6a:5d:
+        02:00:85:27:65:19:a8:1f:b7:93:ed:81:12:65:dc:03:ba:49:
+        ef:58:1e:e9:51:9e:89:a7:d4:fb:9f:ae:e1:8a:bc:ed:0c:57:
+        af:df:e3:cb:b4:43:18:8e:0b:56:2d:0e:6d:70:d9:b5:fa:28:
+        e7:6b
+

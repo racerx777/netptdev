@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+<title>BlueShoes JavaScript Button: Example 1</title>
+<style>
+body {
+	font-family: arial, helvetica;
+	font-size:   12px;
+}
+</style>
+<script>
+function bs_isGecko() {
+  //rather poor implementation.
+  if (navigator.appName == "Microsoft Internet Explorer") return false;
+  return (navigator.userAgent.match(/gecko/i));
+}
+if (bs_isGecko()) {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_ie.css'>");
+}
+</script>
+<script type="text/javascript" src="../../../components/toolbar/Bs_Button.class.js"></script>
+
+<script>
+function btnClicked(btnObj) {
+	alert('Clicked the button: ' + btnObj.title);
+}
+function go() {
+  b1 = new Bs_Button();
+  b1.title = 'Stop';
+	b1.imgPath = '../../../../images/buttons/';
+  b1.imgName = 'bs_stop';
+  b1.attachEvent(btnClicked);
+  b1.drawInto('btn');
+}
+</script>
+</head>
+
+<body bgcolor="white" onLoad="go();">
+
+<h1>JavaScript Toolbar Example 1</h1>
+
+Simple usage of the button class Bs_Button. Features used:
+<ul>
+  <li>Used a premade icon (16x16 pixel).</li>
+  <li>Attached an onClick event.</li>
+  <li>Set the title "Stop".</li>
+</ul>
+
+Move your mouse over the button, and click it.
+<hr>
+<br>
+
+<div id="btn" style="width:200; height:40; background-color:menu;"></div>
+
+</body>
+</html>

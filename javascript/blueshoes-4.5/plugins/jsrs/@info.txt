@@ -1,0 +1,10 @@
+Files in this Dir 
+-------------------
+  JsrsServer.class.php : The basic server class written in PHP.
+  
+  NOTE: More server classes/libs in other langs (like perl, asp, ...) 
+        may follow.
+
+@author Sam Blum  bs_php@users.sourceforge.net
+@doc    http://js-rs.sourceforge.net
+@source http://sourceforge.net/projects/js-rs/

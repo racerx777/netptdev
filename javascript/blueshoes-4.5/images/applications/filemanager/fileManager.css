@@ -1,0 +1,138 @@
+td { 
+  font-family: tahoma, verdana, arial, helvetica; 
+  font-size: 10pt; 
+  color: #000000; 
+}
+.small { 
+  font-family: tahoma, verdana, arial, helvetica; 
+  font-size: 8pt; 
+  color: #000000; 
+}
+.smallBold { 
+  font-family: tahoma, verdana, arial, helvetica; 
+  font-size: 8pt; 
+  color: #000000; 
+  font-weight: bold;
+}
+td.bar { 
+  font-family: tahoma, verdana, arial, helvetica; 
+  font-size: 2pt; 
+  color: #000000; 
+}
+
+.fileList {
+  font-family: tahoma, verdana, arial, helvetica; 
+  font-size: 8pt; 
+  color: #000000; 
+  vertical-align: middle;
+  height:17px; 
+  background-color:white;
+  zoom:100%;
+}
+
+.button {
+  font-family: tahoma, verdana, arial, helvetica; 
+  font-size: 8pt; 
+  color: #000000; 
+  height:23px; 
+  width: 75px;
+}
+
+body {
+  font-family: tahoma, verdana, arial, helvetica; 
+  font-size: 10pt; 
+  color: #000000; 
+	background-color:white;
+	border-width:0px;
+}
+
+
+.menu {
+  display: none; 
+  cursor: hand; 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  width: 100;
+  background-color: menu;
+  border: "2 solid"; 
+  border-top-color: "#EFEFEF"; 
+  border-left-color: "#EFEFEF"; 
+  border-right-color: "#505050"; 
+  border-bottom-color: "#505050"; 
+  font-size: 9pt; 
+  font-family: Arial;
+}
+
+.rightMouseMenuItem {
+  cursor: default;
+  background-color: menu; 
+  height: 15; 
+}
+
+
+
+
+.tblCont {
+	border-left:1px gray solid;
+	background-color:black;
+	table-layout:fixed;
+	width:700px;
+}
+
+.tblTitleCont {
+	font-family:tahoma;
+	cursor:hand;
+}
+
+.tblSortable {
+	cursor:hand;
+	border:2px outset whitesmoke;
+	border-left-width:1px;
+	border-right-width:1px;
+	background-color:menu;
+	font-size:9px;
+	height:19px;
+	padding-top:0px;
+	padding-bottom:0px;
+	padding-left:3px;
+	padding-right:3px;
+}
+
+.tblStatic {
+	cursor:default;
+	border:2px outset whitesmoke;
+	border-left-width:1px;
+	border-right-width:1px;
+	background-color:menu;
+	color:gray;
+	font-size:9px;
+	height:19px;
+	padding-top:0px;
+	padding-bottom:0px;
+	padding-left:3px;
+	padding-right:3px;
+}
+
+.tblData {
+	background-color:whitesmoke;
+	border:1px gray solid;
+	border-left-width:0px;
+	border-top-width:0px;
+	font-size:10px;
+	padding-top:2px;
+	padding-bottom:2px;
+	padding-left:3px;
+	padding-right:6px;
+}
+
+.arrHide {
+	visibility:hidden;
+}
+
+.arrUp {
+	filter:flipv(); /* flip vertical, good for images, used for the -> thing here. */
+}
+
+.arrDn {
+}

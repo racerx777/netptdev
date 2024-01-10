@@ -1,0 +1,65 @@
+<table border="0">
+  <tr>
+    <td valign="top" width="150">
+      <bs_input name="chartType" type="caption"/>
+    </td>
+    <td valign="top">
+      <bs_input name="chartSubtypeBar" type="caption"/>
+    </td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <bs_input name="chartType" type="element"/>
+    </td>
+    <td valign="top">
+      <div id="chartSubtype_barDiv" style="display:none;">
+        <bs_input name="chartSubtypeBar" type="element"/>
+      </div>
+      <div id="chartSubtype_lineDiv" style="display:none;">
+        <bs_input name="chartSubtypeLine" type="element"/>
+      </div>
+      <div id="chartSubtype_pieDiv" style="display:none;">
+        <bs_input name="chartSubtypePie" type="element"/>
+      </div>
+      <div id="chartSubtype_surfaceDiv" style="display:none;">
+        <bs_input name="chartSubtypeSurface" type="element"/>
+      </div>
+      <div id="chartSubtype_scatterDiv" style="display:none;">
+        <bs_input name="chartSubtypeScatter" type="element"/>
+      </div>
+    </td>
+  </tr>
+</table>
+<br><br>
+
+<script>
+//js code has to be here after the html code.
+
+/**
+* fires when the user chooses another chart type, eg switches from bar to pie.
+*/
+function chartTypeOnChange() {
+  document.getElementById('chartSubtype_barDiv').style.display     = "none";
+  document.getElementById('chartSubtype_lineDiv').style.display    = "none";
+  document.getElementById('chartSubtype_pieDiv').style.display     = "none";
+  document.getElementById('chartSubtype_surfaceDiv').style.display = "none";
+  document.getElementById('chartSubtype_scatterDiv').style.display = "none";
+  
+  var myForm = document.forms['chartWizard'];
+  var val = myForm.elements['chartType'].value;
+  document.getElementById('chartSubtype_' + val + 'Div').style.display = 'block';
+}
+
+
+function getValue_billSameAsCustomer() {
+  var myForm = document.forms['mozonForm'];
+  var val = 0;
+  for (var i=0; i<myForm.elements['billSameAsCustomer'].length; i++) {
+    if (myForm.elements['billSameAsCustomer'][i].checked) {
+      val = myForm.elements['billSameAsCustomer'][i].value;
+    }
+  }
+  return val;
+}
+//toggleContainer_billSameAsCustomer('containerbill');
+</script>

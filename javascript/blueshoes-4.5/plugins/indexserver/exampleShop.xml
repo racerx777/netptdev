@@ -1,0 +1,24 @@
+<bs:index>
+  
+  <bs:source>
+    <bs:type>db</type>
+    <bs:dsn>-default-</bs:dsn>
+    <bs:database>-default-</bs:database>
+    <bs:table>exampleShopProduct</bs:table>
+  </bs:source>
+  
+  <bs:minLength>3</bs:minLength>
+  <bs:maxLength>30</bs:maxLength>
+  <bs:languages>
+    <bs:value>de</bs:value>
+    <bs:value>fr</bs:value>
+  </bs:languages>
+  
+  <bs:stopWords>
+    <bs:file lang="de" file="/some/path/to/stopWords.de.txt"/>
+    <bs:file lang="fr" file="/some/path/to/stopWords.fr.txt"/>
+  </bs:stopWords>
+  
+  <bs:dsn name="main" host="" port="" user="" pass="" type="" syntax=""/>
+  
+</bs:index>

@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+	<title>BlueShoes Editor Example 4</title>
+
+<script type="text/javascript" src="../../../core/lang/Bs_Misc.lib.js"></script>
+<script type="text/javascript" src="../../../core/html/Bs_HtmlUtil.lib.js"></script>
+
+<script type="text/javascript" src="../../../components/tabset/Bs_TabSet.class.js"></script>
+<link rel='stylesheet' href='../../../components/tabset/default.css'>
+
+<script type="text/javascript" src="../../../components/editor/Bs_Editor.class.js"></script>
+<script type="text/javascript" src="../../../components/editor/lang/en.js"></script>
+
+<script type="text/javascript" src="../../../core/form/Bs_FormFieldSelect.class.js"></script>
+
+<script type="text/javascript" src="../../../components/toolbar/Bs_ButtonBar.class.js"></script>
+<script type="text/javascript" src="../../../components/toolbar/Bs_Button.class.js"></script>
+
+<script type="text/javascript" src="../../../components/resizegrip/Bs_ResizeGrip.class.js"></script>
+
+<script type="text/javascript">
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_ie.css'>");
+}
+
+onload = function() {
+	myEditor = new Bs_Editor('myEditor');
+	myEditor.buttonsDefaultPath  = '../../../../images/buttons/';
+	myEditor.bsImgPath           = '../../../../images/';
+	myEditor.dataType = 'text';
+	myEditor.convertField('editorField');
+}
+</script>
+</head>
+
+<body bgcolor="white" id="body">
+
+<h1>BlueShoes Editor Example 4</h1>
+
+<ul>
+	<li>Basic example of the editor as text editor.</li>
+	<li>Using an existing textarea field and convertField().</li>
+</ul>
+<br><br>
+
+<textarea id="editorField" cols="40" rows="10">this is a default value</textarea>
+
+</body>
+</html>

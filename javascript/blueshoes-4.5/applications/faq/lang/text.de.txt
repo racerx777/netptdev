@@ -1,0 +1,15 @@
+[default]
+#we put everything into the [default] section for this file. that is hardcoded. if you need more sections, recode.
+askQuestion         = Frage stellen
+noRecords           = Keine Datensätze verfügbar.
+addedSuccessfully   = Added successfully.
+deletedSuccessfully = Deleted successfully.
+savedSuccessfully   = Saved successfully.
+CONFIRM_DELETE      = CONFIRM DELETE
+ADD                 = ADD
+EDIT                = EDIT
+DELETE              = DELETE
+
+
+
+

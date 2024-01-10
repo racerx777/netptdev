@@ -1,0 +1,773 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>BlueShoes Color Picker &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </title>
+
+<script>
+function bs_isGecko() {
+  //rather poor implementation.
+  if (navigator.appName == "Microsoft Internet Explorer") return false;
+  return (navigator.userAgent.match(/gecko/i));
+}
+if (bs_isGecko()) {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_ie.css'>");
+}
+</script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_Button.class.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/numberfield/Bs_NumberField.class.js"></script>
+
+<script type="text/javascript" src='/_bsJavascript/core/lang/Bs_Misc.lib.js'></script>
+<script type="text/javascript" src='/_bsJavascript/core/gfx/Bs_ColorUtil.lib.js'></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/tabset/Bs_TabSet.class.js"></script>
+<link rel='stylesheet' href='/_bsJavascript/components/tabset/default.css'>
+
+<script type="text/javascript" src="/_bsJavascript/core/util/Bs_TitleToTooltip.lib.js"></script>
+
+<style>
+body {
+	font-family: arial,verdana,sans-serif,helvetica;
+	font-size:11px;
+}
+td {
+	font-size:11px;
+}
+.tabContent {
+	height:   480px;
+	overflow: auto;
+}
+input.inputText {
+	width: 40px;
+}
+input.inputButton {
+	width:100px; 
+	height:20px; 
+	font-size:12px;
+}
+.matrixLine {
+	WIDTH:  1px; 
+	HEIGHT: 255px;		
+}
+</style>
+
+<script>
+var currentOuterR;
+var currentOuterG;
+var currentOuterB;
+
+var currentColor; //current color as rgb array (vector with 3 elements)
+
+var myColors = new Array(); //stored colors
+if (document.cookie) {
+	var allCookies = document.cookie.split('; ');
+	for (var i=0; i<allCookies.length; i++) {
+		if (allCookies[i].substr(0,11) == 'bs_colSelMy') {
+			myCook = allCookies[i];
+			var Wertstart = myCook.indexOf("=") + 1;
+			if (Wertstart == 0) break;
+			var Wertende = myCook.indexOf(";");
+			//alert(document.cookie);
+			if (Wertende == -1) Wertende = document.cookie.length;
+			myColorStr = myCook.substring(Wertstart,Wertende);
+			var myColors2 = myColorStr.split(',');
+			for (var j=0; j<myColors2.length; j++) {
+				if (myColors2[j] != '') {
+					myColors[myColors.length] = hexStrToRgbArr(myColors2[j]);
+				}
+			}
+		}
+	}
+}
+
+
+
+/**
+* the caller object, instance of Bs_Wysiwyg.
+* @var object wysiwygObj
+*/
+var wysiwygObj;
+
+/**
+* name of the callback function in the wysiwygObj that we need to call 
+* once this page has loaded (onload).
+* @var string callbackLoad
+*/
+var callbackLoad;
+
+/**
+* name of the callback function in the wysiwygObj that we need to call 
+* to save our value back.
+* @var string callbackSave
+*/
+var callbackSave;
+
+
+
+/**
+* fires onload().
+*/
+function init() {
+	t = new Bs_TabSet('t', 'tabset');
+	var pickerTab = new Object;
+	pickerTab.caption   = 'Picker';
+	pickerTab.container = document.getElementById('ps');
+	pickerTab.onFocus   = pickerTabFocus;
+	pickerTab.onBlur    = pickerTabBlur;
+	t.addTab(pickerTab);
+	var webTab = new Object;
+	webTab.caption   = 'Web Colors';
+	webTab.container = document.getElementById('webSafe');
+	webTab.onFocus   = webTabFocus;
+	t.addTab(webTab);
+	var myTab = new Object;
+	myTab.caption   = 'My Colors';
+	myTab.container = document.getElementById('tabMyColors');
+	myTab.onFocus   = updateMyColors;
+	t.addTab(myTab);
+	//t.addTab('Defined Colors', document.getElementById('tabDefinedColors'));
+	t.draw();
+	
+	setColorByRgb(219, 27, 219); //set some color to start with. could be anything.
+	
+	nf1 = new Bs_NumberField('nf1', 'rgb_r');
+	nf1.minValue = 0;
+	nf1.maxValue = 255;
+	nf1.draw();
+	nf2 = new Bs_NumberField('nf2', 'rgb_g');
+	nf2.minValue = 0;
+	nf2.maxValue = 255;
+	nf2.draw();
+	nf3 = new Bs_NumberField('nf3', 'rgb_b');
+	nf3.minValue = 0;
+	nf3.maxValue = 255;
+	nf3.draw();
+	nf4 = new Bs_NumberField('nf4', 'hsb_h');
+	nf4.minValue = 0;
+	nf4.maxValue = 360;
+	nf4.draw();
+	nf5 = new Bs_NumberField('nf5', 'hsb_s');
+	nf5.minValue = 0;
+	nf5.maxValue = 100;
+	nf5.draw();
+	nf6 = new Bs_NumberField('nf6', 'hsb_b');
+	nf6.minValue = 0;
+	nf6.maxValue = 100;
+	nf6.draw();
+	
+	bs_ttt_initAll();
+	
+	var colorPickerCircleIcon = '/_bsImages/cursors/colorPickerCircle.cur';
+	document.getElementById('psColorSelector').style.cursor = colorPickerCircleIcon;
+	document.getElementById('circle').style.cursor          = colorPickerCircleIcon;
+	//"url('http://work.www.blueshoes.org/defaultBlueOrange.cur')";
+	
+	if (window.dialogArguments) {
+		setDefaultValues(window.dialogArguments);
+	} else { //popup
+		var qsArr      = queryStringToHash();
+		wysiwygObjName = qsArr['objectName'];
+		callbackLoad   = qsArr['callbackLoad'];
+		callbackSave   = qsArr['callbackSave'];
+		var parentOpener = (opener) ? opener : parent;
+		eval('wysiwygObj = parentOpener.' + wysiwygObjName + ';');
+		if (wysiwygObj[callbackLoad]) {
+			setDefaultValues(wysiwygObj[callbackLoad]()); //tell that i'm ready
+		}
+	}
+}
+
+/**
+* the param obj can have the following fields:
+*   color => 6 digit hex code
+*   (more to come...)
+* 
+* @param object paramObj
+*/
+function setDefaultValues(paramObj) {
+	if (!bs_isNull(paramObj.color)) {
+		setColorByHex(paramObj.color);
+	}
+}
+
+
+/**
+* set the value back to the opener.
+* closes this window.
+* @return void
+*/
+function setBack() {
+	var hexCode = rgbArrToHexStr(currentColor);
+	
+	if (window.dialogArguments) {
+		window.returnValue = hexCode;
+	} else {
+		wysiwygObj[callbackSave](hexCode);
+	}
+	window.close();
+}
+
+
+function pickerTabFocus() {
+	document.getElementById('doubleArrow').style.display = 'block';
+	document.getElementById('circle').style.display      = 'block';
+	/* //not needed anymore
+	for (var i=1; i<=6; i++) {
+		window['nf' + i].toggleButtonDisplay(true);
+	}*/
+}
+function pickerTabBlur() {
+	document.getElementById('doubleArrow').style.display = 'none';
+	document.getElementById('circle').style.display      = 'none';
+	/* //not needed anymore
+	for (var i=1; i<=6; i++) {
+		window['nf' + i].toggleButtonDisplay(false);
+	}*/
+}
+
+/**
+* sets the color by rgb.
+* @param int r (red,   0-255)
+* @param int g (green, 0-255)
+* @param int b (blue,  0-255)
+*/
+function setColorByRgb(r, g, b, noUpdateForm) {
+	currentOuterR = r;
+	currentOuterG = g;
+	currentOuterB = b;
+	//find out h:
+	var P=Point3;
+	var hsb = P.RGBtoHSB(new Array(r, g, b));
+	//alert(hsb);
+	var rgb = P.HSBtoRGB(new Array(hsb.x, 1, 1)); //looks like we don't need that anymore.
+	umByHue(hsb.x * 360);
+	
+	var rgb = new Array(r, g, b);
+	updateCircle(rgb, hsb);
+	
+	if (!noUpdateForm) updateForm(rgb, new Array(parseInt(hsb.x * 360), parseInt(hsb.y * 100), parseInt(hsb.z * 100)));
+	var hexCode = rgbArrToHexStr(rgb);
+	updatePreviewBox(hexCode, rgb);
+}
+
+/**
+* sets the color by hsb.
+* @param int h (hue, 0-360)
+* @param int s (saturation, 0-100)
+* @param int b (brightness, 0-100)
+*/
+function setColorByHsb(h, s, b, noUpdateForm) {
+	var P=Point3;
+	/*
+	var hsb = new Object;
+	hsb.x = h;
+	hsb.y = s;
+	hsb.z = b;
+	*/
+	var hsb = new Array(h /360, s /100, b /100)
+	hsb.x = hsb[0];
+	hsb.y = hsb[1];
+	hsb.z = hsb[2];
+	var rgb = P.HSBtoRGB(hsb);
+	
+	currentOuterR = rgb.x;
+	currentOuterG = rgb.y;
+	currentOuterB = rgb.z;
+	
+	umByHue2(h / 360);
+	updateCircle(rgb, hsb);
+	
+	if (!noUpdateForm) updateForm(rgb, new Array(h, s, b));
+	var hexCode = rgbArrToHexStr(rgb);
+	updatePreviewBox(hexCode, rgb);
+	
+	//setColorByRgb(rgb.x, rgb.y, rgb.z, noUpdateForm);
+}
+
+/**
+* sets the color by hex (html code).
+* @param  string hex (eg ffffff)
+* @return void
+*/
+function setColorByHex(hex, noUpdateForm) {
+	var r = hexdec(hex.substr(0,2));
+	var g = hexdec(hex.substr(2,2));
+	var b = hexdec(hex.substr(4,2));
+	setColorByRgb(r, g, b, noUpdateForm);
+}
+
+function setColorByFormRgb() {
+	setColorByRgb(document.myForm.rgb_r.value, document.myForm.rgb_g.value, document.myForm.rgb_b.value, false);
+}
+function setColorByFormHsb() {
+	setColorByHsb(document.myForm.hsb_h.value, document.myForm.hsb_s.value, document.myForm.hsb_b.value, false);
+}
+function setColorByFormHex() {
+	setColorByHex(document.myForm.hex.value, false) 
+}
+
+function updatePreviewBox(hex, rgb) {
+	if (hex.length <= 6) hex = '#' + hex;
+	document.getElementById('colorPreview').style.backgroundColor = hex;
+	
+	if (typeof(rgb) == 'undefined') {
+		var r = hexdec(hex.substr(0,2));
+		var g = hexdec(hex.substr(2,2));
+		var b = hexdec(hex.substr(4,2));
+		var rgb = new Array(r, g, b);
+	}
+	if (typeof(rgb.x) != 'undefined') {
+		rgb[0] = rgb.x;
+		rgb[1] = rgb.y;
+		rgb[2] = rgb.z;
+	}
+	document.getElementById('colorPreviewRgbR').innerHTML = rgb[0];
+	document.getElementById('colorPreviewRgbG').innerHTML = rgb[1];
+	document.getElementById('colorPreviewRgbB').innerHTML = rgb[2];
+	document.getElementById('colorPreviewHex').innerHTML  = hex.substr(1);
+	
+	currentColor = rgb;
+}
+
+function updateForm(rgb, hsb) {
+	if (typeof(rgb.x) != 'undefined') rgb[0] = rgb.x;
+	if (typeof(rgb.y) != 'undefined') rgb[1] = rgb.y;
+	if (typeof(rgb.z) != 'undefined') rgb[2] = rgb.z;
+	document.myForm.rgb_r.value = rgb[0];
+	document.myForm.rgb_g.value = rgb[1];
+	document.myForm.rgb_b.value = rgb[2];
+	
+	document.myForm.hsb_h.value = hsb[0];
+	document.myForm.hsb_s.value = hsb[1];
+	document.myForm.hsb_b.value = hsb[2];
+	
+	document.myForm.hex.value = rgbArrToHexStr(rgb);
+}
+
+
+/**
+* update matrix
+*/
+function um(elm) {
+	//umByElm(elm);
+	
+	//this is the base "proper" color from the bar.
+	color = elm.style.backgroundColor.substr(1);
+	//alert(color);
+	r = hexdec(color.substr(0,2));
+	g = hexdec(color.substr(2,2));
+	b = hexdec(color.substr(4,2));
+	rgb = new Array(r, g, b);
+	
+	var P=Point3;
+	hsb = P.RGBtoHSB(rgb);
+	hue = hsb.x;
+	
+	//var hsb = new Array(hue, document.myForm.hsb_s.value /100, document.myForm.hsb_b.value /100);
+	//var realRgb = P.HSBtoRGB(hsb);
+	//setColorByRgb(realRgb.x, realRgb.y, realRgb.z);
+	setColorByHsb(parseInt(hue *360), document.myForm.hsb_s.value, document.myForm.hsb_b.value);
+}
+
+function umByHue(hue360) {
+	//alert(hue360);
+	var divId = 'colorBar_' + parseInt(hue360);
+	var elm = document.getElementById(divId); //.toLowerCase()
+	umByElm(elm);
+}
+function umByElm(elm) {
+	updateDoubleArrow(elm);
+	
+	//this is the base "proper" color from the bar.
+	color = elm.style.backgroundColor.substr(1);
+	//alert(color);
+	r = hexdec(color.substr(0,2));
+	g = hexdec(color.substr(2,2));
+	b = hexdec(color.substr(4,2));
+	rgb = new Array(r, g, b);
+	
+	currentOuterR = rgb[0];
+	currentOuterG = rgb[1];
+	currentOuterB = rgb[2];
+	
+	var P=Point3;
+	hsb = P.RGBtoHSB(rgb);
+	var hue = hsb.x;
+	
+	umByHue2(hue);
+}
+
+/**
+* updates the double-arrow icon in the picker tab.
+* @param  element elm
+* @return void
+*/
+function updateDoubleArrow(elm) {
+	var pos = getAbsolutePos(elm);
+	document.getElementById('doubleArrow').style.left = pos.x -9;
+	document.getElementById('doubleArrow').style.top  = pos.y;
+}
+
+/**
+* updates the circle icon in the picker tab.
+* @param  array rgb
+* @param  array hsb
+* @return void
+*/
+function updateCircle(rgb, hsb) {
+	var pos = getAbsolutePos(document.getElementById('psColorSelector'));
+	document.getElementById('circle').style.left = pos.x + (hsb.y * 255);
+	document.getElementById('circle').style.top  = pos.y + (255 - (hsb.z * 255));
+	var hexCode = rgbArrToHexStr(rgb);
+	var imgPath = '/_bsJavascript/components/wysiwyg/';
+	document.getElementById('circleImage').src = imgPath + 'circle' + ((isDarkColor(hexCode)) ? 'Light' : 'Dark') + '.gif';
+}
+
+/**
+* @param  hue (that is hue / 360)
+* @return void
+*/
+function umByHue2(hue) {
+	var divId = 'colorBar_' + parseInt(hue *360);
+	updateDoubleArrow(document.getElementById(divId));
+	
+	var P=Point3;
+	
+	var h = new Array;
+	var lastR;
+	var lastG;
+	var lastB;
+	var ii  = 0;
+	var iii = 0;
+	for (var i=0; i<=100; i++) {
+		hsb = new Array(hue, i /100, 1);
+		rgb = P.HSBtoRGB(hsb);
+		color = dechex(rgb.x) + '' + dechex(rgb.y) + '' + dechex(rgb.z);
+		h[h.length] = '<SPAN id="" class="matrixLine" style="FILTER:progid:DXImageTransform.Microsoft.Gradient(gradientType=0,startColorStr=#' + color + ',endColorStr=#000000);"></SPAN>';
+		h[h.length] = '<SPAN id="" class="matrixLine" style="FILTER:progid:DXImageTransform.Microsoft.Gradient(gradientType=0,startColorStr=#' + color + ',endColorStr=#000000);"></SPAN>';
+		ii = ii + 0.55;
+		iii++;
+		if (((ii / 1) > 1) && (iii < 100)) {
+			h[h.length] = '<SPAN id="" class="matrixLine" style="FILTER:progid:DXImageTransform.Microsoft.Gradient(gradientType=0,startColorStr=#' + color + ',endColorStr=#000000);"></SPAN>';
+			ii = ii -1;
+		}
+		
+		lastR = rgb.x;
+		lastG = rgb.y;
+		lastB = rgb.z;
+	}
+	document.getElementById('psColorSelector_1').innerHTML = h.join('');
+}
+
+/**
+* update preview color
+*/
+function upc(elm) {
+	updatePreviewBox(elm.style.backgroundColor);
+}
+
+/**
+* 
+*/
+function updateColorByPsSelector(color, noUpdateForm) {
+	x = event.offsetX;
+	y = event.offsetY;
+	
+	var P=Point3;
+	hsb = P.RGBtoHSB(new Array(currentOuterR, currentOuterG, currentOuterB));
+	//rgb = P.HSBtoRGB(new Array(hsb.x, (255 -x) / 255, (255 -y) / 255));
+	var clicked_hsb_s = x / 255;
+	var clicked_hsb_b = (255 -y) / 255;
+	rgb = P.HSBtoRGB(new Array(hsb.x, clicked_hsb_s, clicked_hsb_b));
+	//alert(rgb);
+	//at the border we may get -1 because of a rendering issue:
+	if (rgb.x < 0) rgb.x = 0;
+	if (rgb.y < 0) rgb.y = 0;
+	if (rgb.z < 0) rgb.z = 0;
+	
+	if (!noUpdateForm) updateForm(rgb, new Array(parseInt(hsb.x * 360), parseInt(clicked_hsb_s * 100), parseInt(clicked_hsb_b * 100)));
+	
+	var hexCode = dechex(rgb.x) + '' + dechex(rgb.y) + '' + dechex(rgb.z);
+	updatePreviewBox(hexCode, rgb);
+	
+	document.getElementById('circle').style.left = event.clientX -7; // event.x; //event.clientX; //event.offsetX;
+	document.getElementById('circle').style.top  = event.clientY -7; //event.clientY; //event.offsetY;
+	
+	var imgPath = '/_bsJavascript/components/wysiwyg/';
+	document.getElementById('circleImage').src = imgPath + 'circle' + ((isDarkColor(hexCode)) ? 'Light' : 'Dark') + '.gif';
+}
+
+
+var lastWebColorElm;
+function selectWebColor(elm, hex) {
+	if (lastWebColorElm) lastWebColorElm.style.border = '2px inset';
+	lastWebColorElm = elm;
+	elm.style.border = '2px outset';
+	setColorByHex(hex);
+}
+function webTabFocus() {
+	if (lastWebColorElm) lastWebColorElm.style.border = '2px inset';
+}
+
+var lastMyColorElm;
+function selectMyColor(elm, hex) {
+	if (lastMyColorElm) lastMyColorElm.style.border = '2px inset';
+	lastMyColorElm = elm;
+	elm.style.border = '2px outset';
+	setColorByHex(hex);
+}
+
+/**
+* saves the current color to my own colors.
+*/
+function saveToMyColor() {
+	for (var i=0; i<myColors.length; i++) {
+		if ((myColors[i][0] == currentColor[0]) && (myColors[i][1] == currentColor[1]) && (myColors[i][2] == currentColor[2])) return; //already stored this color.
+	}
+	myColors[myColors.length] = currentColor;
+	var colorArr = new Array;
+	for (var i=0; i<myColors.length; i++) {
+		colorArr[colorArr.length] = rgbArrToHexStr(myColors[i]);
+	}
+	saveCookieString(colorArr.join(','));
+}
+
+function emptyMyColors() {
+	myColors = new Array();
+	saveCookieString('');
+}
+
+function saveCookieString(str) {
+	var lifetime = 1000*60*60*24*365;
+	var dateNow = new Date();
+	var dateEnd = new Date(dateNow.getTime() + lifetime);
+	var cookieString = "bs_colSelMy=" + str + "; expires=" + dateEnd.toGMTString() + ";";
+	document.cookie = cookieString;
+}
+
+
+/**
+* defaults to white.
+*/
+function rgbArrToHexStr(rgb) {
+	if (typeof(rgb) == 'undefined') return 'ffffff';
+	if (typeof(rgb[0]) == 'undefined') {
+		rgb[0] = rgb.x;
+		rgb[1] = rgb.y;
+		rgb[2] = rgb.z;
+	}
+	return dechex(rgb[0]) + '' + dechex(rgb[1]) + '' + dechex(rgb[2]);
+}
+/**
+* defaults to white.
+*/
+function hexStrToRgbArr(hex) {
+	if (typeof(hex) == 'undefined') return new Array(255, 255, 255);
+	var r = hexdec(hex.substr(0,2));
+	var g = hexdec(hex.substr(2,2));
+	var b = hexdec(hex.substr(4,2));
+	return new Array(r, g, b);
+}
+
+/**
+* re-renders the 'my colors' tab.
+*/
+function updateMyColors() {
+	var out = new Array;
+	out[out.length] = '<br>These are your personally stored colors.<br><br>';
+	if (myColors.length == 0) {
+		out[out.length] = 'No colors stored.';
+	} else {
+		for (var i=0; i<myColors.length; i++) {
+			color = rgbArrToHexStr(myColors[i]);
+			out[out.length] = '<div style="background-color:#' + color + '; width:300px; height:20px; border:2px inset; margin:2px; cursor:default;';
+			if (isDarkColor(color)) {
+				out[out.length] = ' color:white;';
+			}
+			out[out.length] = '"';
+			out[out.length] = ' onclick="selectMyColor(this, \'' + color + '\');" title="#' + color + '"';
+			out[out.length] = ' unselectable="on"';
+			out[out.length] = '>';
+			out[out.length] = 'Hex:' + color;
+			out[out.length] = ' R:' + myColors[i][0];
+			out[out.length] = ' G:' + myColors[i][1];
+			out[out.length] = ' B:' + myColors[i][2];
+			out[out.length] = '</div>';
+		}
+		out[out.length] = '<input type="button" name="btnEmptyMyColors" value="Remove All" onclick="emptyMyColors(); updateMyColors();" class="inputButton">';
+		out[out.length] = '';
+		
+	}
+	document.getElementById('tabMyColors').innerHTML = out.join('');
+}
+
+function foo() {
+	alert('foo');
+	//try {alert(event.SrcElement); } catch (e) {}
+}
+</script>
+</head>
+
+<body bgcolor="#D6D6CE" onload="init();">
+
+<table><tr><td valign="top" width="340">
+<br>
+<div id="tabset" style="background-color:menu;">
+	<div id="tabset_tabs"></div>
+	<div id="tabset_content" class="tabsetContentDiv">
+		<div id="ps" class="tabContent">
+<table><tr><td valign="top">
+
+<div id="psColorSelector" style="width:260; height:260; border:2px inset;" onmousedown="updateColorByPsSelector();" ondragstart="return false;">
+<div style="position:absolute;" id="psColorSelector_1">
+<script>
+/*
+for (var j=15; j>=0; j--) {
+	color2nd = dechex(j);
+	color2nd2 = color2nd + '' + color2nd;
+	document.write('<div>');
+	for (var i=255; i>=0; i--) {
+		color = dechex(i) + '' + color2nd2;
+		document.write('<span style="width:1px; height:1px; background-color:#' + color + '"><img src="" width="1" height="1"></span>');
+		//alert(color);
+		//if (i < 250) break;
+	}
+	document.write('</div>');
+}
+*/
+for (var j=255; j>=0; j--) {
+	hex   = dechex(j);
+	color = 'ff' + hex + '' + hex;
+	document.write('<SPAN onmousedown="updateColorByPsSelector(\'' + color + '\');" style="FILTER:progid:DXImageTransform.Microsoft.Gradient(gradientType=0,startColorStr=#' + color + ',endColorStr=#000000); WIDTH: 1px; HEIGHT: 255px;"></SPAN>');
+}
+</script>
+</div>
+</div>
+<br>
+
+<form name="myForm">
+<table>
+	<tr>
+		<td>Red:</td>
+		<td><input type="text" id="rgb_r" name="rgb_r" value="255" maxlength="3" size="3" class="inputText" tabindex="1" onblur="setColorByFormRgb();" title="The amount of red color, 0 to 255."></td>
+		<td width="50" rowspan="5">&nbsp;</td>
+		<td>Hue:</td>
+		<td><input type="text" id="hsb_h" name="hsb_h" value="360" maxlength="3" size="3" class="inputText" tabindex="5" onblur="setColorByFormHsb();" title="The hue in degrees, 0 to 360.">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;°</td>
+	</tr>
+	<tr>
+		<td>Green:</td>
+		<td><input type="text" id="rgb_g" name="rgb_g" value="255" maxlength="3" size="3" class="inputText" tabindex="2" onblur="setColorByFormRgb();" title="The amount of green color, 0 to 255."></td>
+		<td>Sat.:</td>
+		<td><input type="text" id="hsb_s" name="hsb_s" value="100" maxlength="3" size="3" class="inputText" tabindex="6" onblur="setColorByFormHsb();" title="The saturation in percent, 0 to 100.">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%</td>
+	</tr>
+	<tr>
+		<td>Blue:</td>
+		<td><input type="text" id="rgb_b" name="rgb_b" value="255" maxlength="3" size="3" class="inputText" tabindex="3" onblur="setColorByFormRgb();" title="The amount of blue color, 0 to 255."></td>
+		<td>Bright.:</td>
+		<td><input type="text" id="hsb_b" name="hsb_b" value="100" maxlength="3" size="3" class="inputText" tabindex="7" onblur="setColorByFormHsb();" title="The brightness in percent, 0 to 100.">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%</td>
+	</tr>
+	<tr>
+		<td colspan="2"><input type="button" name="btnUpdateByRgb" value="Update" onclick="setColorByFormRgb();" class="inputButton" tabindex="4"></td>
+		<td colspan="2"><input type="button" name="btnUpdateByHsb" value="Update" onclick="setColorByFormHsb();" class="inputButton" tabindex="8"></td>
+	</tr>
+	<tr>
+		<td colspan="4">Hex Code <br>#<input type="text" name="hex" value="" maxlength="6" size="6" class="inputText" style="width:100px;" onblur="setColorByFormHex();" tabindex="9" title="The hex code aka HTML code."> <br><input type="button" name="btnUpdateByHex" value="Update" onclick="setColorByFormHex();" class="inputButton" tabindex="10"></td>
+	</tr>
+</table>
+</form>
+
+</td><td width="20">&nbsp;</td><td valign="top">
+
+<div style="border:2px inset">
+<script>
+for (var i=360; i>=0; i--) {
+	rgb = HSBtoRGB((i / 360), 1, 1);
+	color = rgb[0] + '' + rgb[1] + '' + rgb[2];
+	//if ((i < 240) && (i > 200)) alert(color);
+	document.write('<div id="colorBar_' + i + '" style="background-color:#' + color + '; WIDTH: 17px; HEIGHT: 1px;" onmousedown="um(this);"><img src="" width="1" height="1"></div>');
+}
+</script>
+</div>
+
+</td></tr></table>		
+		</div>
+		<div id="webSafe" class="tabContent">
+		<br>This is the palette of the 216 "web safe" colors. <br><br>
+		<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td valign="top">
+		<table width="48%" border="0" cellspacing="0" cellpadding="0">
+		<script>
+		document.writeln('<tr>');
+		for (var i=6; i>0; i--) {
+			var ii = i * 3 -3;
+			var hex1 = ii.toString(16);
+			
+			if (i == 3) {
+				document.writeln('</table></td>');
+				document.writeln('<td width="4%">&nbsp;</td>');
+				document.writeln('<td valign="top"><table width="48%" border="0" cellspacing="0" cellpadding="0">');
+			}
+
+			document.writeln('<tr>');
+			for (var j=6; j>0; j--) {
+				var jj = j * 3 -3;
+				var hex2 = jj.toString(16);
+				document.writeln('<td>');
+				for (var k=6; k>0; k--) {
+					var kk = k * 3 -3;
+					var hex3 = kk.toString(16);
+					var color = hex1 + '' + hex1 + '' + hex2 + '' + hex2 + '' + hex3 + '' + hex3;
+					document.writeln('<div style="background-color:#' + color + '; width:20px; height:20px; border:2px inset; margin:2px;" onclick="selectWebColor(this, \'' + color + '\');" title="#' + color + '">&nbsp;</div>');
+				}
+				document.writeln('</td>');
+			}
+			document.writeln('<tr>');
+		}
+		</script>
+		</table>
+		</td></tr></table>
+		</div>
+		<div id="tabMyColors" class="tabContent">
+		</div>
+		<!--
+		<div id="tabDefinedColors" class="tabContent">
+		We could use defined colors, and even restrict the user to only choose from these.
+		</div>
+		-->
+	</div>
+</div>
+
+</td>
+<td width="20">&nbsp;</td>
+<td valign="top">
+<br><br>
+<div style="font-size:10px;">
+<div id="colorPreview" style="width:100px; height:100px; border:2px inset;"></div>
+<table width="100" border="0" cellspacing="0" cellpadding="0">
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td>Red:</td><td align="right"><span id="colorPreviewRgbR"></span></td></tr>
+	<tr><td>Green:</td><td align="right"><span id="colorPreviewRgbG"></span></td></tr>
+	<tr><td>Blue:</td><td align="right"><span id="colorPreviewRgbB"></span></td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td>Hex:</td><td align="right">#<span id="colorPreviewHex"></span></td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<input type="button" name="btnStoreColor" value="Add To My Colors" onclick="saveToMyColor(); updateMyColors();" class="inputButton">
+
+<div style="height:220px;"></div>
+
+<input type="button" name="btnOk"     value="OK"     onclick="setBack(); window.close();" class="inputButton" style="margin-bottom:5px;"><br>
+<input type="button" name="btnCancel" value="Cancel" onclick="window.close();" class="inputButton">
+</div>
+</td>
+</tr></table>
+
+
+
+<div id="doubleArrow" style="position:absolute;"><img src="/_bsJavascript/components/wysiwyg/doubleArrow.gif"></div>
+<div id="circle" style="position:absolute;"><img id="circleImage" src="/_bsJavascript/components/wysiwyg/circleDark.gif"></div>
+
+</body>
+</html>

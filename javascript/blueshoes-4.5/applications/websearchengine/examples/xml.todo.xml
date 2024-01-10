@@ -1,0 +1,363 @@
+<bs:index>
+	
+
+	/**
+	* should iframes be indexed?
+	*   0 => no
+	*   1 => yes, as part of the surrounding page. use the body of the iframe page and 
+	*        add it to the body of the "parent" page. this is the default, and makes sense.
+	*   2 => yes, as standalone page. this feature is not implemented yet, and i won't 
+	*        do it unless i see a use for it.
+	* 
+	* @access public
+	* @var    int $indexIframes
+	*/
+	var $indexIframes = 1;
+	
+	/**
+	* detects dublicate pages even if they have different urls. 
+	* uses an md5 to do so... this TAKES TIME, 5-60 seconds depending on 
+	* cpu and page size.
+	* @access public
+	* @var    bool $detectDublicatePages
+	*/
+	var $detectDublicatePages = TRUE;
+	
+	/**
+	* urls with a user part will be ignored.
+	* scheme://user:pass@host:port/path?query#fragment
+	*           ^
+	* @access public
+	* @var    bool $ignoreUrlsWithUser (default is TRUE)
+	* @todo implement this
+	*/
+	var $ignoreUrlsWithUser = TRUE;
+	
+	/**
+	* urls with a pass part will be ignored.
+	* scheme://user:pass@host:port/path?query#fragment
+	*                ^
+	* @access public
+	* @var    bool $ignoreUrlsWithPass (default is TRUE)
+	* @todo implement this
+	*/
+	var $ignoreUrlsWithPass = TRUE;
+	
+	/**
+	* how many pages with the same url but different query string do we fetch?
+	*   -1 = no limit
+	*    0 = none, ignore all
+	*   10 = only first 10 url's, then stop
+	*  ...
+	* 
+	* @access public
+	* @var    int $queryStringUrlLimit (default is 10)
+	*/
+	var $queryStringUrlLimit = 10;
+	
+	/**
+	* reindex even if the content of a page has not changed since the last time?
+	* default is 30, can be TRUE, or an int that is a number of days. 
+	* for example 15 means that if the last spider date is at least 15 days ago 
+	* then we'll do it, otherwise not.
+	* it makes sense to reindex from time to time because there could be new 
+	* links to that page, which makes the page more or less important.
+	* @access public
+	* @var    mixed $reindexIfUnchanged
+	* @todo   code that functionality
+	*/
+	var $reindexIfUnchanged = 30;
+	
+	/**
+	* don't refetch a page if it has been indexed lately. save traffic and cpu.
+	* 10 means don't refetch for at least 10 days (default).
+	* @access public
+	* @var    int $refetchAfter
+	*/
+	var $refetchAfter = 10;
+	
+	/**
+	* the domains we use. found url's that don't use one of these will be ignored.
+	* 
+	* examples: limitDomains = array(www.blueshoes.org)
+	*           means that "developer.blueshoes.org" and "blueshoes.org" url's will be ignored.
+	* 
+	* if this is not set then we will only allow the domain of the url we get first in index().
+	* 
+	* @access public
+	* @var    array $limitDomains
+	* @todo   support "*.domain.com" (or is this supported using "domain.com"?)
+	*/
+	var $limitDomains;
+	
+	/**
+	* url's can be set to be used or ignored.
+	* 
+	* whatever matches first in this array will decide if it's a go or no-go.
+	* if nothing matches then $queryStringUrlLimit will still be looked at.
+	* 
+	* before we had the vars $allowUrls and $ignoreUrls. allowUrls came first, 
+	* then $ignoreUrls was looked at. this was a problem because i need 
+	* ignore - allow - ignore combinations. this var solves that problem, 
+	* and deprecates the other vars.
+	* now the row is: $allowIgnore, $allowUrls, $ignoreUrls
+	* 
+	* structure: vector holding hashes with the keys 'value', 'type' and 'ignore'.
+	* possible options for 'type' are: 
+	*   'part'  => this string occures in the url. this is the default.
+	*   'parti' => same as part but compare is done case-insensitive.
+	*   'file'  => the filename of the requested page equals this.
+	*   'preg'  => perl style regular expression.
+	*   'ereg'  => better use preg.
+	* 
+	* for 'file' the comparison is made case-insensitive when working on 
+	* windows hosts. (todo)
+	* 
+	* example definition:
+	* $ignoreUrls = array(
+	*   array('value'=>'?goto=',     'type'=>'part', 'ignore'=>TRUE), 
+	*   array('value'=>'/foo/',      'type'=>'part', 'ignore'=>FALSE), 
+	*   array('value'=>'/\.*foo\.*', 'type'=>'preg', 'ignore'=>FALSE), 
+	*   array('value'=>'forum.php',  'type'=>'file', 'ignore'=>TRUE), 
+	* );
+	* 
+	* real-world example (using the definitions from above):
+	* http://www.blueshoes.org/forum.php              => ignore
+	* http://www.blueshoes.org/foo/forum.php          => use
+	* http://www.blueshoes.org/foo/forum.php?goto=foo => ignore
+	* 
+	* example for ignoring everything but url's that start with "/tomjones":
+	*   cheap version:
+	* 		array('value'=>'/tomjones',  'type'=>'part', 'ignore'=>FALSE), 
+	* 		array('value'=>'/',          'type'=>'part', 'ignore'=>TRUE), 
+	*   strong version:
+	* 		TODO: CODE SUPPORT FOR EREG AND PREG
+	* 
+	* if you want to exclude all directories then do 'value'=>'', 'type'=>'file'. so 
+	* url's with an empty file part (means: no file part) will be ignored. untested feature.
+	* 
+	* note that instead of ignoring urls that have a "?" queston mark here you 
+	* can fine-tune $this->queryStringUrlLimit.
+	* 
+	* @access   public
+	* @var      array $allowIgnore
+	*/
+	var $allowIgnore;
+	
+	/**
+	* !!!deprecated use $allowIgnore !!!
+	* 
+	* same as $ignoreUrls but urls that match here will always go through. 
+	* they don't respect the $queryStringUrlLimit limit.
+	* @deprecated     use $allowIgnore
+	*/
+	var $allowUrls = array();
+	
+	/**
+	* !!!deprecated use $allowIgnore !!!
+	* 
+	* (parts of) url's defined here will be ignored from indexing. 
+	* vector holding hashes with the keys 'value' and 'type'.
+	* possible options for 'type' are: 
+	*   'part'  => this string occures in the url. this is the default.
+	*   'file'  => the filename of the requested page equals this.
+	* 
+	* example:
+	* $ignoreUrls = array(
+	*   array('value'=>'/foo/',      'type'=>'part'), 
+	*   array('value'=>'forum.php',  'type'=>'file'), 
+	* );
+	* 
+	* if you want to exclude all directories then do 'value'=>'', 'type'=>'file'. so 
+	* url's with an empty file part (means: no file part) will be ignored. untested feature.
+	* 
+	* note that instead of ignoring urls that have a "?" queston mark here you 
+	* can fine-tune $this->queryStringUrlLimit.
+	* 
+	* for 'part' and 'file' the comparisons are made case-insensitive when working 
+	* on windows hosts. (todo)
+	* 
+	* @access     public
+* @pattern    singleton: (pseudostatic)
+	* @var        array $ignoreUrls
+	* @deprecated use $allowIgnore
+	*/
+	var $ignoreUrls = array();
+	
+	/**
+	* categories can be used so that part-searches are possible.
+	* for example a user might want to search only the 'catalog' or 
+	* 'shop' of your website.
+	* 
+	* the data structure is similar to the one of $ignoreUrls but has the 
+	* additional key 'category'.
+	* 
+	* example:
+	* $ignoreUrls = array(
+	*   array('value'=>'/shop/',     'type'=>'part',  'category'=>'shop'), 
+	*   array('value'=>'forum.php',  'type'=>'file',  'category'=>'forum'), 
+	*   array('value'=>'/\.*foo\.*', 'type'=>'preg',  'category'=>'foo'), 
+	* );
+	* 
+	* the first match will define the category. if there is no match (or that 
+	* feature is not used at all) then the category value will be an empty string.
+	* 
+	* @access public
+	* @var    array $categories
+	*/
+	var $categories;
+	
+	/**
+	* links to urls with such file endings will be ignored, no matter what.
+	* even $allowUrls won't make a change.
+	* user lowercase or it won't work.
+	* @access public
+	* @var    array $ignoreFileExtensions
+	*/
+	var $ignoreFileExtensions = array('zip', 'tar', 'tgz', 'gz', 'bz2', 'pdb', 'chm');
+	
+	
+	/**
+	* weight properties for the different parts of the pages.
+	* 
+	* 'b' (bold) includes <strong>.
+	* 'links' are the links from other pages back to this one.
+	* image means the text of the alt and title tag.
+	* 
+	* the defaults are:
+	* 	'domain'      => array('weight' => 50), 
+	* 	'path'        => array('weight' => 100), 
+	* 	'file'        => array('weight' => 100), 
+	* 	'queryString' => array('weight' => 80), 
+	* 	'title'       => array('weight' => 100), 
+	* 	'description' => array('weight' => 40), 
+	* 	'keywords'    => array('weight' => 5), 
+	* 	'links'       => array('weight' => 100), 
+	* 	'h1'          => array('weight' => 80), 
+	* 	'h2'          => array('weight' => 70), 
+	* 	'h3'          => array('weight' => 60), 
+	* 	'h4'          => array('weight' => 50), 
+	* 	'h5'          => array('weight' => 40), 
+	* 	'h6'          => array('weight' => 30), 
+	* 	'h7'          => array('weight' => 20), 
+	* 	'h8'          => array('weight' => 10), 
+	* 	'b'           => array('weight' => 10), 
+	* 	'i'           => array('weight' => 8), 
+	* 	'u'           => array('weight' => 8), 
+	* 	'body'        => array('weight' => 5), 
+	* 	'image'       => array('weight' => 5), 
+	* 
+	* @access public
+	* @var    array $weightProperties
+	*/
+	var $weightProperties = array(
+		'domain'      => array('weight' => 50), 
+		'path'        => array('weight' => 100), 
+		'file'        => array('weight' => 100), 
+		'queryString' => array('weight' => 80), 
+		'title'       => array('weight' => 100), 
+		'description' => array('weight' => 40), 
+		'keywords'    => array('weight' => 5), 
+		'links'       => array('weight' => 100), 
+		'h1'          => array('weight' => 80), 
+		'h2'          => array('weight' => 70), 
+		'h3'          => array('weight' => 60), 
+		'h4'          => array('weight' => 50), 
+		'h5'          => array('weight' => 40), 
+		'h6'          => array('weight' => 30), 
+		'h7'          => array('weight' => 20), 
+		'h8'          => array('weight' => 10), 
+		'b'           => array('weight' => 10), 
+		'i'           => array('weight' => 8), 
+		'u'           => array('weight' => 8), 
+		'body'        => array('weight' => 5), 
+		'image'       => array('weight' => 5), 
+	);
+	
+	
+	/**
+	* how many seconds to wait after indexing a page. 
+	* useful for busy sites or servers, to avoid fucking up things.
+	* @access public
+	* @var    int $waitAfterIndex (default is 0)
+	* @todo   this seems to not work. check this.
+	*/
+	var $waitAfterIndex = 0;
+	
+	/**
+	* should the meta keywords be used or not. 
+	* 
+	*   0 = not at all
+	*   1 = only if not used yet in any other page
+	*   2 = only if different than on frontpage
+	*   3 = yes
+	* 
+	* you must have a good reason to set this to 3. altavista is the only search engine 
+	* nowadays (2002/2003) that still makes use of the meta keywords. google and all 
+	* the others don't. and i see why. why should a word be important if it's not even 
+	* in the content/body? there are rare cases. it only blows up the index and delivers 
+	* bad results because some webmaster thought he'd put some keywords into every page.
+	* 
+	* if the keywords are well-picked and different for each page then it may make sense.
+	* so that's the default setting for now. 
+	* 
+	* @access public
+	* @var    int $useKeywords
+	* @see    var $useDescription
+	*/
+	var $useKeywords = 1;
+	
+	/**
+	* similar to var $useKeywords so read there.
+	* if not used then the first 250 chars of the content will be used.
+	* 
+	* @access public
+	* @var    int $useKeywords
+	* @see    var $useKeywords
+	*/
+	var $useDescription = 1;
+
+
+<bs:index>
+  <bs:type>db</bs:type>
+  <bs:minLength>3</bs:minLength>
+  <bs:maxLength>30</bs:maxLength>
+  <bs:languages>
+    <bs:value>de</bs:value>
+    <bs:value>fr</bs:value>
+  </bs:languages>
+  <bs:stopWords>
+    <bs:file lang="de" file="/some/path/to/stopWords.de.txt"/>
+    <bs:file lang="fr" file="/some/path/to/stopWords.fr.txt"/>
+  </bs:stopWords>
+  
+  <bs:dsn name="main" host="" port="" user="" pass="" type="" syntax=""/>
+  
+  <bs:fields>
+    <bs:field name="userID">
+      <bs:index>true</bs:index>
+      <bs:weight>100</bs:weight>
+      <bs:indexFiles>
+        <bs:type>pdf</bs:type>
+        <bs:type>doc</bs:type>
+        <bs:type>xls</bs:type>
+        <bs:type>txt</bs:type>
+      </bs:indexFiles>
+      <bs:indexUrls>
+        <bs:use    type="host">domain.com</bs:use>
+        <bs:ignore type="host">otherdomain.com</bs:ignore>
+        <bs:use    type="file">html</bs:use>
+        <bs:ignore type="file">php</bs:ignore>
+      </bs:indexUrls>
+      <bs:foreignKey>
+        <bs:source dsn="main" database="database" table="table" field="field"/>
+        <bs:fields>
+          ... (recursive loop)
+        </bs:fields>
+      </bs:foreignKey>
+    </bs:field>
+  </bs:fields>
+
+
+</bs:index>
+

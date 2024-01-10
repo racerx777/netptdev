@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+	<title>BlueShoes Wysiwyg Editor Example 3</title>
+
+<script type="text/javascript" src="../../../core/lang/Bs_Misc.lib.js"></script>
+<script type="text/javascript" src="../../../core/html/Bs_HtmlUtil.lib.js"></script>
+
+<script type="text/javascript" src="../../../components/tabset/Bs_TabSet.class.js"></script>
+<link rel='stylesheet' href='../../../components/tabset/default.css'>
+
+<script type="text/javascript" src="../../../components/editor/Bs_Editor.class.js"></script>
+<script type="text/javascript" src="../../../components/editor/lang/en.js"></script>
+
+<script type="text/javascript" src="../../../core/form/Bs_FormFieldSelect.class.js"></script>
+
+<script type="text/javascript" src="../../../components/toolbar/Bs_ButtonBar.class.js"></script>
+<script type="text/javascript" src="../../../components/toolbar/Bs_Button.class.js"></script>
+
+<script type="text/javascript" src="../../../components/resizegrip/Bs_ResizeGrip.class.js"></script>
+
+<script type="text/javascript">
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_ie.css'>");
+}
+
+onload = function() {
+	myWysiwyg = new Bs_Editor('myWysiwyg');
+	
+	//special settings only because we're not using the framework:
+	myWysiwyg.hrefSelector        = new Array('../windowHref.html', 490, 350);
+	myWysiwyg.fgColorSelector     = new Array('../../../components/colorpicker/windowColor.html', 500, 600);
+	myWysiwyg.fontSelector        = new Array('../windowFont.html', 420, 300);
+	myWysiwyg.buttonsDefaultPath  = '../../../../images/buttons/';
+	myWysiwyg.bsImgPath           = '../../../../images/';
+	
+	myWysiwyg.setValue('this is a <b>browser-based</b> <a href="http://www.blueshoes.org/">wysiwyg</a> <font color="#008200">editor</font><br><br>An image: <img src="http://www.blueshoes.org/img/logo/shoe_grayOnWhite_blueDot_xxs.gif" alt="alt foo"><br><br><ul><li><font color="red">unordered list</font></li><li><i>italic</i></li><li>&euro; $ £</li></ul><br><br>');
+	myWysiwyg.editareaOnPaste  = 4;
+	myWysiwyg.mayResize        = false;
+	myWysiwyg.editorCssString = "body{ \n font-family:arial,helvetica; \n  font-size: 11px; color:#525252; \n }\n td{ \n font-size: 11px; \n } \n";
+  
+	myWysiwyg.loadButtonsWysiwyg();
+	myWysiwyg.buttonsWysiwyg['insertimage']   = null;
+	myWysiwyg.buttonsWysiwyg['specialchars']  = null;
+	myWysiwyg.buttonsWysiwyg['justifyleft']   = null;
+	myWysiwyg.buttonsWysiwyg['justifycenter'] = null;
+	myWysiwyg.buttonsWysiwyg['justifyright']  = null;
+	
+	myWysiwyg.buttonsWysiwyg['mysomething']   = new Array();
+	myWysiwyg.buttonsWysiwyg['mysomething'].action        = 'mySomethingFunction';
+	myWysiwyg.buttonsWysiwyg['mysomething'].imgPath       = '../../../components/editor/examples/';
+	myWysiwyg.buttonsWysiwyg['mysomething'].imgName       = 'my';
+	myWysiwyg.buttonsWysiwyg['mysomething'].title         = 'My Something';
+	myWysiwyg.buttonsWysiwyg['mysomething'].helpText      = 'This does something blah blah.';
+	
+	myWysiwyg.loadButtonsHtml();
+	myWysiwyg.buttonsHtml   = false;
+	myWysiwyg.formFieldName = 'myFormField';
+	myWysiwyg.drawInto('editorDiv');
+}
+
+function mySomethingFunction() {
+	var windowData = new Array('../../../components/editor/examples/mySomething.html', 490, 250);
+	var url = windowData[0] + '?objectName=' + this._objectName;
+	url += '&callbackLoad=mySomethingPrepareDefault&callbackSave=mySomethingCallback';
+	
+	if (moz) {
+		window.open(url, "mySomethingWindow", "width=" + windowData[1] + ",height=" + windowData[2] + ",left=0,top=0,scrollbars=no,status=no,toolbar=no,resizable=no,location=no,hotkeys=no,dependent=yes");
+	} else {
+		var ret = window.showModalDialog(url, mySomethingPrepareDefault(), "dialogWidth:"  + windowData[1] + "px; dialogHeight:" + windowData[2] + "px;");
+		if (ret) mySomethingCallback(ret);
+	}
+}
+
+function mySomethingPrepareDefault() {
+	var defaults = new Object;
+	defaults['value'] = '';
+	return defaults;
+}
+
+function mySomethingCallback(param) {
+	myWysiwyg.insertString(param.value);
+}
+</script>
+</head>
+
+<body bgcolor="white" id="body">
+
+<h1>BlueShoes Wysiwyg Editor Example 3</h1>
+
+<ul>
+	<li>Similar to example 1</li>
+	<li>Shows one usage of the paste handling: If you paste something that includes (html) markup, you're asked if you want to paste as plain text or with the markup.</li>
+	<li>The editor is not resizable this time.</li>
+	<li>No HTML edit mode is possible, only wysiwyg. That's why there are no tabs.</li>
+	<li>Some buttons are disabled: insert image, insert special chars, justify (left/center/right).</li>
+	<li>The editor is used as form field. If you submit the form, you'll receive the editors value in 'myFormField'.</li>
+	<li>Uses a custom button "my" that opens a window, where the user can type in something. The content will then be pasted into the editor. This shows how you can extend the editor with custom user interfaces.</li>
+  <li>Using customized css setting in the editor window (smaller and gray font).</li>
+</ul>
+<br><br>
+
+<form action="http://www.blueshoes.org/postDump.php" method="post">
+<div id="editorDiv" style="width:446; height:400;"></div><br>
+<input type="submit" name="send" value="Submit">
+</form>
+
+</body>
+</html>

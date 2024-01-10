@@ -1,0 +1,148 @@
+REQUEST FOR COMMENTS
+
+
+search phrase parsing
+
+task: implement the new NEAR search feature. like altavista has it.
+example: Bill NEAR Gates
+will find records that have the words bill and gates, and they must be 
+close together. it is ok if they are not connected like "BILL GATES". 
+so it works like a weaker "phrase search". 
+
+this changes the data structure of the parsed query anyway, so i would 
+like to think about it all.
+
+speed problem: currently, a search like
+bill flowers microsoft
+is interpreted like "OR bill OR flowers OR microsoft".
+this will return all recurds that have at least one hit, ordered by 
+points, the more hits the better. a lot of work and overhead, especially 
+since most ppl wanted to find records that mached ALL words, but did 
+not write
+"+bill +flowers +microsoft".
+google does not support this type of query at all, all words are "must" 
+words or exclude words if they are written like -flowers.
+
+so... i really think we should do that too.
+can we still offer the "one of these words" search?
+idea: flowers (bill OR microsoft)
+will be interpreted like
++flowers +(bill OR microsoft)
+
+thus we need to add brackets () to the query parser.
+
+a query like: flowers bill or microsoft
+should be interpreted like: +flowers +(bill OR microsoft). 
+agree? see any problems?
+
+a phrase search is done by putting the words into double-quotes.
+example: "bill gates".
+a near search is done by using brackets and the word near.
+example: (bill near gates)
+idea: allow single quotes for near searches too.
+example: 'bill gates'
+
+a search like: flowers bill near gates
+should be interpreted like: "+flowers +(bill near gates)
+aka:                        "+flowers +'bill gates'
+agree? see any problems?
+
+
+lately i implemented the fuzzy search operator.
+examples: bill ~microsoft might also find micro$oft
+          ~"bill gates" might also find bills gate
+so you see a better operator than the ~? i know it's hard to type 
+for non-programmers, but ...
+
+
+i would like to implement forced stemming searches too. 
+(stemming means ignore the endings, suffixes)
+note: fuzzy searches include stemming, soundex, metaphone, 
+left/right part word searches like *word and word*.
+
+the syntax i have in mind is the hash.
+example: cardio#
+c# is pronounced c-sharp. this would then be the opposite, 
+a non-sharp search.
+
+any other idea for the character?
+
+
+
+the data structure
+query:     "bill gates#" near ~microsoft -buy* 'fresh# flower#' or ibm or (sun not moon)
+interpret: +("bill gates#" near ~microsoft) -buy* +('fresh# flower#' or ibm or (sun not moon))
+parsed data:
+
+$data[0]['operator']          = '+';
+$data[0]['phrase']            = 'bill gates';
+$data[0]['neighbor']          = true; //true "phrase" search
+$data[0]['words'][0]['word']  = 'bill';
+$data[0]['words'][1]['word']  = 'gates';
+
+$data[1]['operator']         = '+';
+$data[1]['word']             = 'microsoft';
+$data[1]['fuzzy']            = true;
+$data[1]['near']             = 0; //near $data[0]
+
+$data[2]['operator']         = '-';
+$data[2]['word']             = 'buy';
+$data[2]['part']             = true;
+
+$data[3]['operator']                    = '+';
+$data[3]['list'][0]['operator']         = '|';
+$data[3]['list'][0]['phrase']           = 'fresh flower';
+$data[3]['list'][0]['neighbor']         = false; //"near" search
+$data[3]['list'][0]['words'][0]['word'] = 'fresh';
+$data[3]['list'][0]['words'][0]['stem'] = true;
+$data[3]['list'][0]['words'][1]['word'] = 'flower';
+$data[3]['list'][0]['words'][1]['stem'] = true;
+
+$data[3]['list'][1]['operator']         = '|';
+$data[3]['list'][1]['word']             = 'ibm';
+
+$data[3]['list'][2]['operator']  = '|';
+$data[3]['list'][2]['list'][0]['operator']  = '|'
+$data[3]['list'][2]['list'][0]['word']      = 'sun';
+
+$data[3]['list'][2]['list'][1]['operator']  = '|'
+$data[3]['list'][2]['list'][1]['word']      = 'moon';
+
+
+
+FIND THE MATCHING RECORDS
+
+for each word that we have in our index, we know how many times 
+(by how many records) it is in use. 
+
+so the first thing is to get those numbers for the words the 
+user is looking for. for example:
+
+bill        = 1000
+gates#      = found words: gates:500        gate:10000      gatesxxx: 100
+~microsoft  = found words: microsoft:600    micro$oft:700
+-buy*       = found words: buy:99999        buyer:8888
+fresh#      = found words: fresh:5555
+flower#     = found words: flower:6666      flowers:7777
+ibm         = 50
+sun         = 2000
+moon        = 500
+
+my goal is to start with a (small) base of matching records, and then make 
+that smaller and smaller. 
+we should, whenever possible, pick a must word, which is used the least 
+times. fuzzy words (~and * and #) are mostly no good for this, since 
+they can match many, many words... 
+
+let's pick 'bill'. 
+then subtract all records that have no association (as neighbor!) to 
+gates, gate or gatesxxx. subtract all records that have an assoc. to 
+buy. ... 
+
+
+what do you think about the data structure of the parsed query? 
+*any* ideas, comments, whatever? :-)
+
+
+
+

@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML xmlns:move >
+<head>
+<link rel="stylesheet" href="/_admin/css/editPage.css" TYPE="text/css"/>
+</head>
+<body bgcolor="#008000" leftmargin=0 topmargin=0>
+
+<script>
+if (true) {
+  //document.writeln('<move:iframez id="bs_editBar" class="iframez" style="height:0;">');
+  document.writeln('<div id="bs_editBar" style="background:#000080; border:1px solid black;     position:absolute;    width:442;     height:0;     cursor:hand;     padding:0px;     padding-left:0px;     color:white;">');
+} else {
+  document.writeln('<move:iframez id="bs_editBar" class="iframez">');
+  document.writeln('<table border=0 cellpadding=2 cellspacing=1 width="100%">');
+  document.writeln('  <tr>');
+  document.writeln('    <td><font face="arial" size="2" color="white"><b>blueshoes editor toolbar</b></font></td>');
+  document.writeln('    <td align="right" width="16"><img src="/_admin/editBar/images/windows_undo.gif"  width="16" height="14" border="0" onClick="parent.bs_edit_setOriginalValue(parent.bs_edit_editPart); parent.bs_edit_liveEditEnd(); return false;"></td>');
+  document.writeln('    <td align="right" width="16"><img src="/_admin/editBar/images/windows_save.gif"  width="16" height="14" border="0" onClick="parent.bs_edit_setChangedValue(parent.bs_edit_editPart); parent.bs_edit_liveEditSave(); parent.bs_edit_liveEditEnd(); return false;"></td>');
+  document.writeln('    <td align="right" width="16"><img src="/_admin/editBar/images/windows_close.gif" width="16" height="14" border="0" onClick="parent.bs_edit_setChangedValue(parent.bs_edit_editPart); parent.bs_edit_liveEditEnd(); return false;"></td>');
+  document.writeln('  </tr>');
+  document.writeln('</table>');
+}
+</script>
+<noscript>
+<move:iframez id="bs_editBar" class="iframez">
+<table border=0 cellpadding=2 cellspacing=1 width="100%">
+  <tr>
+    <td><font face="arial" size="2" color="white"><b>blueshoes editor toolbar</b></font></td>
+    <td align="right" width="16"><img src="/_admin/editBar/images/windows_undo.gif"  width="16" height="14" border="0" onClick="parent.bs_edit_setOriginalValue(parent.bs_edit_editPart); parent.bs_edit_liveEditEnd(); return false;"></td>
+    <td align="right" width="16"><img src="/_admin/editBar/images/windows_save.gif"  width="16" height="14" border="0" onClick="parent.bs_edit_setChangedValue(parent.bs_edit_editPart); parent.bs_edit_liveEditSave(); parent.bs_edit_liveEditEnd(); return false;"></td>
+    <td align="right" width="16"><img src="/_admin/editBar/images/windows_close.gif" width="16" height="14" border="0" onClick="parent.bs_edit_setChangedValue(parent.bs_edit_editPart); parent.bs_edit_liveEditEnd(); return false;"></td>
+  </tr>
+</table>
+</noscript>
+
+<!--<!iframe class="iframez" style="position: absolute; behavior: url(/bs/editBar/winlessmovable.htc);" id="bs_editBarHeadline" src="/bs/editBar/editBarHeadline.html"></iframe>-->
+<!--<!move:iframez class="iframez" id="bs_editBarHeadline" src="/bs/editBar/editBarHeadline.html"></move:iframez>-->
+
+<!--<iframe id="oIframe" src="/_admin/editBar/editBar.html" style="border:lightgrey 0px inset; position:absolute; top:24; left:0; width:442; height:0; z-index:1;"></iframe>-->
+<iframe id="oIframe" src="/_admin/editBar/editBar.html" style="border:lightgrey 0px inset; position:relative; top:0; left:0; width:442; height:0; z-index:1;"></iframe>
+
+<script>
+if (true) {
+  document.writeln('</div>');
+} else {
+  document.writeln('</move:iframez>');
+}
+</script>
+<noscript>
+</move:iframez>
+</noscript>
+
+</body>
+</html>

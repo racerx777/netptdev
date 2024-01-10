@@ -1,0 +1,21 @@
+[02-Feb-2010 15:20:41] PHP Warning:  mysql_connect() [<a href='function.mysql-connect'>function.mysql-connect</a>]: Can't connect to local MySQL server through socket '/var/tmp/mysql.sock' (2) in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 122
+[02-Feb-2010 15:20:41] PHP Warning:  mysql_connect() [<a href='function.mysql-connect'>function.mysql-connect</a>]: Can't connect to local MySQL server through socket '/var/tmp/mysql.sock' (2) in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 122
+[02-Feb-2010 15:20:41] PHP Warning:  mysql_errno(): supplied argument is not a valid MySQL-Link resource in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 335
+[02-Feb-2010 15:20:41] PHP Warning:  mysql_errno(): supplied argument is not a valid MySQL-Link resource in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 335
+[02-Feb-2010 15:20:41] PHP Warning:  mysql_error(): supplied argument is not a valid MySQL-Link resource in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 336
+[02-Feb-2010 15:20:41] PHP Warning:  mysql_error(): supplied argument is not a valid MySQL-Link resource in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 336
+[18-Jun-2010 09:09:08] PHP Warning:  mysql_connect() [<a href='function.mysql-connect'>function.mysql-connect</a>]: Can't connect to local MySQL server through socket '/var/tmp/mysql.sock' (2) in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 122
+[18-Jun-2010 09:09:08] PHP Warning:  mysql_errno(): supplied argument is not a valid MySQL-Link resource in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 335
+[18-Jun-2010 09:09:08] PHP Warning:  mysql_error(): supplied argument is not a valid MySQL-Link resource in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 336
+[19-Oct-2010 12:14:48] PHP Warning:  mysql_connect() [<a href='function.mysql-connect'>function.mysql-connect</a>]: Too many connections in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 122
+[19-Oct-2010 12:14:49] PHP Warning:  mysql_errno(): supplied argument is not a valid MySQL-Link resource in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 335
+[19-Oct-2010 12:14:49] PHP Warning:  mysql_error(): supplied argument is not a valid MySQL-Link resource in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 336
+[19-Oct-2010 12:17:15] PHP Warning:  mysql_connect() [<a href='function.mysql-connect'>function.mysql-connect</a>]: Too many connections in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 122
+[19-Oct-2010 12:17:15] PHP Warning:  mysql_errno(): supplied argument is not a valid MySQL-Link resource in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 335
+[19-Oct-2010 12:17:15] PHP Warning:  mysql_error(): supplied argument is not a valid MySQL-Link resource in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 336
+[19-Oct-2010 12:18:12] PHP Warning:  mysql_connect() [<a href='function.mysql-connect'>function.mysql-connect</a>]: Too many connections in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 122
+[19-Oct-2010 12:18:12] PHP Warning:  mysql_errno(): supplied argument is not a valid MySQL-Link resource in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 335
+[19-Oct-2010 12:18:12] PHP Warning:  mysql_error(): supplied argument is not a valid MySQL-Link resource in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 336
+[15-Nov-2010 09:36:53] PHP Warning:  mysql_connect() [<a href='function.mysql-connect'>function.mysql-connect</a>]: Can't connect to local MySQL server through socket '/var/tmp/mysql.sock' (2) in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 122
+[15-Nov-2010 09:36:53] PHP Warning:  mysql_errno(): supplied argument is not a valid MySQL-Link resource in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 335
+[15-Nov-2010 09:36:53] PHP Warning:  mysql_error(): supplied argument is not a valid MySQL-Link resource in /home/wsptn/public_html/netpt/livehelp/class/mysql_db.php on line 336

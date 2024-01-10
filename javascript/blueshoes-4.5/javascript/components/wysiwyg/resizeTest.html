@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Untitled</title>
+<script>
+
+var currentResizeElm;
+var currentResizeStartX;
+var currentResizeStartY;
+var currentResizeHeight;
+var currentResizeWidth;
+function resizeStart(elm) {
+	currentResizeElm = elm;
+	var container = document.getElementById(currentResizeElm.resizeElm);
+	currentResizeStartX = event.clientX;
+	currentResizeStartY = event.clientY;
+	currentResizeHeight = container.offsetHeight;
+	currentResizeWidth  = container.offsetWidth;
+	document.body.attachEvent('onmousemove', resize);
+	document.body.attachEvent('onmouseup',   resizeEnd);
+}
+function resize() {
+	//alert('foo');
+	var container = document.getElementById(currentResizeElm.resizeElm);
+	container.style.height = currentResizeHeight + (event.clientY - currentResizeStartY);
+	container.style.width  = currentResizeWidth  + (event.clientX - currentResizeStartX);
+}
+function resizeEnd() {
+	document.body.detachEvent('onmousemove', resize);
+}
+</script>
+</head>
+
+<body>
+
+<div style="width:200px; height:200px;">
+
+<div style="width:100%; height:100%; border:1px solid black;" id="outer">
+<div style="position:absolute; ">
+asdfasdfasdfasdf asdf asdf asdf
+asdfasdfasdfasdf asdf asdf asdf
+asdfasdfasdfasdf asdf asdf asdf<br>
+asdfasdfasdfasdf asdf asdf asdf
+asdfasdfasdfasdf asdf asdf asdf<br>
+</div>
+<div resizeElm="outer" style="width:100%; height:100%; position:absolute; cursor: nw-resize; align:right; vertical-align:bottom;" onMouseDown="resizeStart(this);" ondragstart="return false;">
+<img src="/_bsImages/windows/resizeWindow.gif">
+</div>
+</div>
+
+</div>
+
+</body>
+</html>

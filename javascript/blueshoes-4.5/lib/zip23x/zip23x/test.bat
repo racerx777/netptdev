@@ -1,0 +1,1 @@
+zip -R test "*"

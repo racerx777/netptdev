@@ -1,0 +1,1256 @@
+<?php
+
+require_once($APP['path']['XPath'] . 'XPath.class.php');
+
+
+
+/**
+* 
+* the names of indexes are used case sensitive. but if you try to create one that 
+* already exists with different case that will fail cause for that we check case 
+* insensitive to avoid problems.
+* 
+* 
+* xml definition of the index settings:
+* ---------------------------------------------
+* <blueshoes version="4.0">
+* <bs:index
+*   languages       = "" 
+*   languageDefault = "" 
+*   db              = "" 
+*   user            = "" 
+*   pass            = "" 
+*   host            = "" 
+*   port            = "" 
+*   manualSqlQuery  = "" 
+* >
+*   <bs:source dbtable="" user="" pass="" host="" port="">
+*     <bs:field name="caption"     fieldtype="char" datatype="text" languages="" languageDefault="" weight="">
+*     <bs:field name="description" fieldtype="blob" datatype="html" languages="" languageDefault="" weight="" getSize="-1">
+*   </bs:source>
+*   <bs:source dbtable="" user="" pass="" host="" port="" relation="">
+*     <bs:field name="resume" fieldtype="varchar" datatype="url" filetype="word" languages="" languageDefault="" weight="" indexFile="true" getSize="-1">
+*   </bs:source>
+* </bs:index>
+* </blueshoes>
+* ---------------------------------------------
+* 
+* 
+* dependencies: XPath
+* 
+*/
+Class Bs_Is_Index extends Bs_Object {
+  
+  /************** objects **************/
+  
+  /**
+  * instance of XPath
+  * @access private
+  * @var object $_xPath
+  */
+  var $_xPath;
+  
+  /**
+  * reference to the globally used db object.
+  * @access private
+  * @var object $_bsDb
+  */
+  var $_bsDb;
+  
+  /**
+  * reference to our own db object, if used. this index might need 
+  * another db object with different user/pass because of db/table rights.
+  * @access private
+  * @var object $_bsDbSpecial
+  */
+  var $_bsDbSpecial;
+  
+  
+  /************** vars **************/
+  
+  /**
+  * the xml of this index.
+  * @var string $_xml
+  */
+  var $_xml;
+  
+  /**
+  * @access private
+  * @var string $_name
+  */
+  var $_name;
+  
+  
+  //constructor
+  function Bs_Is_Index() {
+    parent::Bs_Object();  //call parent constructor.
+    $this->_bsDb  =& $GLOBALS['bsDb'];
+    $this->_xPath =& new XPath(); //i do it here cause i'm lazy.
+  }
+  
+  
+  /**
+  * loads the settings of this index.
+  * 
+  * if you have used this object before you need to reset() it first to make it ready
+  * for a new index.
+  * 
+  * @access public
+  * @param  string $name the name of the index
+  * @return bool TRUE on success
+  * @throws bool FALSE or bs_exception
+  */
+  function load($name) {
+    //object has to be reset() first:
+    if (!empty($this->_name)) return FALSE; 
+    
+    //let's see if we have that index.
+    $sqlQ = "SELECT * FROM bs_indexServer.Indexes WHERE lcase(caption) = lcase('{$name}') LIMIT 1";
+    $result = &$this->_bsDb->getRow($sqlQ);
+    if (isEx($result)) {
+      $result->stackTrace('was here in load()', __FILE__, __LINE__);
+      return $result;
+    }
+    
+    $this->settingsXmlToVar($result['xml']);
+    
+/*    
+* <blueshoes version="4.0">
+* <bs:index
+*   languages       = "" 
+*   languageDefault = "" 
+*   db              = "" 
+*   user            = "" 
+*   pass            = "" 
+*   host            = "" 
+*   port            = "" 
+*   manualSqlQuery  = "" 
+* >
+*   <bs:source dbtable="" user="" pass="" host="" port="">
+*     <bs:field name="caption"     fieldtype="char" datatype="text" languages="" languageDefault="" weight="">
+*     <bs:field name="description" fieldtype="blob" datatype="html" languages="" languageDefault="" weight="" getSize="-1">
+*   </bs:source>
+*   <bs:source dbtable="" user="" pass="" host="" port="" relation="">
+*     <bs:field name="resume" fieldtype="varchar" datatype="url" filetype="word" languages="" languageDefault="" weight="" indexFile="true" getSize="-1">
+*   </bs:source>
+* </bs:index>
+* </blueshoes>
+*/
+
+//$table['name']['properties']
+//$table['name']['fields']['name'] = array()
+
+    
+    $this->_name = $name;
+  }
+  
+  
+  function settingsXmlToVar(&$xml) {
+    $this->_xPath->importFromString(&$xml);
+    $xpvIndex  = $this->_xPath->match('/blueshoes[1]/bs:index[1]');
+    $prop['index']  = $this->_xPath->getAttributes($xpvIndex[0]);
+    $xpvSource = $this->_xPath->match('/blueshoes[1]/bs:index[1]/bs:source/descendant-or-self::*');
+    var_dump($xpvSource);
+    exit;
+    while (list($k) = each($xpvSource)) {
+      $x = $this->_xPath->getAttributes($xpvIndex[$k]);
+      //$prop['source'] = 
+    }
+
+/*
+    $xpvParts = $xPath->match("/blueshoes/bs:index[1]/bs:source/descendant-or-self::*");
+    var_dump($xpvParts);
+    exit;
+    
+    if (empty($xpvParts)) break; //part not found. throw.
+    
+    //fetch attributes
+    $partProp = $xPath->getAttributes($xpvParts[0]); //the first one is a part. there might be attributes aswell.
+    if (empty($partProp)) break; //part not found. throw.
+    $ret['type'] = $partProp['type'];
+    
+    $numAttributes = sizeOf($xpvParts);
+    switch ($numAttributes) {
+      case 1:
+        //there is just the part, no attributes.
+        $ret['value'] = $xPath->getData($xpvParts[0]);
+        return $ret;
+      case 0:
+        //not found.
+        break 2;
+      default: // >1
+        //got attributes aswell like for the image thing.
+        $ret['value'] = array();
+        for ($x=1; $x<$numAttributes; $x++) { //we don't want element 0 cause it's the part itself.
+          $partProp = $xPath->getAttributes($xpvParts[$x]);
+          if (!empty($partProp)) {
+            $ret['value'][$partProp['name']] = $partProp['value'];
+          }
+        }
+        return $ret;
+    }
+  } while (FALSE);
+  return FALSE; //throw
+*/
+
+    $xpvIndex  = $this->_xPath->match('/blueshoes/bs:source');
+    
+    //$prop['source'] = 
+    
+  }
+  
+  function settingsVarToXml() {
+  }
+  
+  
+  /**
+  * saves the settings of this index.
+  * @access public
+  */
+  function save() {
+  }
+  
+  
+  /**
+  * 
+  * this is the opposite of load().
+  * @access public
+  * @return void
+  */
+  function reset() {
+    $this->_xPath->reset();
+    unset($this->_name);
+  }
+  
+  
+  /**
+  * creates a new index with the given name.
+  *   - creates the db tables for the new index 
+  *     Index_{name}_relation
+  *     Index_{name}_word
+  *   - inserts the index record into table 'Indexes'.
+  * 
+  * param $optimized: 
+  * 'disk'  => (default) it uses a lot less disk space. (about 1/4)
+  * 'speed' => faster search. fixed length rows for the tables.
+  * the difference comes from using char fields instead of varchar.
+  * 
+  * @access public
+  * @param  string $name the name of the new index. it must be us-ascii [a-zA-Z0-9], *nothing* else.
+  * @param  string $optimized one of 'disk' (default) or 'speed'. see above.
+  * @return bool TRUE on success
+  * @throws bs_exception
+  * @todo add transactions
+  */
+  function create($name, $optimized='disk') {
+    
+    //make sure there is no equally named index. make the check case insensitive.
+    $sqlQ = "SELECT * FROM bs_indexServer.Indexes WHERE lcase(caption) = lcase('{$name}')";
+    if ($this->_bsDb->countRead($sqlQ) > 0) {
+      $e =& new Bs_Exception('there is already an index with this name.', __FILE__, __LINE__, BS_DB_ERROR_ALREADY_EXISTS);
+      return $e;
+    }
+    
+    //check that tables don't exist already.
+    if (
+    ($this->_bsDb->tableExists("index_{$name}_relation", 'bs_indexServer', FALSE) === TRUE) OR 
+    ($this->_bsDb->tableExists("index_{$name}_word", 'bs_indexServer', FALSE) === TRUE)) 
+    {
+      $e =& new Bs_Exception('table already exists, clean up first.', __FILE__, __LINE__, BS_DB_ERROR_ALREADY_EXISTS);
+      return $e;
+    }
+    
+    //try to insert index record
+    $sqlI = "INSERT INTO bs_indexServer.Indexes SET caption='{$name}', xml='" . addSlashes($this->_xml) . "'";
+    $status = $this->_bsDb->write($sqlI);
+    if (isEx($status)) {
+      $status->stackTrace('was here in createIndex(). maybe there is already an index with this name?', __FILE__, __LINE__);
+      return $status;
+    }
+    
+    //create tables
+    //todo: add transactions.
+    $charField = ($optimized=='disk') ? 'VARCHAR' : 'CHAR';
+    
+    $sqlC = "
+      CREATE TABLE bs_indexServer.Index_{$name}_relation (
+      ID                  int not null default 0 auto_increment, 
+      wordID              int not null default 0, 
+      recordID            int not null default 0, 
+      ranking             smallint not null default 0, 
+      primary key(ID), 
+      key wordID(wordID), 
+      key recordID(recordID), 
+      key(ranking)
+    )
+    ";
+    $status = $this->_bsDb->write($sqlC);
+    if (isEx($status)) {
+      $status->stackTrace('was here in createIndex()', __FILE__, __LINE__);
+      return $status;
+    }
+    
+    $sqlC = "
+      CREATE TABLE bs_indexServer.Index_{$name}_word (
+      caption             {$charField}(30) not null default '', 
+      soundex             {$charField}(10) not null default '', 
+      length              tinyint not null default 0, 
+      languages           {$charField}(30) NOT NULL default '', 
+      useCount            int not null default 0, 
+      searchCount         int not null default 0, 
+      
+      primary key(caption), 
+      unique(caption)
+    )
+    ";
+    $status = $this->_bsDb->write($sqlC);
+    if (isEx($status)) {
+      //uhm. crap. let's try to clean up and erase the first table. but that's strange, i guess
+      //we have lost connection to the db here. so there's a big chance this will fail also.
+      $sqlD    = "DROP TABLE IF EXISTS bs_indexServer.index_{$name}_relation";
+      $status2 = $this->_bsDb->write($sqlD);
+      if (isEx($status2)) {
+        //crap. clean up worked, now one table exists while the other does not.
+        $status->stackTrace("was here in createIndex(). failed in the middle of the process. the first db table (bs_indexServer.index_{$name}_relation) was created and could not be removed.", __FILE__, __LINE__);
+        return $status;
+      } else {
+        //ok, clean up worked.
+        $status->stackTrace('was here in createIndex(). we have been able to clean up things.', __FILE__, __LINE__);
+        return $status;
+      }
+    }
+    
+    return TRUE;
+  }
+  
+  
+  /**
+  * tells if the name is a reserved index name because of internal use.
+  * 
+  * reserved names currently are (case insensitive):
+  *   - Indexes
+  *   - Queue
+  *   - everything that starts with noiseWords (eg noiseWordsEn)
+  * 
+  * @access public
+  * @param  string $name
+  * @return bool
+  */
+  function isReservedName($name) {
+    switch strToLower($name) {
+      case 'indexes':
+      case 'queue':
+        return TRUE;
+        break;
+      default:
+        if ((strToLower(substr($name, 0, 10))) == 'noisewords') return TRUE; //like 'noiseWordsEn'
+    }
+    return FALSE;
+  }
+  
+  
+  function setXml(&$xml) {
+    $this->_xml =&$xml;
+    return TRUE;
+  }
+  function &getXml(&$xml) {
+    return $this->_xml;
+  }
+  
+  
+  function drop() {
+  }
+  
+  
+  /**
+  * drops the given index. all data will be removed (lost).
+  * 
+  *   - removes the index record in table 'Indexes'.
+  *   - drops the db tables for the given index
+  *     Index_{name}_relation
+  *     Index_{name}_word
+  *   - removes existing queued records in the table 'Queue'.
+  * 
+  * @access public
+  * @param  string $name the name of the index. it must be us-ascii [a-zA-Z0-9], *nothing* else.
+  * @return bool TRUE on success
+  * @throws bs_exception
+  * @todo add transactions
+  */
+  function dropIndex($name) {
+    //let's try to clean the queue first. 
+    $sqlD = "DELETE FROM bs_indexServer.Queue WHERE IndexesCaption = '{$name}'";
+    $this->_bsDb->write($sqlI); //we don't care if that fails.
+    
+    //delete index record:
+    $sqlD = "DELETE FROM bs_indexServer.Indexes WHERE caption='{$name}'";
+    $status = $this->_bsDb->countWrite($sqlI);
+    if (isEx($status)) {
+      $status->stackTrace('was not able to delete the index record.', __FILE__, __LINE__);
+      return $status;
+    } elseif (is_int($status) && ($status == 0)) {
+      //no match
+      $e =& new Bs_Exception('no record found with this name. there is already an index with this name.', __FILE__, __LINE__, BS_DB_ERROR_ALREADY_EXISTS);
+      return $e;
+    }
+    
+    //let's drop the tables:
+    $sqlD = "DROP TABLE IF EXISTS bs_indexServer.index_{$name}_relation";
+    $status = $this->_bsDb->write($sqlD);
+    if (isEx($status)) {
+      $status->stackTrace("was here in dropIndex(). failed, none of the 2 tables has been removed.", __FILE__, __LINE__);
+      return $status;
+    }
+    $sqlD = "DROP TABLE IF EXISTS bs_indexServer.index_{$name}_word";
+    $status = $this->_bsDb->write($sqlD);
+    if (isEx($status)) {
+      $status->stackTrace("was here in dropIndex(). failed, the first table worked while the 2nd table bs_indexServer.index_{$name}_word still exists.", __FILE__, __LINE__);
+      return $status;
+    }
+    return TRUE;
+  }
+  
+  
+  /**
+  * adds a record to the index-todo-queue. 
+  * the record may be added to be (re)indexed or to be removed from the index.
+  * 
+  * behavior of adding:
+  *   - if this record is already in the queue and waiting to be (re)indexed, 
+  *     and you want to index it again, then it won't be added again. it would 
+  *     make no sense.
+  *   - if this record is already in the queue and waiting to be (re)indexed, 
+  *     and you want to remove it from the index (probably because the record 
+  *     has been deleted), then the existing queue-entry will be removed. it 
+  *     is of no use anymore.
+  *   - if the record is waiting to be removed from the index, and you want 
+  *     to queue another delete order, then it won't be added. would make no 
+  *     sense to remove twice.
+  *   - it is *theoretically* possible that a record has been removed from 
+  *     the table and it is marked here to be removed from the index aswell. 
+  *     now in the meantime a record has been added with exactly the same 
+  *     record id. and this one gets added here to the queue. in this case we 
+  *     have to keep the remove-index command, and it will have to be executed 
+  *     before the new record is indexed.
+  *     this case really is not usual since databases normally don't allow you 
+  *     to use an id when inserting a record that has been in use before. but 
+  *     it still may happen.
+  * overview:
+  *   +-----------------+------------+---------+-------------+
+  *   | existing entry  | new entry  | accept? | new entries |
+  *   +-----------------+------------+---------+-------------+
+  *   | add             | add        | no      | add         |
+  *   | add             | remove     | yes     | remove      |
+  *   | remove          | add        | yes     | remove add  |
+  *   | remove          | remove     | no      | remove      |
+  *   | remove add      | add        | no      | remove add  |
+  *   | remove add      | remove     | yes     | remove      |
+  *   +-----------------+------------+---------+-------------+
+  * 
+  * @access public
+  * @param  string $name the name of the index.
+  * @param  int    $sourceRecordID the record that you want to have indexed.
+  * @paramm char   $todo (one of 'a' for add (default) or 'r' for remove.)
+  * @return bool TRUE if it has been added, FALSE if it has not been added (failed, already listed, whatever).
+  * @see queueRemove()
+  */
+  function queueAdd($name, $sourceRecordID, $todo='a') {
+    //let's see if it's already in the queue somehow:
+    $sqlQ   = "SELECT ID, todo FROM bs_indexServer.Queue WHERE IndexesCaption='{$name}' AND recordID={$sourceRecordID}";
+    $result = $this->_bsDb->getAll($sqlQ);
+    if (isEx($result)) {
+      return FALSE; //whatever. this is not nice, but i don't see it happen often (if at all) and then it's just an index.
+    }
+    $remove = FALSE; //remove all existing entries?
+    $accept = FALSE; //accept new entry?
+    switch (sizeOf($result)) {
+      case 0:
+        //nothing in the queue yet. let's insert it.
+        $accept = TRUE;
+        break;
+      case 1:
+        //if (($result[0]['todo'] == 'a') && ($todo == 'a')) { //not needed
+          //do nothing
+        if (($result[0]['todo'] == 'a') && ($todo == 'r')) {
+          $remove = TRUE;
+          $accept = TRUE;
+        } elseif (($result[0]['todo'] == 'r') && ($todo == 'a')) {
+          $accept = TRUE;
+        //} elseif (($result[0]['todo'] == 'r') && ($todo == 'r')) { //not needed
+          //do nothing
+        }
+        break;
+      case 2:
+        if (($todo == 'r')) {
+          $remove = TRUE;
+          $accept = TRUE;
+        }
+        break;
+    }
+    
+    if ($remove) {
+      $idInString = (sizeOf($result) == 1) ? $result[0]['ID'] : $result[0]['ID'] . ', ' . $result[1]['ID'];
+      $sqlD = "DELETE FROM bs_indexServer.Queue WHERE ID IN ({$idInString})";
+      $status = $this->_bsDb->countWrite($sqlI);
+      //if (isEx($status)) {
+        //hrm. fuck it.
+      //}
+    }
+    
+    if ($accept) {
+      //ok, let's insert it.
+      $sqlI = "INSERT INTO bs_indexServer.Queue SET IndexesCaption='{$name}', recordID={$sourceRecordID}, todo='{$todo}'";
+      $status = $this->_bsDb->write($sqlI);
+      if (!isEx($status)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+  
+  
+  /**
+  * removes a record from the index-todo-queue. 
+  * 
+  * @access public
+  * @param  mixed  $queueRecordID the record id from the queue table that you want to delete. an int or a vector filled with integers.
+  * @return int    the number of deleted records
+  * @throws bs_exception on error, bool FALSE if just the count of the deleted records failed.
+  * @see queueAdd()
+  */
+  function queueRemove($queueRecordID) {
+    if (is_array($queueRecordID)) {
+      $queueRecordID = join(',', $queueRecordID);
+    }
+    $sqlD = "DELETE FROM bs_indexServer.Queue WHERE ID IN ({$queueRecordID})";
+    $status = $this->_bsDb->countWrite($sqlI);
+    if (isEx($status)) {
+      $status->stackTrace('was here in queueRemove()', __FILE__, __LINE__);
+    }
+    return $status;
+  }
+  
+  
+  /**
+  * @access private
+  * @param  string $name the name of the index.
+  * @param  int    $sourceRecordID
+  * @return array
+  * @throws bs_exception
+  * @see    &_fetchDataForIndexUsingQuery()
+  */
+  function &_fetchDataForIndex($name, $sourceRecordID) {
+    $sqlQ = "SELECT * FROM bs_indexServer.Indexes WHERE caption='{$name}' LIMIT 1";
+    $result = $this->_bsDb->getRow($sqlD);
+    if (isEx($result)) {
+      $result->stackTrace('was here in _fetchDataForIndex()', __FILE__, __LINE__);
+      return $result;
+    }
+    $xp =& new XPath();
+    
+    
+  }
+  
+  
+  /**
+  * same as _fetchDataForIndex() but using query as param directly here.
+  * 
+  * @access private
+  * @param  string $query the sql query. 
+  * @return see Bs_Db->getRow() 
+  * @throws bs_exception
+  * @see    &_fetchDataForIndex()
+  */
+  function &_fetchDataForIndexUsingQuery($query) {
+    $result = &$this->_bsDb->getRow($query);
+    if (isEx($result)) {
+      $result->stackTrace('was here in _fetchDataForIndexUsingQuery()', __FILE__, __LINE__);
+      return $result;
+    }
+    return $result;
+  }
+  
+  
+  /*
+  var $searchInput: 
+  input from user as associative array
+  $searchInput["keywords"] = "+hello +world -foobar"
+  $searchInput["mode"]     = [normal|soundex] //fulltext not supported yet
+  $searchInput["offset"]   = 0
+  $searchInput["numRows"]  = 20
+  $searchInput["language"] = [all|en|de|fr] //not supported yet cause we don't have a spracherkennung
+  $searchInput["dbName"]   = "cmt";
+  $searchInput["dbTable"]  = "webguideSite";
+  $searchInput["dbField"]  = "ID, caption, url";
+  $searchInput["preWhere"] = "";
+  */
+  function search($searchInput="", $preWhere="") {
+    $this->cacheStopWords(); //cache noise words
+    unset($this->searchStopWords); //in case there was a previous search with this object ... we need to unset it.
+    $this->realNumRows = 0;        //how many records were found (without offset/limit)
+    $searchInput["keywords"] = " " . $searchInput["keywords"]; //short hack. needed. trust me.
+    $wordArray = $this->parseSearchInput($searchInput["keywords"]);
+    //update word array with ID and popularity:
+    while(list($k, $v) = each($wordArray)) {
+      $this->realWordIdString = "";
+      //example: someone is searching for 'PHONE'. we might have exactly that word in our index. 
+      //but we might also/only have words like 'PHONEbook', 'cellPHONE' and 'cellPHONEs'
+      //if a record has both PHONE and PHONEbook, it should be ranked a little bit better than 
+      //one that just has PHONE, and alot better than one that only has PHONEbook.
+      //note: if a word is found with query 1 then of course it's found in all queries. so exclude all 
+      //words already found in the following queries.
+      if ($searchInput["mode"] == "soundex") {
+        $sqlQ1 = "SELECT ID FROM cmtIndexServer.realWord WHERE SOUNDEX(caption) = SOUNDEX('"  . $wordArray[$k][0] . "')";  //found = 100
+      } else {
+        $sqlQ1 = "SELECT ID FROM cmtIndexServer.realWord WHERE caption = '"  . $wordArray[$k][0] . "'";  //found = 100
+      }
+      $wordArray[$k][2] = $this->searchQueryHelper($sqlQ1, $points=100);
+      if ($v[1] != "!" AND $searchInput["mode"] != "soundex") {
+        //in altavista, if you're looking for '+car -auto' it will find pages that have the words car and autos.
+        //this means we cannot do the queries 2 - 4. otherwise if someone would search for '+automation -auto' 
+        //nothing would be found because -auto also stops 'automation' ... 
+        $sqlQ2  = "SELECT ID FROM cmtIndexServer.realWord WHERE caption LIKE '"  . $wordArray[$k][0] . "%'";
+        if ($this->realWordIdString != "") $sqlQ2 .= " AND ID NOT IN ({$this->realWordIdString})"; //found = (+)30
+        $wordArray[$k][2] = array_merge($wordArray[$k][2], $this->searchQueryHelper($sqlQ2, $points=30));
+        $sqlQ3 = "SELECT ID FROM cmtIndexServer.realWord WHERE caption LIKE '%" . $wordArray[$k][0] . "'";
+        if ($this->realWordIdString != "") $sqlQ3 .= "  AND ID NOT IN ({$this->realWordIdString})"; //found = (+)20
+        $wordArray[$k][2] = array_merge($wordArray[$k][2], $this->searchQueryHelper($sqlQ3, $points=20));
+        $sqlQ4 = "SELECT ID FROM cmtIndexServer.realWord WHERE caption LIKE '%" . $wordArray[$k][0] . "%'";
+        if ($this->realWordIdString != "") $sqlQ4 .= " AND ID NOT IN ({$this->realWordIdString})"; //found = (+)10
+        $wordArray[$k][2] = array_merge($wordArray[$k][2], $this->searchQueryHelper($sqlQ4, $points=10));
+      }
+      /*
+      //4debug
+      echo "word: " . $v[0] . "<br>operator: " . $v[1] . "<br>";
+      foreach($wordArray[$k][2] as $key => $word) {
+        echo "wordID: " . $word["ID"] . "<br>";
+        echo "caption: " . $this->dbIndex->getDatabaseFieldValue("realWord", "ID", $word["ID"], "caption") . "<br>";
+        echo "points: " . $word["points"] . "<br>";
+      }
+      echo "<br>";
+      */
+    }
+    //at first we build a list of all the record_id's which may not be included in the final result because
+    //they use an excluded (NOT) word.
+    reset($wordArray);
+    while(list($k, $v) = each($wordArray)) {
+      if ($v[1] == "!") {
+        if ($v[2][0]["ID"] > 0) { //happened that we got NULL here...
+          $forbiddenWordIDs[] = $v[2][0]["ID"];
+          //echo "forbidden word id: " . $v[2][0]["ID"] . "<br>"; //4debug
+        }
+      }
+    }
+    if (is_array($forbiddenWordIDs)) {
+      $sqlQ = "SELECT record_id FROM word2record WHERE realWordID IN (" . join(", ", $forbiddenWordIDs) . ") GROUP BY record_id";
+      //echo $sqlQ; //4debug
+      $result = $this->dbIndex->Query($sqlQ);
+      $errorMsg = "fehler beim auslesen der forbiddenRecordIDs";
+      $this->dbIndex->checkDbError($errorMsg);
+      while ($rs = $this->dbIndex->FArray($result)) {
+        $forbiddenRecordIDs[] = $rs["record_id"];
+      }
+      //echo "forbidden record ids: " . join(", ", $forbiddenRecordIDs) . "<br>"; //4debug
+    }
+    //then we build a list of all the record_id's which must be included in the final result because
+    //they use an AND statement. only one of the word forms must be in that page. for example if someone searches for 
+    //phone, a page that only has 'cellphone' is accepted. the pages that match 'phone' 
+    //exactly are ranked better anyway... 
+    reset($wordArray);
+    $i = 0;
+    while(list($k, $v) = each($wordArray)) {
+      if ($v[1] == "&") {
+        while(list($k2, $v2) = each($v[2])) {
+          $mustWordIDs[$i][] = $v2["ID"];
+          //echo "must word: $i {$v2["ID"]} <br>"; //4debug
+        }
+        $i++;
+      }
+    }
+    if (is_array($mustWordIDs)) {
+      $i=0;
+      while(list($k, $v) = each($mustWordIDs)) {
+        $sqlQ = "SELECT record_id FROM word2record WHERE realWordID IN (" . join(", ", $v) . ") GROUP BY record_id";
+        //echo $sqlQ . "<br>"; //4debug
+        $result = $this->dbIndex->Query($sqlQ);
+        $errorMsg = "fehler beim auslesen der mustRecordIDs";
+        $this->dbIndex->checkDbError($errorMsg);
+        while ($rs = $this->dbIndex->FArray($result)) {
+          $mustRecordIDs[$i][] = $rs["record_id"];
+        }
+        //echo "must record ids: " . join(", ", $mustRecordIDs[$i]) . "<br>"; //4debug
+        $i++;
+      }
+    }
+    //now find out which records match on these words; prepare the query:
+    $i = 0;
+    reset($wordArray);
+    while(list($k, $v) = each($wordArray)) {
+      if ($v[1] != "!") {
+        //if someone searches for "car OR auto +ford" he doesn't care that much if 
+        //car OR auto OR both are found. so car/auto should have the same weight together
+        //as ford has for itself. for this reason, a word that was searched using OR only 
+        //gets 60% weight (a little bit more than the half) and a word searched using AND 
+        //gets 100%. of corse, if a word was excluded using NOT, the % doesn't matter. trust 
+        //me if you don't get that.
+        switch ($v[1]) {
+          case "&":
+            $operatorPoints = "10";
+            break;
+          case "|":
+            $operatorPoints = "6";
+            break;
+          default:
+            //should not happen, treat as "|"
+            $operatorPoints = "6";
+        }
+        $inArray = array();
+        $caseString = " (CASE realWordID ";
+        while(list($k2, $v2) = each($v[2])) {
+          //echo $v2["ID"] . " " . $v2["points"] . "<br>"; //4debug
+          $caseString .= "WHEN " . $v2["ID"] . " THEN " . $v2["points"] . " ";
+          $inArray[]   = $v2["ID"];
+        }
+        $caseString .= "END) ";
+        //echo "caseString: " . $caseString . "<br>"; //4debug
+        //echo "inArray: " . join(", ", $inArray) . "<br>"; //4debug
+        if ($i == 0) {
+          $sqlC = "CREATE TABLE cmtIndexServer.heapShit TYPE=HEAP ";
+        } else {
+          $sqlC = "INSERT INTO cmtIndexServer.heapShit ";
+        }
+        $sqlC .= "SELECT realWordID, record_id, ";
+        $sqlC .= "SUM(ranking * $operatorPoints * $caseString ) AS rankingSum ";
+        $sqlC .= "FROM word2record ";
+        $sqlC .= "WHERE dbName = '{$searchInput["dbName"]}' ";
+        $sqlC .= "AND dbTable = '{$searchInput["dbTable"]}' ";
+        $sqlC .= "AND (realWordID IN (" . join(", ", $inArray) . ")) ";
+        if (is_array($mustRecordIDs)) {
+          while(list($mustK, $mustV) = each($mustRecordIDs)) {
+            $sqlC .= "AND (record_id IN     (" . join(", ", $mustV) . ")) ";
+          }
+        }
+        if (is_array($forbiddenRecordIDs)) $sqlC .= "AND (record_id NOT IN (" . join(", ", $forbiddenRecordIDs) . ")) ";
+        $sqlC .= "GROUP BY record_id";
+        //echo $sqlC . "<br><br>"; //4debug
+        $dev0 = $this->dbIndex->executeSql($sqlC);
+        $i++;
+      }
+    }
+    
+    //now find out which records match on these words; run the query:
+    if (! $this->dbIndex->tableExists("heapShit", "cmtIndexServer")) {
+      return array();
+    }
+    $sqlQPart1  = "SELECT ";
+    $wantedSelectFields = explode(", ", $searchInput["dbField"]);
+    while(list($k, $v) = each($wantedSelectFields)) {
+      $sqlQPart1 .= "{$searchInput["dbName"]}.{$searchInput["dbTable"]}.{$v}, ";
+    }
+    //$sqlQPart1 .= "{$searchInput["dbName"]}.{$searchInput["dbTable"]}.ID, {$searchInput["dbName"]}.{$searchInput["dbTable"]}.caption, {$searchInput["dbName"]}.{$searchInput["dbTable"]}.url, ";
+    $sqlQPart1 .= "SUM(cmtIndexServer.heapShit.rankingSum) AS internal_rankingSum ";
+    $sqlQPart2  = "FROM cmtIndexServer.heapShit, {$searchInput["dbName"]}.{$searchInput["dbTable"]} ";
+    if ($preWhere != "") {
+      $sqlQPart2 .= $preWhere;
+      $sqlQPart2 .= " AND ";
+    } else {
+      $sqlQPart2 .= " WHERE ";
+    }
+    $sqlQPart2 .= "cmtIndexServer.heapShit.record_id = {$searchInput["dbName"]}.{$searchInput["dbTable"]}.ID ";
+    $sqlQPart2 .= "GROUP BY cmtIndexServer.heapShit.record_id ";
+    $sqlQPart3 .= "ORDER BY internal_rankingSum DESC ";
+    $searchInput["offset"]  = ($searchInput["offset"]  > 0) ? $searchInput["offset"]  : 0;
+    $searchInput["numRows"] = ($searchInput["numRows"] > 0) ? $searchInput["numRows"] : -1;
+    $sqlQPart3 .= "LIMIT {$searchInput["offset"]}, {$searchInput["numRows"]}";
+    $sqlQ = $sqlQPart1 . $sqlQPart2 . $sqlQPart3;
+    //echo "select query is: " . $sqlQ . "<br><br>"; //4debug
+    
+    //this was an idea with an optimaized way to get the number of records. but i didn't succeed :( so we run the 
+    //query the usual way, waise a bit of ram and time, but no more work time.
+    $sqlQCount .= "SELECT count(*) AS rowcount ";
+    $sqlQCount .= $sqlQPart2;
+    //echo "count query is:  " . $sqlQCount . "<br><br>"; //4debug
+    $this->realNumRows = $this->dbIndex->getDatabaseNumRecords($sqlQCount);
+    $result = $this->dbIndex->Query($sqlQ);
+    $errorMsg = "fehler in search()";
+    $this->dbIndex->checkDbError($errorMsg);
+    while ($rs = $this->dbIndex->FArray($result)) {
+      $ret[] = $rs;
+    }
+    $sqlD = "DROP TABLE cmtIndexServer.heapShit";
+    $dev0 = $this->dbIndex->executeSql($sqlD);
+    return $ret;
+  }
+  
+  
+  function searchQueryHelper($query, $points) {
+    //echo $query . "<br>"; //4debug
+    $ret = array();
+    $result   = $this->dbIndex->Query($query);
+    $errorMsg = "Fehler in searchQueryHelper()";
+    $this->dbIndex->checkDbError($errorMsg);
+    $i = 0;
+    while ($rs = $this->dbIndex->FArray($result)) {
+      $ret[$i]["ID"]     = $rs["ID"];
+      $ret[$i]["points"] = $points;
+      //echo "----- word id = " . $rs["ID"] . " points = $points <br>"; //4debug
+      if ($this->realWordIdString != "") $this->realWordIdString .= ", ";
+      $this->realWordIdString .= $rs["ID"];
+      $i++;
+    }
+    return $ret;
+  }
+  
+  
+  
+  function indexRecord($name, $recordID) {
+    //remove existing stuff
+    //$this->removeRecordIndex($name, $recordID);
+    //read out all data
+    
+  }
+  
+  function removeRecordIndex($name, $recordID) {
+  }
+  
+  
+  /**
+   * this function (re)indexes a record. 
+   * if the record was already indexed, the old indexes are removed. 
+   * @version 1.0
+   * @autor fab
+   * @lastmod 2001-01-01
+   * @return boolean; true on success, false on failure
+   * @param string dbName;    the name of the database where the record is
+   * @param string tableName; the name of the table where the record is
+   * @param int recordID;     the id of the record
+   */
+  function indexRecord($dbName="", $tableName="", $recordID=0) {
+    //make sure we have all needed parameters
+    if ($dbName == "" OR $tableName == "" OR $recordID == 0) {
+      return FALSE;
+    }
+    //make sure the stopwords are cached
+    if (! is_array($this->stopWord)) $this->cacheStopWords();
+    
+    //create a tmp SysFieldProperty object
+    $SFP  = new SysFieldProperty($dbName, $tableName);
+    $fieldArray = $SFP->getRecords();
+    //put the indexWeight into out associative array $wantedFields.
+    foreach($fieldArray as $key => $fieldPropertyArray) {
+      //var_dump($fieldPropertyArray); //4debug
+      if ($fieldPropertyArray["addProperties"]["doIndex"]) {
+        $wantedFields[$key]["indexWeight"] = explode(",", $fieldPropertyArray["addProperties"]["indexWeight"]);
+        $wantedFields[$key]["dataType"]    = &$fieldPropertyArray["dataType"];
+        $tmpSpitterArray[$key] = "";
+        $tmpWeight = 0;
+        foreach($wantedFields[$key]["indexWeight"] as $k => $v) {
+          $tmpWeight += $v;
+        }
+        $totalWeight += $tmpWeight;
+      }
+    }
+    //get the strings for the wanted fields. for this we need a dp spitter
+    $myDbSpit = new DbSpit();
+    $settings["realData"]  = TRUE;
+    $settings["dbName"]    = $dbName;
+    $settings["dbTable"]   = $tableName;
+    $settings["whereCond"] = "WHERE ID = $recordID";
+    $settings["dbFieldsShow"][$tableName] = $tmpSpitterArray; //array("caption"=>"", "location"=>"");
+    $myDbSpit->init($settings);
+    $dataArray = $myDbSpit->getDataArray();
+    //var_dump($dataArray); //4debug
+    //note: even if we did not want to receive the ID field here, we got it. don't worry...
+    reset($wantedFields);
+    foreach($wantedFields as $key => $dev0) {
+      $wantedFields[$key]["origValue"] = $dataArray["0"][$key];
+      if ($wantedFields[$key]["dataType"] == "file" OR $wantedFields[$key]["dataType"] == "url") {
+        //we have to deal with a file. read it in. 
+        $wantedFields[$key]["fileValue"] .= " " . $this->Util->readTextFromFile($wantedFields[$key]["origValue"], $wantedFields[$key]["dataType"], $this);
+        //echo "file value is: " . $wantedFields[$key]["fileValue"] . "<br><br>"; //4debug
+        //if (! $wantedFields[$key]["fileValue"]) echo "error reading file: " . $wantedFields[$key]["origValue"] . "<br>"; //4debug
+      }
+      //echo $key . "<br>";                                 //4debug
+      //echo $wantedFields[$key]["origValue"] . "<br><br>"; //4debug
+    }
+    //now we have all fields with all original values. time to extract all words, do some character 
+    //conversions, remove stopwords aka noisewords.
+    reset($wantedFields);
+    foreach($wantedFields as $key => $dev0) {
+      //$wantedFields[$key]["cleanValue"] = $this->getCleanString($wantedFields[$key]["fileValue"]);
+      $wantedFields[$key]["wordArray"]  = $this->getWordArrayFromString($wantedFields[$key]["origValue"]);
+      if ($wantedFields[$key]["dataType"] == "file" OR $wantedFields[$key]["dataType"] == "url") {
+        $wantedFields[$key]["wordArrayFile"] = $this->getWordArrayFromString($wantedFields[$key]["fileValue"]);
+        $wantedFields[$key]["wordArray"] = array_merge($wantedFields[$key]["wordArray"], $wantedFields[$key]["wordArrayFile"]);
+      }
+      
+      /* 4debug
+      foreach($wantedFields[$key]["wordArray"] as $key => $dev0) {
+        echo "$key <br>";
+      }
+      */
+    }
+    //rank the wordlist.
+    reset($wantedFields);
+    foreach($wantedFields as $key => $array) {
+      //echo "weight for next word group: " . arrayToCsv($array["indexWeight"], ", ") . "<br>"; //4debug
+      foreach($array["wordArray"] as $word => $wordArray) {
+        //echo "wort: $word<br>"; //4debug
+        //echo "findCount: {$wordArray["findCount"]} <br>"; //4debug
+        $wantedFields[$key]["wordArray"][$word]["indexWeight"]   = $array["indexWeight"];
+        $wantedFields[$key]["wordArray"][$word]["weightPercent"] = $wantedFields[$key]["wordArray"][$word]["weightPoints"] / $totalWeight * 100;
+        $pointsForWord = 0;
+        for ($i = 0; $i < $wordArray["findCount"]; $i++) {
+          $pointsForWord += $array["indexWeight"][$i];
+          //echo "points: " . $pointsForWord . "<br>"; //4debug
+        }
+        $wantedFields[$key]["wordArray"][$word]["weightPoints"]  = $pointsForWord;
+      }
+    }
+    //problem is that now we have a multidim array, the first dimension is the dbfield not the word. 
+    //this would be some overhead work. fix that first before we do db work for the words.
+    reset($wantedFields);
+    foreach($wantedFields as $key => $array) {
+      foreach($array["wordArray"] as $word => $wordArray) {
+        $finalWordArray[$word]["weightPoints"]  += $wordArray["weightPoints"];
+      }
+    }
+    //okie so far. next step will be to insert the indexed words, so... if the record has already been indexed, 
+    //we need to clean the db first:
+    $sqlD  = "DELETE FROM cmtIndexServer.word2record WHERE dbName = '$dbName' AND dbTable = '$tableName' AND record_id = $recordID";
+    $this->dbIndex->executeSql($sqlD);
+    
+    //okie. now get the final ranking for each word. 
+    //the weightPercent is much more important here than the popularity ranking. 
+    //the pop ranking is somewhere between 0 and 1000. often something like 600-700.
+    //the weightPercent is often somewhere between 3 and 30. but it can be 100.
+    //to get a number between 0 and 1000, we need to multiple it with 10.
+    //so we often get a value between 30 and 300. even if our computed value is now 30, 
+    //it should have more weight than the number 700 from the popranking. we'd need it
+    //to multiple it with 30 for this. but... if the computed weightPercent value is 
+    //900 instead of 30, and we multiple it with 30, we'll have 27'000 (compared to the 
+    //popranking of 700, doh ...
+    //now what?
+    //not sure... thinking... hmmm let's take (9x weightPrecent + 1x popranking) / 10
+    foreach($finalWordArray as $word => $dev0) {
+      $finalWordArray[$word]["weightPercent"] = $finalWordArray[$word]["weightPoints"] / $totalWeight * 100;
+      $wordProp = $this->getWordProperties($word);
+      $finalWordArray[$word]["wordID"]        = $wordProp["ID"];
+      $finalWordArray[$word]["popularity"]    = $wordProp["popularity"];
+      //pop can be 0-1000. if it is 950 then it's an often used word. and should have little points. for this we need the next lines:
+      $tmpPop = 1000 - $finalWordArray[$word]["popularity"];
+      $finalWordArray[$word]["ranking"]       = (int) (($finalWordArray[$word]["weightPercent"] * 10 * 9) + $tmpPop) / 10;
+      /* 4debug
+      echo "word: $word<br>";
+      echo "weightPoints: " .  $finalWordArray[$word]["weightPoints"] . "<br>";  //4debug
+      echo "weightPercent: " . $finalWordArray[$word]["weightPercent"] . "<br>"; //4debug
+      echo "popularity: " .    $finalWordArray[$word]["popularity"] . "<br>";    //4debug
+      echo "wordID: " .        $finalWordArray[$word]["wordID"] . "<br>";        //4debug
+      echo "ranking: " .       $finalWordArray[$word]["ranking"] . "<br><br>";   //4debug
+      */
+      $sqlI  = "INSERT INTO cmtIndexServer.word2record SET realWordID = " . $finalWordArray[$word]["wordID"] . ", ";
+      $sqlI .= "dbName = '$dbName', dbTable = '$tableName', record_id = $recordID, ranking = " . $finalWordArray[$word]["ranking"];
+      $this->dbIndex->executeSql($sqlI);
+    }
+    
+    
+    //create index
+    
+    return TRUE;
+  }
+  
+  
+  function connectDb($param) {
+    switch ($param) {
+      case "IndexServer":
+        $dbName = $this->Application["dbname_indexserver"];
+        $dbVar  = "dbIndex";
+        break;
+      case "PageSys":
+        $dbName = $this->Application["dbname_system"];
+        $dbVar  = "dbSys";
+        break;
+      default:
+        $dbName = $param;
+        $dbVar  = $param;
+    }
+    $this->$dbVar = new dbClass($this->Application["dbserver"], $this->Application["dbuser"], $this->Application["dbpassword"], $persistent=TRUE, $this->Application["dbport"], $this->Application["dbpathtosocket"]);
+    $this->$dbVar->setDbName($dbName);
+    $this->$dbVar->Connect();
+    return TRUE;
+  }
+  
+/*
+  function getSpecialInterestString($functionName, $strID, $strTitle, $strUrl) {
+    if ($strID != "") {
+      $myArray = $this->$functionName($strID);
+      if (sizeOf($myArray) > 0) {
+        $ret .= "<b>$strTitle</b><br>\n";
+        while(list($k) = each($myArray)) {
+          $ret .= sprintf($strUrl, $myArray[$k]) . "\n";
+        }
+        $ret .= "<br>";
+      }
+    }
+    return $ret;
+  }
+
+  function getSpecialInterest($param, $baseUrl) {
+    $ret = array();
+    if ($param == "") return $ret;
+    $tmp = explode(";", $param);
+    while(list($k) = each($tmp)) {
+      $x = explode("|", $tmp[$k]);
+      if ($x[0] > 0) 
+        $ret[] = $baseUrl . $x[0] . "' target='_blank'>" . $x[1] . "</a>";
+    }
+    return $ret;
+  }
+*/
+  
+  
+  function getWordProperties($word) {
+    $wordProp["len"] = strlen($word);
+    //at first we try to get the properties from the realWord table
+    $sqlQ = "SELECT ID, popularity FROM cmtIndexServer.realWord WHERE caption = '" . $word . "' LIMIT 1";
+    $result = $this->dbIndex->Query($sqlQ);
+    $errorMsg = "fehler in getWordProperties() 1";
+    $this->dbIndex->checkDbError($errorMsg);
+    if ($this->dbIndex->NumRows($result) == 1) {
+      $rs = $this->dbIndex->FArray($result);
+      $wordProp["ID"]         = $rs["ID"];
+      $wordProp["popularity"] = $rs["popularity"];
+    } else {
+      //if word is not in there, we need to add it. but first get the most information we can 
+      //about this word...
+      $sqlQ = "SELECT useCount FROM cmtIndexServer.word WHERE caption = '" . $word . "' LIMIT 1";
+      $result = $this->dbIndex->Query($sqlQ);
+      $errorMsg = "fehler in getWordProperties() 2";
+      $this->dbIndex->checkDbError($errorMsg);
+      if ($this->dbIndex->NumRows($result) == 1) {
+        $rs = $this->dbIndex->FArray($result);
+        $wordProp["useCount"] = $rs["useCount"];
+      } else {
+        $wordProp["useCount"] = 0;
+      }
+      $lenPoints = (30 - $wordProp["len"]) * 33;
+      $wordProp["popularity"] = ($lenPoints + (3 * $wordProp["useCount"])) / 4;
+      $sqlI  = "INSERT INTO cmtIndexServer.realWord SET caption = '$word', soundex = soundex('$word'), popularity=" . $wordProp["popularity"] . ", ";
+      $sqlI .= "len = " . $wordProp["len"] . ", origUseCount = " . $wordProp["useCount"];
+      $this->dbIndex->executeSql($sqlI);
+      $wordProp["ID"] = $this->dbIndex->InsertID();
+    }
+    return $wordProp;
+  }
+  
+  function getWordID($word) {
+    $ret = -1; //will be returned if not found
+    $sqlQ = "SELECT ID FROM cmtIndexServer.realWord WHERE caption = '" . $word . "' LIMIT 1";
+    $result = $this->dbIndex->Query($sqlQ);
+    $errorMsg = "fehler in getWordID()";
+    $this->dbIndex->checkDbError($errorMsg);
+    if ($this->dbIndex->NumRows($result) == 1) {
+      $rs = $this->dbIndex->FArray($result);
+      $ret = $rs["ID"];
+    }
+    return $ret;
+  }
+  
+  
+  
+  
+  function cacheStopWords() {
+    $sqlQ = "SELECT caption FROM stopWord ORDER BY caption";
+    $result = $this->dbIndex->Query($sqlQ);
+    $errorMsg = "fehler in cacheStopWords()";
+    $this->dbIndex->checkDbError($errorMsg);
+    while($rs = $this->dbIndex->FArray($result)) {
+      $tmp[$rs["caption"]] = TRUE;
+    }
+    $this->stopWord = &$tmp;
+  }
+  
+  
+  function isStopWord($word) {
+    $ret = FALSE;
+    if ($this->stopWord[$word]) $ret = TRUE;
+    return $ret;
+  }
+  
+  
+  function getWordArrayFromString($string) {
+    $ret = array();
+    $string = $this->getCleanedWordString($string);
+    $explodeChar = " ";
+    $tmpArray = explode($explodeChar, $string);
+    while(list($k) = each($tmpArray)) {
+      $tmpWord = $this->cleanWord($tmpArray[$k]);
+      if ($tmpWord != "") {
+        if (is_array($ret[$tmpWord])) {
+          $ret[$tmpWord]["findCount"]++;   //increase counter, word was found once more.
+        } else {
+          $ret[$tmpWord]["findCount"]  = 1; //word was found for the first time
+          $ret[$tmpWord]["wordString"] = $tmpWord;
+        }
+      }
+    }
+    return $ret;
+  }
+  
+  //remove all chars that are not letters or numbers (or ";" or "," or " " because keywords might be separated by them):
+  function treatSpecialChars($string="", $replaceWith=" ", $allowedSpecialCharsArray="") {
+    $len = strlen($string);
+    for ($i = 0; $i < $len; $i++) {
+      $allowedChar = FALSE;
+      $x = ord($string[$i]);
+      //echo "zeichen ist: " . $string[$i] . " asc ist: " . $x . "<br>"; //4debug
+      //059, 044 und 032 -> ";"   ","   " "
+      //if (($x >= 048 AND $x <= 057) OR ($x >= 065 AND $x <= 090) OR ($x >= 097 AND $x <= 122) OR ($x == 059) OR ($x == 044) OR ($x == 032)) {
+      if (($x >= 48 AND $x <= 57) OR ($x >= 65 AND $x <= 90) OR ($x >= 97 AND $x <= 122)) {
+        $allowedChar = TRUE;
+      } else {
+        if (is_array($allowedSpecialCharsArray)) {
+          reset($allowedSpecialCharsArray);
+          while(list($k, $v) = each($allowedSpecialCharsArray)) {
+            if ($x == $v) {
+              $allowedChar = TRUE;
+              break;
+            }
+          }
+        } else {
+          $allowedChar = FALSE;
+        }
+      }
+      if ($allowedChar) {
+        //everything is ok, add this character to the output string
+        $ret .= $string[$i];
+      } else {
+        //"remove" this character (replace it with $replaceWith)
+        //echo "remove char: X" . $string[$i] . "X <br>"; //4debug
+        $ret .= $replaceWith;
+      }
+    }
+    return $ret;
+  }
+  
+  
+  function cleanWord($word, $rememberSearchStopWords=FALSE) {
+    //trim:
+    $word = trim($word);
+    //at least one letter has to be in the string, not only numbers:
+    //2do.
+    $wordStrLen = strlen($word);
+    if ($wordStrLen <= 1) {
+      //we require a min of 2 characters. most search engines i've seen require 3.
+      if ($wordStrLen > 0 AND $rememberSearchStopWords) $this->searchStopWords[] = $word;
+      return "";
+    } else if ($wordStrLen > 30) {
+       //the db field can only hold 30 chars anyway.
+      $word = substr($word, 0, 30);
+    }
+    //check if it's not an ignored word
+    if ($this->isStopWord($word)) {
+      if ($rememberSearchStopWords) $this->searchStopWords[] = $word;
+      return "";
+    }
+    return $word;
+  }
+  
+  
+  function getCleanedWordString($string, $parseSearch=FALSE) {
+    if ($this->debug) echo "1: $string <br>\n"; //4debug
+    if ($string == "") return "";
+    //convert original string to internal usable string
+    $string = strToLower($string);
+    //problem: look at this example text:
+    //  nach 7% realem Wachstum 1998 - zu bele-<br>
+    //  gen. In den ersten 5 Monaten 1999 verrin-<br>
+    //  gerten sich die Ausfuhren sogar um nominal<br>
+    //to fix the problem with the -breaked words, we'll replace "-<br><anyinvisiblechars>" with "".
+    //$string = ereg_replace('-\<br\>[ \t\n\r]*', '', $string);
+    $string = ereg_replace('-<br>[ \t\n\r]*', '', $string);
+    $string = str_replace("<", " <", $string); //  \problem: if someone wrote "hello<br>world" our word will be "hello world" 
+    $string = strip_tags($string);             //  /as one word after stripping the tags.
+    if ($this->debug) echo "2: $string <br>\n"; //4debug
+    $string = $this->Util->htmlValueToRealValue($string);
+    if ($this->debug) echo "3: $string <br>\n"; //4debug
+    $string = $this->Util->foreignToInternalChar($string);
+    if ($this->debug) echo "4: $string <br>\n"; //4debug
+    
+    //make 2 words from concardinated words 
+    //example: car-market        -> carmarket
+    //example: tom&jerry         -> tom jerry
+    //example: software/hardware -> software hardware
+    //example: free(share)ware   -> free share ware
+    
+    //if we come from parseSearchInput() we cannot do this at this time
+    if (! $parseSearch) { 
+      $string = str_replace("-", "", $string);
+      if ($this->debug) echo "5: $string <br>\n"; //4debug
+      
+      //replace all chars that are not letters or numbers, except the space itself, with a space.
+      $allowedSpecialCharsArray = array(32);
+      $string = $this->treatSpecialChars($string, " ", $allowedSpecialCharsArray);
+      if ($this->debug) echo "6: $string <br>\n"; //4debug
+    }
+    return $string;
+  }
+  
+  
+  function parseSearchInput($string) {
+    $ret = array();
+    if ($string == " ") return $ret;
+    
+    $string = $this->getCleanedWordString($string, TRUE);
+    
+    $string = str_replace(" and ",   " &", $string); //replace " and "   with " &"
+    $string = str_replace(" und ",   " &", $string); //replace " und "   with " &"
+    $string = str_replace(" + ",     " &", $string); //replace " + "     with " &"
+    $string = str_replace(" +",      " &", $string); //replace " +"      with " &"
+    
+    $string = str_replace(" or ",    " |", $string); //replace " or "    with " |"
+    $string = str_replace(" oder ",  " |", $string); //replace " oder "  with " |"
+    
+    $string = str_replace(" not ",   " !", $string); //replace " not "   with " !"
+    $string = str_replace(" nicht ", " !", $string); //replace " nicht " with " !"
+    $string = str_replace(" - ",     " !", $string); //replace " - "     with " !"
+    $string = str_replace(" -",      " !", $string); //replace " -"      with " !"
+    
+    //there might be words like "car-washing". we cannot remove the - before because it could be an operator. 
+    $myWord = str_replace("-", "", $myWord);
+    //remove all chars that are not letters or numbers, except the space itself, &, ! and | (the operators)
+    $allowedSpecialCharsArray = array(32, 38, 124, 33); //32 = space, 38 = &, 124 = |, 33 = !    //| could be 179 instead of 124. but doesn't matter that much cause it's the "else" case anyway.
+    $string = $this->treatSpecialChars($string, " ", $allowedSpecialCharsArray);
+    if ($debug) echo "6: $string <br>\n"; //4debug
+    
+    $searchArray  = explode(" ", $string);
+    while(list($k, $v) = each($searchArray)) {
+      $myWord = $v;
+      if ($this->Util->startsWith($myWord, "&")) {
+        $myOperator = "&";
+        //remove first & sign. this is a cheap solution:
+        $myWord = str_replace("&", "", $myWord);
+      } elseif ($this->Util->startsWith($myWord, "!")) {
+        $myOperator = "!";
+        //remove first ! sign. this is a cheap solution:
+        $myWord = str_replace("!", "", $myWord);
+      } else {
+        $myOperator = "|";
+        //remove first | sign. this is a cheap solution:
+        $myWord = str_replace("|", "", $myWord);
+      }
+      $myWord = $this->cleanWord($myWord, TRUE);
+      if ($myWord != "") {
+        $ret[] = array($myWord, $myOperator);
+      }
+    }
+    
+    return $ret;
+  }  
+  
+  function uniqueArray($array) { 
+    return array_flip(array_flip($array)); 
+  } 
+
+}
+?>

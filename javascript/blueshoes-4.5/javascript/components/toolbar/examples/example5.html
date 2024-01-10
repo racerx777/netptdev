@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+<title>BlueShoes JavaScript Button: Example 5</title>
+<style>
+body {
+	font-family: arial, helvetica;
+	font-size:   12px;
+}
+</style>
+<script>
+function bs_isGecko() {
+  //rather poor implementation.
+  if (navigator.appName == "Microsoft Internet Explorer") return false;
+  return (navigator.userAgent.match(/gecko/i));
+}
+if (bs_isGecko()) {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_ie.css'>");
+}
+</script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_ButtonBar.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_Button.class.js"></script>
+<script>
+function btnClicked(btnObj) {
+	alert('Clicked the button: ' + btnObj.title);
+}
+
+function go() {
+  bar = new Bs_ButtonBar();
+  bar.useHelpBar = false;
+  bar.alignment  = 'vert';
+	
+  b1 = new Bs_Button();
+  b1.title = 'New';
+  b1.imgName = 'bs_new';
+  b1.attachEvent(btnClicked);
+  bar.addButton(b1, 'Create a new document.');
+  
+  b2 = new Bs_Button();
+  b2.title = 'Open';
+  b2.imgName = 'bs_open';
+  b2.attachEvent(btnClicked);
+  bar.addButton(b2, 'Open an existing document.');
+  
+  b3 = new Bs_Button();
+  b3.title = 'Save';
+  b3.imgName = 'bs_save';
+  b3.attachEvent(btnClicked);
+  bar.addButton(b3, 'Save the active document.');
+  
+  bar.newGroup();
+  
+  b4 = new Bs_Button();
+  b4.title = 'Cut';
+  b4.imgName = 'bs_cut';
+  b4.attachEvent(btnClicked);
+  bar.addButton(b4, 'Cut out the selection and put it into the clipboard.');
+  
+  b5 = new Bs_Button();
+  b5.title = 'Copy';
+  b5.imgName = 'bs_copy';
+  b5.attachEvent(btnClicked);
+  bar.addButton(b5, 'Copy the selection and put it into the clipboard.');
+  
+  b6 = new Bs_Button();
+  b6.title = 'Paste';
+  b6.imgName = 'bs_paste';
+  b6.attachEvent(btnClicked);
+  bar.addButton(b6, 'Paste data in clipboard at current position.');
+  
+  bar.drawInto('buttonBar');
+	
+	
+	
+  bar2 = new Bs_ButtonBar();
+  bar2.useHelpBar = true;
+  bar2.alignment  = 'vert';
+	
+  b21 = new Bs_Button();
+  b21.title   = 'New';
+	b21.caption = true;
+  b21.imgName = 'bs_new';
+  b21.attachEvent(btnClicked);
+  bar2.addButton(b21, 'Create a new document.');
+  
+  b22 = new Bs_Button();
+  b22.title      = 'Open';
+	b22.caption    = true;
+  b22.imgName    = 'bs_open';
+  b22.attachEvent(btnClicked);
+  bar2.addButton(b22, 'Open an existing document.');
+  
+  b23 = new Bs_Button();
+  b23.title      = 'Save';
+	b23.caption    = true;
+  b23.imgName    = 'bs_save';
+  b23.attachEvent(btnClicked);
+  bar2.addButton(b23, 'Save the active document.');
+	
+  bar2.drawInto('buttonBar2');
+}
+</script>
+</head>
+<body bgcolor="white" onLoad="go();">
+
+<h1>JavaScript Toolbar Example 5</h1>
+
+Like example 2 but...
+<ul>
+
+  <li>toolbar is drawn vertically.</li>
+  <li></li>
+</ul>
+
+Move your mouse over the buttons, and click them.
+<hr>
+<br>
+
+<table>
+	<tr>
+		<td valign="top">
+			<div id="buttonBar"  style="width:26px; border:1px solid black;"></div>
+		</td>
+		<td width="50">&nbsp;</td>
+		<td valign="top">
+			<div id="buttonBar2" style="width:200px; border:1px solid black;"></div>
+		</td>
+	</tr>
+</table>
+
+</body>
+</html>

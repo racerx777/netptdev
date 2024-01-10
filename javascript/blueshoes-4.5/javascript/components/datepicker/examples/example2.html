@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title>JavaScript Bs_DatePicker example 2</title>
+	<script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Misc.lib.js"></script>
+  <script type="text/javascript" src="/_bsJavascript/components/datepicker/Bs_DatePicker.class.js"></script>
+  <script type="text/javascript" src="/_bsJavascript/core/form/Bs_FormFieldSelect.class.js"></script>
+	<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_Button.class.js"></script>
+<script type="text/javascript">
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_ie.css'>");
+}
+
+function init() {
+  myDatePicker = new Bs_DatePicker();
+  myDatePicker.fieldName                  = 'datePickerField';
+	myDatePicker.openByInit                 = true;
+	//myDatePicker.setDateByIso('2003-12-31');
+	myDatePicker.dateFormat                 = 'eu';
+	myDatePicker.useSpinEditForYear         = false;
+	
+	myDatePicker.dateInputClassName         = 'datePickerDate';
+	myDatePicker.monthSelectClassName       = 'datePickerMonth';
+	myDatePicker.yearInputClassName         = 'datePickerYear';
+	myDatePicker.dayTableClassName          = 'datePickerTable';
+	myDatePicker.dayHeaderClassName         = 'datePickerDayHeader';
+	myDatePicker.dayClassName               = 'datePickerDay';
+	myDatePicker.dayClassNameByWeekday['7'] = 'datePickerDaySunday';
+	myDatePicker.dayTableAttributeString    = 'width="100%" border="1" cellspacing="0" cellpadding="0" bordercolor="white"';
+	
+	myDatePicker.dayHeaderFontColor         = 'yellow';
+	myDatePicker.dayHeaderBgColor           = 'green';
+	myDatePicker.dayFontColor               = 'brown';
+	myDatePicker.dayBgColor                 = 'antiquewhite';
+	myDatePicker.dayFontColorActive         = 'red';
+	myDatePicker.dayBgColorActive           = 'white';
+	myDatePicker.dayTableBgColor            = 'silver';
+	myDatePicker.dayBgColorOver             = 'yellow';
+	
+	myDatePicker.width                      = 115;
+	myDatePicker.daysNumChars               = 1;
+  myDatePicker.drawInto('myDatePickerDiv');
+}
+</script>
+
+<style>
+input.datePickerDate {
+	color: green;
+	font-weight: bold;
+}
+select.datePickerMonth {
+	font-size: 10px;
+	height: 18px;
+	background-color:silver;
+}
+input.datePickerYear {
+	font-size: 10px;
+	height: 18px;
+	width: 35px;
+	background-color:silver;
+}
+.datePickerTable {
+}
+.datePickerDayHeader {
+	font-size: 10px;
+	font-family: arial;
+}
+.datePickerDay {
+	font-size: 9px;
+	font-family: arial;
+}
+</style>
+
+</head>
+
+<body onLoad="init();" bgcolor="silver">
+
+<h1>JavaScript Bs_DatePicker example 2</h1>
+
+<ul>
+	<li>is open by default</li>
+	<li>european output format dd.mm.yyyy</li>
+	<li>no default value</li>
+  <li>lots of color and style customization</li>
+	<li>the spinedit feature for the year iput field is disabled</li>
+</ul>
+<hr>
+<br>
+
+
+<form  name="test" id="test" action="http://www.blueshoes.org/postDump.php" method="post">
+  <div id="myDatePickerDiv"></div>
+	<br>
+	<input type="submit">
+</form>
+
+
+</body>
+</html>
+

@@ -1,0 +1,311 @@
+@charset "utf-8";
+body  {
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:14px;
+}
+
+th {
+background-color:#4682B4;
+color:#FFFFFF;
+}
+
+.thrCol #container { 
+	width: 900px;  
+	background: #FFFFFF;
+	margin: 0 auto; 
+	text-align: justify;
+	line-height: 1.7em;
+} 
+.thrCol #header { 
+	background: url('../images/masthead-sky.jpg') no-repeat;
+	width: 900px;
+	height: 190px; 
+	padding: 0 0 10px 0; 
+} 
+
+.logo {
+	padding:0;
+	margin: 50px 0 0 30px;
+}
+
+.flash {
+	position:relative;
+	width: 654px;
+	height: 138px;
+}
+
+.centerFieldset {
+	text-align: center;
+	vertical-align: middle;
+	clear: both;
+	margin-top: 35px;
+	margin-right: 100px;
+}
+
+.centerFieldset fieldset {
+	display:inline;
+	margin-left:auto;
+	margin-right:auto;
+	/* INHERITED ALIGNMENT IS CENTER. ONLY INCLUDE THIS IF YOU WANT */
+	/* TO CHANGE THE ALIGNMENT OF THE CONTENTS OF THE FIELDSET */
+	text-align:left;
+}
+
+#nav {
+	width: 1000px;
+	height: 36px ;
+	margin:16px 0 0 -2px;
+	padding:0;
+}		
+
+
+#navbar li{
+	list-style:none;
+	float: left;
+	margin:0;
+	padding:0;
+}	
+
+#watermark {
+ 	background: url('../images/logo_watermark.gif') no-repeat #ffffff;
+}
+	
+.thrCol #sidebar1 {
+	float: left;
+	width: 260px; /* the actual width of this div, in standards-compliant browsers, or standards mode in Internet Explorer will include the padding and border in addition to the width */ 
+	padding: 10px 20px 0 0;
+}
+
+.thrCol #sidebar2 {
+	float: right;
+	width: 260px; /* the actual width of this div, in standards-compliant browsers, or standards mode in Internet Explorer will include the padding and border in addition to the width */
+	padding: 10px 0 0 20px;
+}
+
+.thrCol #mainContent { 
+	margin: 0 310px; /* the right and left margins on this div element creates the two outer columns on the sides of the page. No matter how much content the sidebar divs contain, the column space will remain. You can remove this margin if you want the #mainContent div's text to fill the sidebar spaces when the content in each sidebar ends. */
+	padding: 10px 10px; /* remember that padding is the space inside the div box and margin is the space outside the div box */
+} 
+
+.bottom {
+	margin: -20px 0 0 0;
+	padding: 0;
+}
+
+
+.thrCol #footer { 
+	padding: 0 10px 0 20px; /* this padding matches the left alignment of the elements in the divs that appear above it. */
+} 
+.thrCol #footer p {
+	margin: 0;
+	padding: 25px 0;
+	color: #cccccc;
+	font-size:11px;
+	line-height:1.2em;
+}
+
+.thrCol #footer a:link {color: #cccccc; text-decoration: underline;}
+.thrCol #footer a:hover {color: #005696 ; text-decoration:none;}
+
+.fltrt { /* this class can be used to float an element right in your page. The floated element must precede the element it should be next to on the page. */
+	float: right;
+	margin-left: 8px;
+}
+.fltlft { /* this class can be used to float an element left in your page */
+	float: left;
+	margin-right: 8px;
+}
+.clearfloat { /* this class should be placed on a div or break element and should be the final element before the close of a container that should fully contain a float */
+	clear:both;
+    height:0;
+    font-size: 1px;
+    line-height: 0px;
+}
+
+/*-------------------------------------------- sub-page styles --------------------------------------*/
+
+h1 {
+	color: #3971aa;
+	font-size: 15px;
+	margin-left:7px;
+}
+
+h1 a:link  {color: #3971aa; text-decoration:none;}
+h1 a:hover  {color: #3971aa; text-decoration:underline;}
+h1 a:visited  {color: #3971aa; text-decoration:none;}
+
+
+#background {
+	background: url('../images/sub_slice.gif') repeat-y;
+	width: 900px;
+	margin: 5px 0 0 0;
+}
+
+.thrCol #sub-content {
+	float: left;
+	width: 580px; /* the actual width of this div, in standards-compliant browsers, or standards mode in Internet Explorer will include the padding and border in addition to the width */ 
+	padding: 5px 20px 0 10px;
+	font-size: 12px;
+	background: url('/images/watermark.gif') no-repeat top;
+}
+
+.thrCol #sub-content p {
+	padding: 0 0 0 20px;
+}
+
+.thrCol #sub-sidebar {
+	float: right;
+	width: 250px; /* the actual width of this div, in standards-compliant browsers, or standards mode in Internet Explorer will include the padding and border in addition to the width */
+	padding: 10px 20px 0 0;
+}
+
+.sub-sidebar-top {
+	margin: -10px 0 0 -21px;
+}
+
+.thrCol #footer-sub { 
+	margin: -65px 0 0 0;
+	padding: 0 10px 0 20px; /* this padding matches the left alignment of the elements in the divs that appear above it. */
+} 
+
+.thrCol #footer-sub p {
+	margin: 0;
+	padding: 25px 0;
+	color: #999999;
+	font-size:11px;
+	line-height:1.2em;
+}
+
+.thrCol #footer-sub a:link {color: #999999; text-decoration: underline;}
+.thrCol #footer-sub a:hover {color: #005696 ; text-decoration:none;}
+
+.sub-bottom {
+	margin: 15px 0 0 0;
+	padding: 0;
+}
+
+.containedBox {
+	clear:both;
+}
+
+#logoRow {
+/*	float:left;
+	min-height:100px; */
+	width:100%;
+}
+
+#logoRow_mobile {
+	width:100%;
+	font-size: 8px;
+}
+
+#logoDiv {
+/*	margin-left:0px;
+	min-height:100px; */
+	float:left;
+}
+
+#logoDiv_mobile {
+	float:left;
+}
+
+#NetPtSupportLink {
+	float:left;
+}
+
+#NetPtSupportLink_mobile {
+	float:left;
+}
+
+#instructionsDiv {
+/*	font-size:medium; */
+	color:#4682B4;
+/*	margin-left:10px;
+	min-height:100px; */
+	float:left;
+}
+
+#instructionsDiv_mobile {
+	float:left;
+}
+
+#weststarDiv {
+/*	margin-right:0px;
+	min-height:100px; */
+	float:right;
+	margin-right:4px;
+	display: inline; /* IE6 bug fix */
+}
+
+#weststarDiv_mobile {
+	float:right;
+}
+
+#userstatusDiv {
+/*	font-size:medium; */
+	color:#4682B4;
+}
+
+.boldLarger {
+font-size:15px;
+font-weight:bold;
+}
+
+.navBarDiv {
+	clear:both;
+	background-color:#CCCCCC;
+}
+
+#menuTabs {
+	float:left;
+}
+
+.menuTabItem {
+float:left;
+margin:5px;
+}
+
+#imitateUserDiv {
+float:right;
+}
+
+#accountSettingsDiv {
+float:right;
+}
+
+#logoutDiv {
+float:right;
+}
+
+#userLoginDiv {
+width:200px;
+}
+
+th#userLoginTableHeader {
+	border:none;
+	background-color: #FFFFFF;
+}
+
+#dummycheckbox {
+display:none;
+}
+
+a.plusminuslink:link {
+	background-color:blue;
+	color:white;
+}
+
+a.plusminuslink:hover {
+	background-color:white;
+	color:blue;
+}
+
+.popup {
+	background-color:white;
+	color:#4682B4;
+}
+
+.popup option:hover {
+	background-color:#4682B4;
+	color:white;
+}

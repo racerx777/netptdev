@@ -1,0 +1,106 @@
+[misc]
+name                  = Name
+fileName              = File Name
+inFolder              = In Folder
+size                  = Size
+fileSizeBytes         = File Size in bytes
+type                  = Type
+fileType              = File Type
+modified              = Modified
+lastModDatetime       = Last modified Datetime
+read                  = Read
+fileReadableByProcess = is File readable by webserver process
+diskFreeSpace         = Disk free space
+desiredPath           = desired path
+askFolderName         = What's the name for the new folder?
+newFolder             = New Folder
+askFileName           = What's the name for the new file?
+newfiletxt            = newfile.txt
+virtualRoot           = Virtual Root
+directory             = Directory
+unknown               = unknown
+object-s              = object(s)
+path                  = Path
+
+
+[edit]
+savedSuccessfully = Saved successfully.
+errorSaving       = Error saving file.
+fileNotReadable   = The file is not readable. Check the permissions.
+fileNotWritable   = The file is not writable. Check the permissions.
+noDir             = This is a directory. It is not possible to edit directories.
+editFile          = Edit file
+
+
+[search]
+named       = Search for files or folders named
+containing  = Containing text
+lookIn      = Look in
+subfolders  = Search Subfolders
+searchNow   = Search Now
+newSearch   = New Search
+title       = Search for Files and Folders
+
+
+[error]
+notAllowed         = Not allowed!
+couldNotDelete     = Could not delete!
+pathAlreadyExists  = Path already exists!
+fileAlreadyExists  = File already exists!
+createDir          = Could not create the directory!
+createFile         = Could not create the file!
+couldNot           = Could not %s files/folders!
+overwrite          = The destination file/directory already exists. Do you want to overwrite it?
+cheat              = Don't cheat! your attempt has been logged.
+undefinedError     = As you can see, an error occured.
+uploadFailedTmp    = The file you wanted to upload already exists. so i tried to save it to the tmp directory for further processing, but that failed. The temp path would have been
+pathNotAllowed     = Path not allowed or does not exist.
+tooManyFiles       = There are %s files and directories. This is too much for the current technology.
+limitOfFiles       = The limit is set to %s.
+
+
+[overwrite]
+alreadyExists = That file already exists, what do you want to do?
+cancel        = cancel
+overwrite     = overwrite
+renameOld     = rename old file to
+renameNew     = rename new file to
+
+
+[actions]
+view        = View
+edit        = Edit
+download    = Download
+delete      = Delete
+rename      = Rename
+cut         = Cut
+copy        = Copy
+
+
+[buttons]
+homeTitle      = Home
+homeDesc       = Go back to the start.
+refreshTitle   = Refresh
+refreshDesc    = Refresh the whole file manager.
+goDirUpTitle   = Up
+goDirUpDesc    = Go one dir up.
+foldersTitle   = Folders
+foldersDesc    = Show the folders view.
+searchTitle    = Search
+searchDesc     = Show the search view.
+deleteTitle    = Delete
+deleteDesc     = Delete the selected files/folders.
+cutTitle       = Cut
+cutDesc        = Cut the selected files/folders into the clipboard.
+copyTitle      = Copy
+copyDesc       = Copy the selected files/folders into the clipboard.
+pasteTitle     = Paste
+pasteDesc      = Paste the files/folders from the clipboard here.
+newFolderTitle = New Folder
+newFolderDesc  = Create a new folder in the current folder.
+newFileTitle   = New File
+newFileDesc    = Create a new folder in the current folder.
+editTitle      = Edit
+editDesc       = Edit the content of the selected file.
+
+

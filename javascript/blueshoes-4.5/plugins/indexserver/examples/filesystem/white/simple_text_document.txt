@@ -1,0 +1,7 @@
+this is a simple text document. it does not have any formatting other than 
+line breaks. it could use tabs (tabulators) but nah, i don't use those here.
+text cannot be writtin in *bold*, _italic_ or underline. not possible. 
+also it is not possible to change the font face or size.
+
+but hey, everyone can read it. no proprietary software is needed. unix, 
+windows and mac all do, no special operating system needed either.

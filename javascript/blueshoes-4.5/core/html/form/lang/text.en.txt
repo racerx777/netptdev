@@ -1,0 +1,8 @@
+[default]
+#we put everything into the [default] section for this file. that is hardcoded. if you need more sections, recode.
+md5       = You are not allowed to modify hidden input fields. If you don't know what that means please email the webmaster.
+yes       = yes
+no        = no
+errorsOccured   = Errors occured
+
+

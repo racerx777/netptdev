@@ -1,0 +1,11 @@
+instant help is a plugin for blueshoes.
+
+it uses jsrs (javascript remote scripting) for the client/server 
+communication and a mysql db as backend storage.
+
+the help texts don't need to be loaded/sent to the client along 
+with the page. you can place neat little ? icons into your pages, 
+put some js code around them (onClick or onMouseOver) and the help 
+text will be loaded on demand directly from the server (jsrs).
+
+

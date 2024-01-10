@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+	<title>BS Wysiwyg Example 2</title>
+
+<script type="text/javascript" src="/_bsJavascript/components/wysiwyg/Bs_Wysiwyg.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/form/Bs_FormFieldSelect.class.js"></script>
+<script>
+function init() {
+  w = new Bs_Wysiwyg('w'); //global
+	w.setImageBrowser('http://www.blueshoes.org/_bsApplications/filebrowser/examples/example1.php');
+  //w.setValue('blah <b>bold</b> <i>italic</i>');
+  w.style = 'toolbar';
+  var status = w.drawAsToolbar('editableArea');
+  if (!status) alert('failed loading toolbar!');
+}
+</script>
+
+</head>
+
+<body onLoad="init()">
+
+<a href="javascript:void(0);" onclick="alert(w.getValue()); return false;">alert the current value</a>
+<br><br>
+
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<div id="editableArea" style="background-color:antiquewhite; border:1px solid gray;">this is the content that gets edited.</div>
+
+</body>
+</html>

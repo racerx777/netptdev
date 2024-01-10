@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="notes" value="This process will select the next entry assigned to user queue. The record will be locked for 30 minutes to ensure that multiple users do not work the same queue entry at the same time.&#xD;1. Select next unlocked queue entry in current user queue&#xD;2. Priority first then next contact time second.&#xD;3. Entry will be re-queued according to action taken when working the entry." />
+</info>

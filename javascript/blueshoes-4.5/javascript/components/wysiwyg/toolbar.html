@@ -1,0 +1,1991 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>editbar</title>
+
+<style TYPE="text/css">
+		td { font-family: arial, helvetica; font-size: 10pt; color: #000000; }
+		td.small { font-family: arial, helvetica; font-size: 8pt; color: #000000; }
+		td.bar { font-family: arial, helvetica; font-size: 2pt; color: #000000; }
+</style>
+
+<!-- buttonbar in use here since bs4.3 -->
+<script type="text/javascript">
+function bs_isGecko() {
+  //rather poor implementation.
+  if (navigator.appName == "Microsoft Internet Explorer") return false;
+  return (navigator.userAgent.match(/gecko/i));
+}
+if (bs_isGecko()) {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_ie.css'>");
+}
+</script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_ButtonBar.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_Button.class.js"></script>
+
+
+  <script type="text/javascript" src="/_bsJavascript/core/html/Bs_HtmlUtil.lib.js"></script>
+  <script type="text/javascript">
+  <!-- hide it
+  
+  var editorDoc  = parent.document;
+  var workingDoc = parent.document; //parent.parent.document;
+  
+  var currentRegister        = "";
+  
+  
+  /**
+  * once this page got loaded, parent.bsWysiwygToolbarOnloadCallback() 
+  * gets executed. then the parent does not know which iframe editbar 
+  * it is. usually there is just one, but there could be more!
+  * so using the vars meLoaded and sawThatMeLoaded the parent can find it out.
+  * @see var meLoaded
+  */
+  var sawThatMeLoaded = false;
+  /**
+  * @see var sawThatMeLoaded
+  */
+  var meLoaded        = false;
+  
+  /**
+  * reference to the instance of Bs_Wysiwyg that uses this toolbar.
+  * gets set after this toolba is rendered.
+  * @var object wysiwygObj
+  */
+  var wysiwygObj;
+  
+  /**
+  * reference to the html editor element. it can be here, internal, or 
+  * in the parent frame.
+  * gets set after this page loaded.
+  * @var object htmlEditorElm
+  var htmlEditorElm;
+  */
+  var useInternalHtmlElement = false;
+  
+  
+  function loaded() {
+    /*
+    if ((parent) && (parent.parent) && (parent.parent._callbackLoaded)) {
+      parent.parent._callbackLoaded();
+    }
+    */
+    meLoaded = true;
+    parent.bsWysiwygToolbarOnloadCallback();
+  }
+  
+  /**
+  * 
+  * @param  string type (one of: whtml, html, xhtml, xml, text, screentype)
+	* @param  bool startActivated
+	* @return void
+  */
+  function init(type, startActivated) {
+    //alert('here in init'); //4debug
+		
+		if (wysiwygObj.style != 'toolbar') {
+			//don't need these
+			document.getElementById('btnSave').style.display                = 'none';
+			document.getElementById('btnNosave').style.display              = 'none';
+			document.getElementById('registerHtmlSeparator1').style.display = 'none';
+		}
+		
+		//at first we set all registers to invisible:
+    document.all.btnRegisterCustom1.style.display    = 'none';
+    document.all.btnRegisterText.style.display       = 'none';
+    document.all.btnRegisterEasy.style.display       = 'none';
+    document.all.btnRegisterPlus.style.display       = 'none';
+    document.all.btnRegisterEditlive.style.display   = 'none';
+    document.all.btnRegisterHtml.style.display       = 'none';
+    document.all.btnRegisterScreentype.style.display = 'none';
+		
+		var switchTo = false;
+		
+		//then we activate some registers based on the data type:
+    switch (type) {
+      case 'whtml':
+				if ((wysiwygObj.useRegisterEasy) || (wysiwygObj.useRegisterEasy == 'auto')) {
+	        document.all.btnRegisterEasy.style.display     = 'block';
+	        switchTo = 'registerEasy';
+				}
+				if ((wysiwygObj.useRegisterPlus) || (wysiwygObj.useRegisterPlus == 'auto')) {
+	        document.all.btnRegisterPlus.style.display     = 'block';
+				}
+				if ((wysiwygObj.useRegisterEditlive) || (wysiwygObj.useRegisterEditlive == 'auto')) {
+					document.all.btnRegisterEditlive.style.display = 'block';
+				}
+				if ((wysiwygObj.useRegisterHtml) || (wysiwygObj.useRegisterHtml == 'auto')) {
+	        document.all.btnRegisterHtml.style.display     = 'block';
+				}
+        break;
+      case 'html':
+      case 'xhtml':
+      case 'xml':
+				if ((wysiwygObj.useRegisterHtml) || (wysiwygObj.useRegisterHtml == 'auto')) {
+	        document.all.btnRegisterHtml.style.display = 'block';
+  	      switchTo = 'registerHtml';
+				}
+        break;
+      case 'text':
+				if ((wysiwygObj.useRegisterText) || (wysiwygObj.useRegisterText == 'auto')) {
+	        document.all.btnRegisterText.style.display = 'block';
+  	      switchTo = 'registerText';
+				}
+        break;
+      case 'screentype':
+				if ((wysiwygObj.useRegisterScreentype) || (wysiwygObj.useRegisterScreentype == 'auto')) {
+	        document.all.btnRegisterScreentype.style.display = 'block';
+  	      switchTo = 'registerScreentype';
+				}
+        break;
+      default:
+        //hrm. 
+				if ((wysiwygObj.useRegisterText) || (wysiwygObj.useRegisterText == 'auto')) {
+	        document.all.btnRegisterText.style.display = 'block';
+  	      switchTo = 'registerText';
+				}
+    }
+		
+    //and then we might have to activate other registers:
+    if (wysiwygObj.useRegisterCustom1    == true) document.all.btnRegisterCustom1.style.display    = 'block';
+    if (wysiwygObj.useRegisterText       == true) document.all.btnRegisterText.style.display       = 'block';
+    if (wysiwygObj.useRegisterEasy       == true) document.all.btnRegisterEasy.style.display       = 'block';
+    if (wysiwygObj.useRegisterPlus       == true) document.all.btnRegisterPlus.style.display       = 'block';
+    if (wysiwygObj.useRegisterEditlive   == true) document.all.btnRegisterEditlive.style.display   = 'block';
+    if (wysiwygObj.useRegisterHtml       == true) document.all.btnRegisterHtml.style.display       = 'block';
+    if (wysiwygObj.useRegisterScreentype == true) document.all.btnRegisterScreentype.style.display = 'block';
+		
+		if (document.all.btnRegisterCustom1.style.display == 'block') {
+			renderRegisterCustom1();
+			document.getElementById('btnRegisterCustom1').innerHTML = wysiwygObj.registerCustom1Caption; //set the caption
+		}
+		
+		if (!switchTo) {
+			do {
+				if (document.all.btnRegisterCustom1.style.display == 'block') {
+					switchTo = 'registerCustom1';
+					break;
+				}
+				if (document.all.btnRegisterText.style.display == 'block') {
+					switchTo = 'registerText';
+					break;
+				}
+				if (document.all.btnRegisterEasy.style.display == 'block') {
+					switchTo = 'registerEasy';
+					break;
+				}
+				if (document.all.btnRegisterPlus.style.display == 'block') {
+					switchTo = 'registerPlus';
+					break;
+				}
+				if (document.all.btnRegisterEditlive.style.display == 'block') {
+					switchTo = 'registerEditlive';
+					break;
+				}
+				if (document.all.btnRegisterHtml.style.display == 'block') {
+					switchTo = 'registerHtml';
+					break;
+				}
+				if (document.all.btnRegisterScreentype.style.display == 'block') {
+					switchTo = 'registerScreentype';
+					break;
+				}
+			} while (false);
+		}
+		if (switchTo) switchToRegister(switchTo, !startActivated);
+  }
+  
+	
+	/**
+	* switches to the register specified.
+	* @param  string strWhich (eg 'registerHtml')
+	* @return void
+	*/
+  function switchToRegister(strWhich, noActivation) {
+		if (strWhich == 'registerCustom1') {
+			document.getElementById('trInfoBar').style.display = 'none';
+		} else {
+			document.getElementById('trInfoBar').style.display = 'block';
+		}
+		
+    if (currentRegister != "") {
+      toggleDisplay(false, currentRegister);
+      var tmp = switchToRegisterHelper(currentRegister);
+      document.all[tmp].background="/_bsJavascript/components/wysiwyg/img/register_off.gif";
+      document.all[tmp].vAlign="middle";
+    }
+    toggleDisplay(true, strWhich);
+    var tmp2 = switchToRegisterHelper(strWhich);
+    document.all[tmp2].background = "/_bsJavascript/components/wysiwyg/img/register_on.gif";
+    document.all[tmp2].vAlign="top";
+    if (strWhich == "registerHtml") {
+      if (useInternalHtmlElement) {
+        document.getElementById('htmlEditorTr').style.display     = '';
+        document.getElementById('htmlEditorTrLane').style.display = '';
+        document.all.htmlEditor.innerHTML = filterForHtml(wysiwygObj.getValue());
+        wysiwygObj.wysiwygElm.contentEditable = false;
+        document.all.htmlEditor.focus();
+      } else {
+        wysiwygObj.inHtmlMode           = true;
+        wysiwygObj.wysiwygElm.innerHTML = filterForHtml(wysiwygObj.getValue());
+        wysiwygObj.wysiwygElm.focus();
+      }
+    } else if (strWhich == "registerEditlive") {
+      if (document.all.editliveIframe.src == "/_bsJavascript/components/wysiwyg/empty.html") {
+        document.all.editliveIframe.src = "/_bsJavascript/components/wysiwyg/editlive.html";
+      } else {
+        if (workingDoc.all[parent.parent.bs_edit_editCurrent]) editliveIframe.editLive1.setSource(workingDoc.all[parent.parent.bs_edit_editCurrent].innerHTML);
+      }
+      if (workingDoc.all[parent.parent.bs_edit_editCurrent]) workingDoc.all[parent.parent.bs_edit_editCurrent].contentEditable = false;
+    } else {
+      wysiwygObj.inHtmlMode                 = false;
+      wysiwygObj.wysiwygElm.contentEditable = true;
+      wysiwygObj.wysiwygElm.innerHTML = wysiwygObj.getValue();
+			if (!noActivation) {
+  	    wysiwygObj.wysiwygElm.focus();
+			}
+    }
+    currentRegister = strWhich;
+  }
+  /**
+  * takes a string like 'registerText' and returns 'btnRegisterText'.
+  * @param  string str
+  * @return string
+  */
+  function switchToRegisterHelper(str) {
+    ret  = 'btn';
+    ret += str.substring(0, 1).toUpperCase();
+    ret += str.substring(1);
+    return ret;
+  }
+  
+  function updateZoom() {
+    var zoomSize = "100%";
+    switch (navbarForm.zoom.selectedIndex) {
+      case 0:
+        zoomSize = "25%";
+        break;
+      case 1:
+        zoomSize = "50%";
+        break;
+      case 2:
+        zoomSize = "75%";
+        break;
+      case 3:
+        zoomSize = "100%";
+        break;
+      case 4:
+        zoomSize = "125%";
+        break;
+      case 5:
+        zoomSize = "150%";
+        break;
+      case 6:
+        zoomSize = "175%";
+        break;
+      case 7:
+        zoomSize = "200%";
+        break;
+      case 8:
+        zoomSize = "300%";
+        break;
+      case 9:
+        zoomSize = "500%";
+        break;
+      default:
+        zoomSize = "100%";
+    }
+    workingDoc.all[parent.parent.bs_edit_editCurrent].style.zoom = zoomSize; 
+    wysiwygObj.wysiwygElm.focus();
+  }
+  
+  function updateFontface() {
+    switch (navbarForm.fontFace.selectedIndex) {
+      case 0:
+        var fontFace = "arial";
+        break;
+      case 1:
+        var fontFace = "helvetica";
+        break;
+      case 2:
+        var fontFace = "verdana";
+        break;
+      case 3:
+        var fontFace = "times new roman";
+        break;
+      default:
+        var fontFace = "arial";
+    }
+    wysiwygObj.wysiwygElm.focus();
+    workingDoc.execCommand("FontName", false, fontFace); 
+  }
+  
+  function updateFontsize() {
+    var fontSize = (navbarForm.fontSize.selectedIndex + 1);
+    wysiwygObj.wysiwygElm.focus();
+    workingDoc.execCommand("FontSize", false, fontSize); 
+  }
+  
+  function updateBlockFormat() {
+    var style = navbarForm.formatBlock.options[navbarForm.formatBlock.selectedIndex].value;
+    wysiwygObj.wysiwygElm.focus();
+    workingDoc.execCommand("FormatBlock", false, style); 
+  }
+
+  function updateBlockStyle() {
+    var style = navbarForm.styleBlock.options[navbarForm.styleBlock.selectedIndex].value;
+    addTags("<span class='" + style + "'>", "</span>");
+  }
+  
+  /**
+  * inserts the image that was specified in the gui.
+	* @todo i think we could do execCommand('InsertImage', false, 'url'); instead of the hack.
+  */
+  function insertImage(t) {
+    //somehow i can't access it this way.
+    //alert(document.forms.img.imgSource.value);
+    source = document.all.imgSource.value;
+    alt    = document.all.imgAlt.value;
+    width  = document.all.imgWidth.value;
+    height = document.all.imgHeight.value;
+    hSpace = document.all.imgHSpace.value;
+    vSpace = document.all.imgVSpace.value;
+    border = document.all.imgBorder.value;
+    align  = document.all.imgAlign.options[document.all.imgAlign.selectedIndex].text;
+    tag = "<img src=\"" + source + "\"";
+    if (alt.length    > 0) tag += " alt=\""    + alt    + "\"";
+    if (width.length  > 0) tag += " width=\""  + width  + "\"";
+    if (height.length > 0) tag += " height=\"" + height  + "\"";
+    if (hSpace.length > 0) tag += " hSpace=\"" + hSpace  + "\"";
+    if (vSpace.length > 0) tag += " vSpace=\"" + vSpace  + "\"";
+    if (border.length > 0) tag += " border=\"" + border  + "\"";
+    if (align.length  > 0) tag += " align=\""  + align   + "\"";
+    tag += ">";
+    insertText(tag);
+  }
+  
+  /**
+  * clears the gui for the insert image so the user can start from scratch.
+  */
+  function clearImage() {
+    document.all.imgSource.value = '';
+    document.all.imgAlt.value    = '';
+    document.all.imgWidth.value  = '';
+    document.all.imgHeight.value = '';
+    document.all.imgHSpace.value = '';
+    document.all.imgVSpace.value = '';
+    document.all.imgBorder.value = '';
+    document.all.imgAlign.selectedIndex = 0;
+    //document.all.imgAlign.options[document.all.imgAlign.selectedIndex].text;
+  }
+  
+  /**
+  * actualizes the preview image in the gui.
+  */
+  function previewImage() {
+    document.all.imgPreview.src = document.all.imgSource.value;
+  }
+  
+  /**
+  * inserts the given text (or html, whatever).
+  * 
+  * this is tricky. ie6 has no insert function. nothing to insert text 
+  * at the given position, or in front and at then end of selected text. sucks. 
+  * security thing? don't think so. but there are plenty of other functions (see 
+  * execCommand()), so i don't see why this is missing.
+  * 
+  * what we do is execCommand("InsertMarquee", false, 'dummy') and then go and 
+  * replace that inserted marquee using a regexp with the given text. :-)
+  * 
+  * updated info: there is pasteHTML() that works sometimes. some further reading 
+  *               and learning will be needed for proper usage. 2002/10/31 --andrej
+  * 
+  * @param string text
+  * @param string treatCurrentAsText (if we should treat the current value as text and not as html)
+  * @return void
+  */
+  function insertText(text, treatCurrentAsText) {
+    //note: this code is fucked and buggy as hell :/ dunno what's the cause.
+    if (wysiwygObj._editorCursorPos) {
+      wysiwygObj._editorCursorPos.pasteHTML(text);
+    } else {
+      wysiwygObj.wysiwygElm.focus();
+      workingDoc.execCommand("InsertMarquee", false, 'dummy');
+      //have to use innerHTML, not getValue() here:
+      //var t = wysiwygObj.getValue();
+      if (treatCurrentAsText) {
+        wysiwygObj.wysiwygElm.innerHTML = wysiwygObj.wysiwygElm.innerText;
+      }
+      var t = wysiwygObj.wysiwygElm.innerHTML;
+      t = t.replace(/<MARQUEE id=dummy><\/MARQUEE>/, text);
+      if (treatCurrentAsText) {
+        wysiwygObj.wysiwygElm.innerHTML = t;
+        wysiwygObj.wysiwygElm.innerText = wysiwygObj.wysiwygElm.innerHTML;
+        t = wysiwygObj.wysiwygElm.innerText;
+      }
+      wysiwygObj.setValue(t);
+      alert('here');
+    }
+  }
+  
+  
+  /**
+  * adds the given tags around the selected text. alerts the user if no text selected.
+  */
+  function addTags(tagStart, tagEnd) {
+    //note: in ns6 this would be window.getSelection(); rtfm
+    var text = tagStart + workingDoc.selection.createRange().text + tagEnd;
+    insertText(text);
+  }
+  
+  var buttonImagePath = "/_bsJavascript/components/wysiwyg/buttons/";
+  
+  function buttonMouseOver(obj) {
+    buttonHelpOn(obj);
+    obj.src= buttonImagePath + obj.id + "_mouse.gif";
+  }
+  function buttonMouseOut(obj) {
+    buttonHelpOff();
+    obj.src= buttonImagePath + obj.id + "_off.gif";
+  }
+  function buttonMouseDown(obj) {
+    obj.src= buttonImagePath + obj.id + "_on.gif";
+  }
+  function buttonMouseUp(obj) {
+    buttonAct(obj);
+    obj.src= buttonImagePath + obj.id + "_mouse.gif";
+  }
+  
+  /*
+  * new version, directly called with button name.
+  */
+  
+  function buttonMouseOver2(btnObj, btnName) {
+    buttonHelpOn(btnObj);
+    btnObj.src= buttonImagePath + btnName + "_mouse.gif";
+  }
+  function buttonMouseOut2(btnObj, btnName) {
+    buttonHelpOff();
+    btnObj.src= buttonImagePath + btnName + "_off.gif";
+  }
+  function buttonMouseDown2(btnObj, btnName) {
+    btnObj.src= buttonImagePath + btnName + "_on.gif";
+  }
+  function buttonMouseUp2(btnObj, btnName) {
+    btnObj.src= buttonImagePath + btnName + "_mouse.gif";
+  }
+  
+  /*
+  * a switch is a button that toggles on and off. for example it stays 'pushed' when on.
+  */
+  
+  function switchMouseOver(obj) {
+    buttonHelpOn(obj);
+    if (!getToggledState(obj)) {
+      obj.src="/_bsJavascript/components/wysiwyg/buttons/" + obj.id + "_mouse.gif";
+    }
+  }
+  function switchMouseOut(obj) {
+    buttonHelpOff();
+    if (getToggledState(obj)) {
+      obj.src="/_bsJavascript/components/wysiwyg/buttons/" + obj.id + "_on.gif";
+    } else {
+      obj.src="/_bsJavascript/components/wysiwyg/buttons/" + obj.id + "_off.gif";
+    }
+  }
+  function switchMouseDown(obj) {
+    if (!getToggledState(obj)) {
+      obj.src="/_bsJavascript/components/wysiwyg/buttons/" + obj.id + "_on.gif";
+    }
+  }
+  function switchMouseUp(obj) {
+    switchAct(obj);
+    if (getToggledState(obj)) {
+      obj.src="/_bsJavascript/components/wysiwyg/buttons/" + obj.id + "_on.gif";
+    } else {
+      obj.src="/_bsJavascript/components/wysiwyg/buttons/" + obj.id + "_mouse.gif";
+    }
+  }
+  
+  function switchAct(obj) {
+    switch (obj.id) {
+      case "btnImageBs":
+        toggleDisplayBar(!getToggledState(obj), "imageBar");
+        break;
+      case "btnFontcolor":
+        toggleDisplayBar(!getToggledState(obj), "colorBar");
+        break;
+      case "btnSnippets":
+        toggleDisplayBar(!getToggledState(obj), "snippetBar");
+        break;
+      case "btnSpecialChars":
+        toggleDisplayBar(!getToggledState(obj), "charsBar");
+        break;
+      default:
+        //murphy
+    }
+  }
+  
+  /**
+  * tells if the part of the navbar is currently visible to the user or not.
+  * @param  object
+  * @see    switchAct() switch...() ...
+  * @return bool
+  */
+  function getToggledState(obj) {
+    switch (obj.id) {
+      case "btnImageBs":
+        return (!(document.all.imageBar.style.display == "none"));
+      case "btnFontcolor":
+        return (!(document.all.colorBar.style.display == "none"));
+      case "btnSnippets":
+        return (!(document.all.snippetBar.style.display == "none"));
+      case "btnSpecialChars":
+        return (!(document.all.charsBar.style.display == "none"));
+    }
+  }
+
+  
+	/**
+	* acts when a button got pushed.
+	* @param  mixed obj (object or string)
+	* @return void
+	*/
+  function buttonAct(obj) {
+    //wysiwygObj.wysiwygElm.focus(); //fucks up btnPin and pasteHTML in some circumstances :/
+    
+    /*
+    2do:
+    OverWrite (true = overwrite mode, false = insert mode) Toggles the text-entry mode between insert and overwrite.
+    RemoveFormat //Removes the formatting tags from the current selection.
+    SaveAs, true (with gui) Saves the current Web page to a file.
+document.execCommand("LiveResize", true, true);
+document.execCommand("2D-Position", true, true);
+document.execCommand("MultipleSelection", true, true);
+see http://msdn.microsoft.com/library/default.asp?url=/workshop/author/dhtml/reference/commandids.asp
+
+FontName
+Sets or retrieves the font for the current selection.
+
+FontSize
+Sets or retrieves the font size for the current selection.
+
+ForeColor
+Sets or retrieves the foreground (text) color of the current selection.
+
+OverWrite
+Toggles the text-entry mode between insert and overwrite.
+
+    */
+		
+		if (typeof(obj) == 'string') {
+			var buttonId = obj;
+		} else {
+			var buttonId = obj.id;
+		}
+		
+    switch (buttonId) {
+      case "btnCut":
+        workingDoc.execCommand('Cut'); 
+        break;
+      case "btnCopy":
+        workingDoc.execCommand('Copy');
+        break;
+      case "btnPaste":
+        workingDoc.execCommand('Paste');
+        break;
+      case "btnUndo":
+        workingDoc.execCommand('Undo');
+        break;
+      case "btnRedo":
+        workingDoc.execCommand('Redo');
+        break;
+      case "btnLeft":
+        workingDoc.execCommand('JustifyLeft');
+        break;
+      case "btnCenter":
+        workingDoc.execCommand('JustifyCenter');
+        break;
+      case "btnRight":
+        workingDoc.execCommand('JustifyRight');
+        break;
+      case "btnOl":
+        workingDoc.execCommand('InsertOrderedList');
+        break;
+      case "btnUl":
+        workingDoc.execCommand('InsertUnorderedList');
+        break;
+      case "btnParagraph": //no such button yet. not really needed, you can still hit return on your keyboard.
+        workingDoc.execCommand('InsertParagraph');
+        break;
+      case "btnOutdent":
+        workingDoc.execCommand('Outdent');
+        break;
+      case "btnIndent":
+        workingDoc.execCommand('Indent');
+        break;
+      case "btnBold":
+        workingDoc.execCommand('Bold');
+        //var x = "hi";
+        //alert(x);
+        //document.body.
+        //x = workingDoc.execCommand('IDM_BOLD', true);
+        //workingDoc.body.execCommand('IDM_BOLD', true);
+
+        //var y;
+        //y = workingDoc.createRange();
+        //y.execCommand('Bold');
+        //alert(x);
+        break;
+      case "btnItalic":
+        workingDoc.execCommand('Italic');
+        break;
+      case "btnUnderline":
+        workingDoc.execCommand('Underline');
+        break;
+      case "btnStrikethrough":
+        workingDoc.execCommand('StrikeThrough');
+        break;
+      case "btnSuperscript":
+        workingDoc.execCommand('Superscript');
+        break;
+      case "btnSubscript":
+        workingDoc.execCommand('Subscript');
+        break;
+      case "btnImage":
+			  //workingDoc.execCommand("InsertImage", true, "");
+			  workingDoc.execCommand("InsertTable", true, "");
+        break;
+      case "btnLink":
+			  workingDoc.execCommand("CreateLink", true, "");
+        break;
+      case "btnUnLink": //Removes any hyperlink from the current selection.
+			  workingDoc.execCommand("Unlink");
+        break;
+      case "btnPrint": //show print dialog
+			  workingDoc.execCommand("Print", true);
+        break;
+      /*
+      case "btn":
+			  workingDoc.execCommand("InsertMarquee", false, 'dummy');
+        break;
+      */
+      case "btnOk":
+        wysiwygObj.wysiwygElm.focus();
+        workingDoc.execCommand("ForeColor", false, document.all.customColor.value); 
+        break;
+      case "btnSave":
+        wysiwygObj.wysiwygElm.innerHTML = filterForHtml2(document.all.htmlEditor.innerHTML);
+        break;
+      case "btnNosave":
+        document.all.htmlEditor.innerHTML = filterForHtml(wysiwygObj.wysiwygElm.innerHTML);
+        break;
+      /*
+      case "btnPreview":
+        alert("preview not implemented yet.");
+        break;
+      */
+      case "btnPin":
+        if (useInternalHtmlElement && wysiwygObj._editorCursorPos) {
+          //can only use smarter way if we have a saved cursor pos.
+          wysiwygObj._editorCursorPos.pasteHTML(filterForHtml(snippetHtmlEditor.innerText));
+        } else {
+          //hacked like insertText()
+          if (useInternalHtmlElement) {
+            var editor = htmlEditor;
+          } else {
+            var editor = wysiwygObj.wysiwygElm;
+          }
+          editor.focus();
+          if (useInternalHtmlElement) {
+            document.execCommand("InsertMarquee", false, 'dummy');
+          } else {
+            workingDoc.execCommand("InsertMarquee", false, 'dummy');
+          }
+          var t = editor.innerHTML;
+          t = t.replace(/<MARQUEE id=dummy><\/MARQUEE>/, filterForHtml(snippetHtmlEditor.innerText));
+          editor.innerHTML = t;
+        }
+        break;
+      case "btnImageBrowser":
+        if (!wysiwygObj.openImageBrowser()) {
+          alert("sorry, no image browser has been attached.");
+        }
+        break;
+      case "btnSpecialChars":
+        wysiwygObj.specialCharsSelectorShow();
+        break;
+      default:
+        alert("not handled in buttonAct: " + obj.id);
+    }
+  }
+  
+  var barBaseHeight = 55;
+  var barTitleHeight = 28;
+  
+  //size definitions for the registers
+  var registerSize = new Array();
+  
+  //-53
+  registerSize['custom1'] = new Array();
+  registerSize['custom1']['height'] = 32 + barBaseHeight;
+  registerSize['custom1']['width']  = 0;
+	
+  registerSize['text'] = new Array();
+  registerSize['text']['height'] = 32 + barBaseHeight;
+  registerSize['text']['width']  = 0;
+  
+  registerSize['easy'] = new Array();
+  registerSize['easy']['height'] = 32 + barBaseHeight;
+  registerSize['easy']['width']  = 0;
+
+  registerSize['plus'] = new Array();
+  registerSize['plus']['height'] = 67 + barBaseHeight;
+  registerSize['plus']['width']  = 0;
+
+  registerSize['editlive'] = new Array();
+  registerSize['editlive']['height'] = 445 + barBaseHeight;
+  registerSize['editlive']['width']  = 190;
+
+  registerSize['html'] = new Array();
+  if (useInternalHtmlElement) {
+    registerSize['html']['height'] = 340 + barBaseHeight;
+  } else {
+    registerSize['html']['height'] = 32 + barBaseHeight;
+  }
+  registerSize['html']['width']  = 0;
+
+  registerSize['screentype'] = new Array();
+  registerSize['screentype']['height'] = 395;
+  registerSize['screentype']['width']  = 0;
+
+  registerSize['colorbar'] = new Array();
+  registerSize['colorbar']['height'] = 160;
+  registerSize['colorbar']['width']  = 0;
+
+  registerSize['imagebar'] = new Array();
+  registerSize['imagebar']['height'] = 236;
+  registerSize['imagebar']['width']  = 0;
+  
+  registerSize['snippetbar'] = new Array();
+  registerSize['snippetbar']['height'] = 182;
+  registerSize['snippetbar']['width']  = 0;
+  
+  registerSize['charsbar'] = new Array();
+  registerSize['charsbar']['height'] = 182;
+  registerSize['charsbar']['width']  = 0;
+  
+  
+  var registerSizeNow = new Array();
+  
+  registerSizeNow['custom1'] = new Array();
+  registerSizeNow['custom1']['height'] = registerSize['custom1']['height'];
+  registerSizeNow['custom1']['width']  = registerSize['custom1']['width'];
+	
+  registerSizeNow['text'] = new Array();
+  registerSizeNow['text']['height'] = registerSize['text']['height'];
+  registerSizeNow['text']['width']  = registerSize['text']['width'];
+  
+  registerSizeNow['easy'] = new Array();
+  registerSizeNow['easy']['height'] = registerSize['easy']['height'];
+  registerSizeNow['easy']['width']  = registerSize['easy']['width'];
+
+  registerSizeNow['plus'] = new Array();
+  registerSizeNow['plus']['height'] = registerSize['plus']['height'];
+  registerSizeNow['plus']['width']  = registerSize['plus']['width'];
+
+  registerSizeNow['editlive'] = new Array();
+  registerSizeNow['editlive']['height'] = registerSize['editlive']['height'];
+  registerSizeNow['editlive']['width']  = registerSize['editlive']['width'];
+
+  registerSizeNow['html'] = new Array();
+  registerSizeNow['html']['height'] = registerSize['html']['height'];
+  registerSizeNow['html']['width']  = registerSize['html']['width'];
+
+  registerSizeNow['screentype'] = new Array();
+  registerSizeNow['screentype']['height'] = registerSize['screentype']['height'];
+  registerSizeNow['screentype']['width']  = registerSize['screentype']['width'];
+
+  
+  /**
+  * toggles the bar on/off. 
+  * @param  b      bool (true = on, false = off)
+  * @param  string bar (name of the bar)
+  * @return void
+  */
+  function toggleDisplayBar(b, bar) {
+    operator = (b) ? '+' : '-';
+    
+    switch (bar) {
+      case "colorBar":
+        barHeight = registerSize['colorbar']['height'];
+        registerSizeNow['plus']['height'] = eval("registerSizeNow['plus']['height'] " + operator + ' ' + barHeight);
+        newHeight = registerSizeNow['plus']['height'];
+        break;
+      case "imageBar":
+        barHeight = registerSize['imagebar']['height'];
+        registerSizeNow['plus']['height'] = eval("registerSizeNow['plus']['height'] " + operator + ' ' + barHeight);
+        newHeight = registerSizeNow['plus']['height'];
+        break;
+      case "snippetBar":
+        barHeight = registerSize['snippetbar']['height'];
+        registerSizeNow['html']['height'] = eval("registerSizeNow['html']['height'] " + operator + ' ' + barHeight);
+        newHeight = registerSizeNow['html']['height'];
+        break;
+      case "charsBar":
+        barHeight = registerSize['charsbar']['height'];
+        registerSizeNow['html']['height'] = eval("registerSizeNow['html']['height'] " + operator + ' ' + barHeight);
+        newHeight = registerSizeNow['html']['height'];
+        break;
+      default:
+        return; //unknown bar
+    }
+    
+    //show or hide the bar
+    display = (b) ? 'block' : 'none';
+    document.all[bar].style.display = display;
+    
+
+    wysiwygObj.toolbarElm.style.height = newHeight;
+    //workingDoc.getElementById('bs_editBarIframe').style.height = newHeight + barTitleHeight;
+  }
+  
+  
+  /**
+  * changes to another register or toggles the display on/off.
+  * @param bool   b (a boolean telling if we should display (true) or hide (false).)
+  * @param string strWhat (the name of the register/layer.)
+  */
+  function toggleDisplay(b, strWhat) {
+    
+    //show or hide the bar
+    display = (b) ? 'block' : 'none';
+    document.all[strWhat].style.display = display;
+    
+    if (b) {
+      switch (strWhat) {
+        case "registerCustom1":
+          newHeight = registerSizeNow['custom1']['height'];
+          myWidth   = registerSizeNow['custom1']['width'];
+          break;
+        case "registerText":
+          newHeight = registerSizeNow['text']['height'];
+          myWidth   = registerSizeNow['text']['width'];
+          break;
+        case "registerEasy":
+          newHeight = registerSizeNow['easy']['height'];
+          myWidth   = registerSizeNow['easy']['width'];
+          break;
+        case "registerPlus":
+          newHeight = registerSizeNow['plus']['height'];
+          myWidth   = registerSizeNow['plus']['width'];
+          break;
+        case "registerEditlive":
+          newHeight = registerSizeNow['editlive']['height'];
+          myWidth   = registerSizeNow['editlive']['width'];
+          break;
+        case "registerHtml":
+          newHeight = registerSizeNow['html']['height'];
+          myWidth   = registerSizeNow['html']['width'];
+          break;
+        case "registerScreentype":
+          newHeight = registerSizeNow['screentype']['height'];
+          myWidth   = registerSizeNow['screentype']['width'];
+          break;
+        default:
+          return; //unknown register
+      }
+    }
+    
+    //editorDoc.all.oIframe.style.height = newHeight;
+    //workingDoc.getElementById('bs_editBarIframe').style.height = newHeight + barTitleHeight;
+    wysiwygObj.toolbarElm.style.height = newHeight;
+  }
+  
+  
+  function buttonHelpOn(obj) {
+    var helpText = "";
+    switch (obj.id) {
+      case "btnCut":
+        helpText = "Cut out the selection and put it into the Clipboard.";
+        break;
+      case "btnCopy":
+        helpText = "Copy the selection and put it into the Clipboard.";
+        break;
+      case "btnPaste":
+        helpText = "Paste data in clipboard into the current place.";
+        break;
+      case "btnUndo":
+        helpText = "Undo the last action.";
+        break;
+      case "btnRedo":
+        helpText = "Redo the previously undone action.";
+        break;
+      case "btnLeft":
+        helpText = "Aligns the selected paragraphs to the left.";
+        break;
+      case "btnCenter":
+        helpText = "Centers the selected paragraphs.";
+        break;
+      case "btnRight":
+        helpText = "Aligns the selected paragraphs to the right.";
+        break;
+      case "btnOl":
+        helpText = "Adds numbers to or removes numbers from selected paragraphs.";
+        break;
+      case "btnUl":
+        helpText = "Adds bullets to or removes bullets from selected paragraphs.";
+        break;
+      case "btnOutdent":
+        helpText = "Outdent text.";
+        break;
+      case "btnIndent":
+        helpText = "Indent text.";
+        break;
+      case "btnBold":
+        helpText = "Makes selected text bold.";
+        break;
+      case "btnItalic":
+        helpText = "Makes selected text italic.";
+        break;
+      case "btnUnderline":
+        helpText = "Unterlines selected text.";
+        break;
+      case "btnStrikethrough":
+        helpText = "Strike Through";
+        break;
+      case "btnSuperscript":
+        helpText = "Superscript";
+        break;
+      case "btnSubscript":
+        helpText = "Subscript";
+        break;
+      case "btnFontcolor":
+        helpText = "Formats the selected text with the color you click.";
+        break;
+      case "btnSave":
+        helpText = "Actualize the documents html with your new html code.";
+        break;
+      case "btnNosave":
+        helpText = "Actualize your html editor with the documents html code.";
+        break;
+      case "btnSnippets":
+        helpText = "Insert often used code snippets.";
+        break;
+      case "btnSpecialChars":
+        helpText = "Insert special characters.";
+        break;
+      /*
+      case "btnPreview":
+        helpText = "Refresh the preview with your snippet html code.";
+        break;
+      */
+      case "btnPin":
+        helpText = "Insert this snippet now.";
+        break;
+      case "btnLink":
+        helpText = "Create hyperlink for the selection.";
+        break;
+      case "btnUnLink":
+        helpText = "Removes all hyperlinks from the selection.";
+        break;
+      case "btnPrint":
+        helpText = "Opens the print dialog box.";
+        break;
+      case "btnImage":
+        helpText = "Insert an image.";
+        break;
+      case "fontFace":
+        helpText = "Changes the font of the selected text.";
+        break;
+      case "fontSize":
+        helpText = "Changes the font size of the selected text.";
+        break;
+      case "formatBlock":
+        helpText = "Changes the format of the selected text.";
+        break;
+      case "styleBlock":
+        helpText = "Changes the style of the selected text.";
+        break;
+      case "zoom":
+        helpText = "Reduce or enlarge the display of the active layer.";
+        break;
+      case "iconInfo":
+        helpText = "Move your mouse over the buttons to see the description here.";
+        break;
+      default:
+        helpText = "";
+    }
+    document.all.helpText.innerHTML = "<font face='arial' size='2'>" + helpText + "</font>";
+  }
+  function buttonHelpOff() {
+    document.all.helpText.innerHTML = "<font face='arial' size='2'></font>";
+  }
+  
+  
+  function colorOnMouseUp(obj) {
+    wysiwygObj.wysiwygElm.focus();
+    workingDoc.execCommand("ForeColor", false, obj.bgColor); 
+  }
+  //2do: there is also 'BackColor'
+
+  function colorOnMouseOver(obj) {
+    var x = HexToDec(obj.bgColor.replace('#', ''));
+    document.all.colorRgbR.innerHTML = x[0];
+    document.all.colorRgbG.innerHTML = x[1];
+    document.all.colorRgbB.innerHTML = x[2];
+    document.all.colorHex.innerHTML = obj.bgColor;
+    document.all.col_Preview.bgColor = obj.bgColor;
+  }
+  function colorOnMouseOut(obj) {
+    document.all.colorRgbR.innerHTML = "";
+    document.all.colorRgbG.innerHTML = "";
+    document.all.colorRgbB.innerHTML = "";
+    document.all.colorHex.innerHTML = "";
+    document.all.col_Preview.bgColor = "";
+  }
+  
+  
+  
+  /*
+  * screentype functions
+  */
+  
+  function screenTypeHtmlEditorRefresh() {
+    var t      = screenTypeTextEditor.innerText;
+    var length = t.length;
+    var result = "<nobr>";
+    for (i=0; i<length; i++) {
+      charCode = t.charCodeAt(i);
+      temp = "<img src='/_s/a1/" + charCode + "'>";
+      if (charCode == 32) {
+        result += "</nobr>" + temp + "<nobr>";
+      } else {
+        result += temp;
+      }
+    }
+    result += "</nobr>";
+    screenTypeHtmlEditor.innerText = result;
+    screenTypePreviewRefresh();
+  }
+  
+  function screenTypePreviewRefresh() {
+    screenTypePreview.innerHTML = screenTypeHtmlEditor.innerText;
+  }
+  
+	
+	/**
+	* fires when a Bs_Button gets clicked.
+	* @param  object btnObj (reference to the clicked Bs_Button instance.)
+	* @return void
+	* @since  bs4.3
+	*/
+	function toolbarButtonClicked(btnObj) {
+    wysiwygObj.wysiwygElm.focus(); //needed here with these buttons, altough fucks up btnPin and pasteHTML in some circumstances :/
+		buttonAct(btnObj.action);
+	}
+	
+  /**
+	* renders the custom1 register.
+	* @return void
+	* @since  bs4.3
+	*/
+	function renderRegisterCustom1() {
+		bar = new Bs_ButtonBar();
+		bar.useHelpBar = 2; //true;
+		
+		for (var i=0; i<wysiwygObj.registerCustom1Content.length; i++) {
+			if (wysiwygObj.registerCustom1Content[i] == '__SEPARATOR__') {
+				bar.newGroup();
+			} else {
+				var varName = 'b' + i;
+				eval(varName + " = new Bs_Button();");
+				eval(varName + ".objectName = '" + varName + "';");
+				eval(varName + ".action  = '" + wysiwygObj.registerCustom1Content[i]['action'] + "';");
+				eval(varName + ".title   = '" + wysiwygObj.registerCustom1Content[i]['title'] + "';");
+				eval(varName + ".imgName = '" + wysiwygObj.registerCustom1Content[i]['imgName'] + "';");
+				eval(varName + ".attachEvent(toolbarButtonClicked);");
+				eval("bar.addButton(" + varName + ", '" + wysiwygObj.registerCustom1Content[i]['helpText'] + "');");
+			}
+		}
+		
+		/*
+		//btnUndo
+		b1 = new Bs_Button();
+		b1.objectName = 'b1';
+		b1.title = 'New';
+		b1.imgName = 'bs_new';
+		b1.attachEvent(toolbarButtonClicked);
+		bar.addButton(b1, 'Create a new document.');
+		*/
+		
+		//bar.newGroup();
+		
+		bar.drawInto('registerCustom1Content');
+		//document.getElementById('registerCustom1Content').innerHTML = 'foo';
+	}
+	
+  //-->
+  </script>
+</head>
+
+<!body leftmargin=2 topmargin=2 bgcolor="#C6C6C6" onload="loaded()";>
+<body leftmargin=2 topmargin=2 bgcolor="menu" onload="loaded()";>
+
+<form name="navbarForm">
+<table BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%">
+  <tr>
+    <td id="btnRegisterCustom1"    width="78" height="23" align="center" background="/_bsJavascript/components/wysiwyg/img/register_off.gif" style="cursor: default; display: none;" onClick="switchToRegister('registerCustom1');">Custom 1</td>
+    <td id="btnRegisterText"       width="78" height="23" align="center" background="/_bsJavascript/components/wysiwyg/img/register_off.gif" style="cursor: default; display: none;" onClick="switchToRegister('registerText');">Text</td>
+    <td id="btnRegisterEasy"       width="78" height="23" align="center" background="/_bsJavascript/components/wysiwyg/img/register_off.gif" style="cursor: default; display: none;" onClick="switchToRegister('registerEasy');">Wysiwyg</td>
+    <td id="btnRegisterPlus"       width="78" height="23" align="center" background="/_bsJavascript/components/wysiwyg/img/register_off.gif" style="cursor: default; display: none;" onClick="switchToRegister('registerPlus');">Wysiwyg++</td>
+    <td id="btnRegisterEditlive"   width="78" height="23" align="center" background="/_bsJavascript/components/wysiwyg/img/register_off.gif" style="cursor: default; display: none;" onClick="switchToRegister('registerEditlive');">Editlive</td>
+    <td id="btnRegisterHtml"       width="78" height="23" align="center" background="/_bsJavascript/components/wysiwyg/img/register_off.gif" style="cursor: default; display: none;" onClick="switchToRegister('registerHtml');">HTML</td>
+    <td id="btnRegisterScreentype" width="78" height="23" align="center" background="/_bsJavascript/components/wysiwyg/img/register_off.gif" style="cursor: default; display: none;" onClick="switchToRegister('registerScreentype');">Screentype</td>
+    <td>&nbsp;</td>
+  </tr>
+  <tr>
+    <td colspan="100%"><img src="/_bsJavascript/components/wysiwyg/img/buttons_lane.gif" height="2" width="100%"></td>
+  </tr>
+</table>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%">
+  <tr ID="registerCustom1" style="DISPLAY: none" width="100%">
+    <td width="100%">
+      <TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%">
+        <TR width="100%">
+          <td class="bar" colspan="2" width="100%" id="registerCustom1Content">
+          </td>
+        </tr>
+        <tr>
+          <td class="bar" colspan="2">
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_lane.gif" height="2" width="100%">
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+	
+	<tr ID="registerText" style="DISPLAY: none" width="100%">
+    <td width="100%">
+      <TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%">
+        <TR width="100%">
+          <td class="bar" colspan="2" width="100%">
+            <img ID="btnPrint"          src="/_bsJavascript/components/wysiwyg/buttons/btnPrint_off.gif"   alt="Print"          width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_separator.gif" width="2" height="22" border="0"> 
+            
+            <img ID="btnCut"            src="/_bsJavascript/components/wysiwyg/buttons/btnCut_off.gif"     alt="Cut"            width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnCopy"           src="/_bsJavascript/components/wysiwyg/buttons/btnCopy_off.gif"    alt="Copy"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnPaste"          src="/_bsJavascript/components/wysiwyg/buttons/btnPaste_off.gif"   alt="Paste"          width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+      			
+						<!--
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_separator.gif" width="2" height="22" border="0"> 
+      
+            <img ID="btnUndo"           src="/_bsJavascript/components/wysiwyg/buttons/btnUndo_off.gif"    alt="Undo"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnRedo"           src="/_bsJavascript/components/wysiwyg/buttons/btnRedo_off.gif"    alt="Redo"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+						-->
+          </td>
+        </tr>
+        <tr>
+          <td class="bar" colspan="2">
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_lane.gif" height="2" width="100%">
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <!--
+  <tr ID="registerWysiwyg" style="display:none;" width="100%">
+    <td width="100%">
+      <TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%">
+        <TR width="100%">
+          <td class="bar" colspan="2" width="100%">
+            <img ID="btnCut"            src="/_bsJavascript/components/wysiwyg/buttons/btnCut_off.gif"     alt="Cut"            width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  -->
+  
+  <tr ID="registerEasy" style="DISPLAY: none" width="100%">
+    <td width="100%">
+      <TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%">
+        <TR width="100%">
+          <td class="bar" colspan="2" width="100%">
+            <img ID="btnCut"            src="/_bsJavascript/components/wysiwyg/buttons/btnCut_off.gif"     alt="Cut"            width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnCopy"           src="/_bsJavascript/components/wysiwyg/buttons/btnCopy_off.gif"    alt="Copy"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnPaste"          src="/_bsJavascript/components/wysiwyg/buttons/btnPaste_off.gif"   alt="Paste"          width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+      
+						<!--
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_separator.gif" width="2" height="22" border="0"> 
+            <img ID="btnUndo"           src="/_bsJavascript/components/wysiwyg/buttons/btnUndo_off.gif"    alt="Undo"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnRedo"           src="/_bsJavascript/components/wysiwyg/buttons/btnRedo_off.gif"    alt="Redo"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+						-->
+      
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_separator.gif" width="2" height="22" border="0"> 
+            
+            <img ID="btnBold"           src="/_bsJavascript/components/wysiwyg/buttons/btnBold_off.gif"          alt="Bold"            width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnItalic"         src="/_bsJavascript/components/wysiwyg/buttons/btnItalic_off.gif"        alt="Italic"          width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnUnderline"      src="/_bsJavascript/components/wysiwyg/buttons/btnUnderline_off.gif"     alt="Underline"       width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_separator.gif" width="2" height="22" border="0"> 
+            
+            <select name="formatBlock" ID="formatBlock" size="1" onChange="updateBlockFormat();" onMouseOver="buttonHelpOn(this);" onMouseOut="buttonHelpOff();">
+            <option value="Normal">Normal</option>
+            <option value="Formatted">Formatted &lt;pre&gt;</option>
+            <option value="Address">&lt;Address&gt;</option>
+            <option value="Heading 1">Heading 1 &lt;H1&gt;</option>
+            <option value="Heading 2">Heading 2 &lt;H2&gt;</option>
+            <option value="Heading 3">Heading 3 &lt;H3&gt;</option>
+            <option value="Heading 4">Heading 4 &lt;H4&gt;</option>
+            <option value="Heading 5">Heading 5 &lt;H5&gt;</option>
+            <option value="Heading 6">Heading 6 &lt;H6&gt;</option>
+            <option value="Numbered List">Numbered List</option>
+            <option value="Bulleted List">Bulleted List</option>
+            <option value="Directory List">Directory List</option>
+            <option value="Menu List">Menu List</option>
+            <option value="Definition Term">Definition Term</option>
+            <option value="Definition">Definition</option>
+            </select>
+            
+						<!--
+            <select name="styleBlock" ID="styleBlock" size="1" onChange="updateBlockStyle();" onMouseOver="buttonHelpOn(this);" onMouseOut="buttonHelpOff();">
+            <option value="aa">aa</option>
+            <option value="title">title</option>
+            </select>
+						-->
+          </td>
+        </tr>
+        <tr>
+          <td class="bar" colspan="2">
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_lane.gif" height="2" width="100%">
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr ID="registerPlus" style="DISPLAY: none" width="100%">
+    <td width="100%">
+      <TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%">
+        <TR width="100%">
+          <td class="bar" colspan="2" width="100%">
+            <img ID="btnCut"            src="/_bsJavascript/components/wysiwyg/buttons/btnCut_off.gif"     alt="Cut"            width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnCopy"           src="/_bsJavascript/components/wysiwyg/buttons/btnCopy_off.gif"    alt="Copy"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnPaste"          src="/_bsJavascript/components/wysiwyg/buttons/btnPaste_off.gif"   alt="Paste"          width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+      			
+						<!--
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_separator.gif" width="2" height="22" border="0"> 
+            <img ID="btnUndo"           src="/_bsJavascript/components/wysiwyg/buttons/btnUndo_off.gif"    alt="Undo"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnRedo"           src="/_bsJavascript/components/wysiwyg/buttons/btnRedo_off.gif"    alt="Redo"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+						-->
+      
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_separator.gif" width="2" height="22" border="0"> 
+      
+            <img ID="btnLeft"           src="/_bsJavascript/components/wysiwyg/buttons/btnLeft_off.gif"    alt="Justify Left"   width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnCenter"         src="/_bsJavascript/components/wysiwyg/buttons/btnCenter_off.gif"  alt="Justify Center" width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnRight"          src="/_bsJavascript/components/wysiwyg/buttons/btnRight_off.gif"   alt="Justify Right"  width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+      
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_separator.gif" width="2" height="22" border="0"> 
+      
+            <img ID="btnOl"             src="/_bsJavascript/components/wysiwyg/buttons/btnOl_off.gif"      alt="Ordered List"   width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnUl"             src="/_bsJavascript/components/wysiwyg/buttons/btnUl_off.gif"      alt="Unordered List" width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+      
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_separator.gif" width="2" height="22" border="0"> 
+      
+            <img ID="btnOutdent"        src="/_bsJavascript/components/wysiwyg/buttons/btnOutdent_off.gif" alt="Outdent"        width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnIndent"         src="/_bsJavascript/components/wysiwyg/buttons/btnIndent_off.gif"  alt="Indent"         width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_separator.gif" width="2" height="22" border="0"> 
+
+            <img ID="btnLink"           src="/_bsJavascript/components/wysiwyg/buttons/btnLink_off.gif"    alt="Create Link"    width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnUnLink"         src="/_bsJavascript/components/wysiwyg/buttons/btnUnLink_off.gif"  alt="Remove Link"    width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <!--<img ID="btnImage"          src="/_bsJavascript/components/wysiwyg/buttons/btnImage_off.gif"   alt="Insert Image"   width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> -->
+            <img ID="btnImageBs"        src="/_bsJavascript/components/wysiwyg/buttons/btnImageBs_off.gif" alt="Insert Image"   width="23" height="22" border="0" unselectable="On" onMouseOver="switchMouseOver(this);" onMouseOut="switchMouseOut(this);" onMouseDown="switchMouseDown(this);" onMouseUp="switchMouseUp(this);"> 
+          </td>
+        </tr>
+        <tr>
+          <td class="bar" height=2 colspan="2">
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_lane.gif" height="2" width="100%">
+          </td>
+        </tr>
+        <tr>
+          <td class="bar" colspan="2">
+            <select name="fontFace" ID="fontFace" size="1" onChange="updateFontface();" onMouseOver="buttonHelpOn(this);" onMouseOut="buttonHelpOff();">
+            <option>Arial</option>
+            <option>Helvetica</option>
+            <option>Verdana</option>
+            <option>Times New Roman</option>
+            </select>
+            <select name="fontSize" ID="fontSize" size="1" onChange="updateFontsize();" onMouseOver="buttonHelpOn(this);" onMouseOut="buttonHelpOff();">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+            <option>7</option>
+            </select>
+            <img ID="btnBold"           src="/_bsJavascript/components/wysiwyg/buttons/btnBold_off.gif"          alt="Bold"            width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnItalic"         src="/_bsJavascript/components/wysiwyg/buttons/btnItalic_off.gif"        alt="Italic"          width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnUnderline"      src="/_bsJavascript/components/wysiwyg/buttons/btnUnderline_off.gif"     alt="Underline"       width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnStrikethrough"  src="/_bsJavascript/components/wysiwyg/buttons/btnStrikethrough_off.gif" alt="Strike Through"  width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+      
+            <img ID="btnSuperscript"    src="/_bsJavascript/components/wysiwyg/buttons/btnSuperscript_off.gif"   alt="Superscript"     width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnSubscript"      src="/_bsJavascript/components/wysiwyg/buttons/btnSubscript_off.gif"     alt="Subscript"       width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+      
+            <img ID="btnFontcolor"      src="/_bsJavascript/components/wysiwyg/buttons/btnFontcolor_off.gif"     alt="Font Color"      width="35" height="22" border="0" unselectable="On" onMouseOver="switchMouseOver(this);" onMouseOut="switchMouseOut(this);" onMouseDown="switchMouseDown(this);" onMouseUp="switchMouseUp(this);"> 
+            <select name="zoom" ID="zoom" size="1" onChange="updateZoom();" onMouseOver="buttonHelpOn(this);" onMouseOut="buttonHelpOff();">
+            <option>25%</option>
+            <option>50%</option>
+            <option>75%</option>
+            <option selected>100%</option>
+            <option>125%</option>
+            <option>150%</option>
+            <option>175%</option>
+            <option>200%</option>
+            <option>300%</option>
+            <option>500%</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td class="bar" colspan="2">
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_lane.gif" height="2" width="100%">
+          </td>
+        </tr>
+        <tr ID="imageBar" style="DISPLAY: none">
+          <td colspan="2">
+            <form name="img">
+            <table border=0 cellpadding=2 cellspacing=0 width="100%">
+              <tr>
+                <td>Source</td>
+                <td colspan="5">
+                  <input type="text" name="imgSource" id="imgSource" size="48" value=""> 
+                  <img ID="btnImageBrowser" src="/_bsJavascript/components/wysiwyg/buttons/btnImageBrowser_off.gif"    alt="Browse..."    width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+                </td>
+              </tr>
+              <tr>
+                <td>Alt.Text</td>
+                <td colspan="4"><input type="text" name="imgAlt" id="imgAlt" size="28"></td>
+                <td rowspan="4"><iframe name="imgPreview" id="imgPreview" width="92%" height="100%" marginwidth="0" marginheight="0" align="middle"></iframe></td>
+              </tr>
+              <tr>
+                <td>Width</td>
+                <td><input type="text" name="imgWidth" id="imgWidth" size="3" maxlength="4"></td>
+                <td>Height</td>
+                <td><input type="text" name="imgHeight" id="imgHeight" size="3" maxlength="4"></td>
+                <td><!button (recalculate)>&nbsp;</td>
+              </tr>
+              <tr>
+                <td>HSpace</td>
+                <td><input type="text" name="imgHSpace" id="imgHSpace" size="3" maxlength="4"></td>
+                <td>VSpace</td>
+                <td colspan="2"><input type="text" name="imgVSpace" id="imgVSpace" size="3" maxlength="4"></td>
+              </tr>
+              <tr>
+                <td>Border</td>
+                <td><input type="text" name="imgBorder" id="imgBorder" value="0" size="3" maxlength="4"></td>
+                <td>Align</td>
+                <td colspan="2"><select name="imgAlign" id="imgAlign"><option><option>left<option>right<option>top<option>middle<option>bottom<option>absmiddle<option>texttop<option>baseline</select></td>
+              </tr>
+              <tr>
+                <td colspan="5">
+                  <input type="button" value="Insert Image" onClick="javascript:insertImage();">
+                  <input type="button" value="Clear" onClick="javascript:clearImage();">
+                </td>
+                <td align="middle"><input type="button" value="Preview" onClick="javascript:previewImage()"></td>
+              </tr>
+            </table>
+            </form>
+          </td>
+        </tr>
+        <tr ID="colorBar" style="DISPLAY: none">
+          <td colspan="2">
+            <table border=0 cellpadding=2 cellspacing=0>
+              <tr>
+                <td valign="top">
+                  <table border=0 cellpadding=1 cellspacing=0>
+                    <tr>
+                      <td align=top>
+                  			<table align=center border=0 cellspacing=1 cellpadding=0>
+                          <tr>
+                            <td bgColor="000000"><img id="col_000000" bgColor="000000" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="330000"><img id="col_330000" bgColor="330000" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="660000"><img id="col_660000" bgColor="660000" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="990000"><img id="col_990000" bgColor="990000" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC0000"><img id="col_CC0000" bgColor="CC0000" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF0000"><img id="col_FF0000" bgColor="FF0000" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="000033"><img id="col_000033" bgColor="000033" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="330033"><img id="col_330033" bgColor="330033" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="660033"><img id="col_660033" bgColor="660033" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="990033"><img id="col_990033" bgColor="990033" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC0033"><img id="col_CC0033" bgColor="CC0033" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF0033"><img id="col_FF0033" bgColor="FF0033" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="000066"><img id="col_000066" bgColor="000066" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="330066"><img id="col_330066" bgColor="330066" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="660066"><img id="col_660066" bgColor="660066" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="990066"><img id="col_990066" bgColor="990066" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC0066"><img id="col_CC0066" bgColor="CC0066" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF0066"><img id="col_FF0066" bgColor="FF0066" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="000099"><img id="col_000099" bgColor="000099" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="330099"><img id="col_330099" bgColor="330099" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="660099"><img id="col_660099" bgColor="660099" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="990099"><img id="col_990099" bgColor="990099" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC0099"><img id="col_CC0099" bgColor="CC0099" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF0099"><img id="col_FF0099" bgColor="FF0099" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="0000CC"><img id="col_0000CC" bgColor="0000CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="3300CC"><img id="col_3300CC" bgColor="3300CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="6600CC"><img id="col_6600CC" bgColor="6600CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="9900CC"><img id="col_9900CC" bgColor="9900CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC00CC"><img id="col_CC00CC" bgColor="CC00CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF00CC"><img id="col_FF00CC" bgColor="FF00CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="0000FF"><img id="col_0000FF" bgColor="0000FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="3300FF"><img id="col_3300FF" bgColor="3300FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="6600FF"><img id="col_6600FF" bgColor="6600FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="9900FF"><img id="col_9900FF" bgColor="9900FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC00FF"><img id="col_CC00FF" bgColor="CC00FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF00FF"><img id="col_FF00FF" bgColor="FF00FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                        </table>
+                      </td>
+                      <td valign=top>
+                        <table align=center border=0 cellspacing=1 cellpadding=0>
+                          <tr>
+                            <td bgColor="003300"><img id="col_003300" bgColor="003300" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="333300"><img id="col_333300" bgColor="333300" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="663300"><img id="col_663300" bgColor="663300" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="993300"><img id="col_993300" bgColor="993300" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC3300"><img id="col_CC3300" bgColor="CC3300" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF3300"><img id="col_FF3300" bgColor="FF3300" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="003333"><img id="col_003333" bgColor="003333" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="333333"><img id="col_333333" bgColor="333333" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="663333"><img id="col_663333" bgColor="663333" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="993333"><img id="col_993333" bgColor="993333" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC3333"><img id="col_CC3333" bgColor="CC3333" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF3333"><img id="col_FF3333" bgColor="FF3333" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="003366"><img id="col_003366" bgColor="003366" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="333366"><img id="col_333366" bgColor="333366" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="663366"><img id="col_663366" bgColor="663366" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="993366"><img id="col_993366" bgColor="993366" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC3366"><img id="col_CC3366" bgColor="CC3366" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF3366"><img id="col_FF3366" bgColor="FF3366" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="003399"><img id="col_003399" bgColor="003399" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="333399"><img id="col_333399" bgColor="333399" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="663399"><img id="col_663399" bgColor="663399" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="993399"><img id="col_993399" bgColor="993399" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC3399"><img id="col_CC3399" bgColor="CC3399" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF3399"><img id="col_FF3399" bgColor="FF3399" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="0033CC"><img id="col_0033CC" bgColor="0033CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="3333CC"><img id="col_3333CC" bgColor="3333CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="6633CC"><img id="col_6633CC" bgColor="6633CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="9933CC"><img id="col_9933CC" bgColor="9933CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC33CC"><img id="col_CC33CC" bgColor="CC33CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF33CC"><img id="col_FF33CC" bgColor="FF33CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="0033FF"><img id="col_0033FF" bgColor="0033FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="3333FF"><img id="col_3333FF" bgColor="3333FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="6633FF"><img id="col_6633FF" bgColor="6633FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="9933FF"><img id="col_9933FF" bgColor="9933FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC33FF"><img id="col_CC33FF" bgColor="CC33FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF33FF"><img id="col_FF33FF" bgColor="FF33FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td valign=top>
+                  			<table align=center border=0 cellspacing=1 cellpadding=0>
+                          <tr>
+                            <td bgColor="006600"><img id="col_006600" bgColor="006600" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="336600"><img id="col_336600" bgColor="336600" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="666600"><img id="col_666600" bgColor="666600" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="996600"><img id="col_996600" bgColor="996600" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC6600"><img id="col_CC6600" bgColor="CC6600" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF6600"><img id="col_FF6600" bgColor="FF6600" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="006633"><img id="col_006633" bgColor="006633" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="336633"><img id="col_336633" bgColor="336633" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="666633"><img id="col_666633" bgColor="666633" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="996633"><img id="col_996633" bgColor="996633" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC6633"><img id="col_CC6633" bgColor="CC6633" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF6633"><img id="col_FF6633" bgColor="FF6633" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="006666"><img id="col_006666" bgColor="006666" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="336666"><img id="col_336666" bgColor="336666" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="666666"><img id="col_666666" bgColor="666666" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="996666"><img id="col_996666" bgColor="996666" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC6666"><img id="col_CC6666" bgColor="CC6666" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF6666"><img id="col_FF6666" bgColor="FF6666" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="006699"><img id="col_006699" bgColor="006699" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="336699"><img id="col_336699" bgColor="336699" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="666699"><img id="col_666699" bgColor="666699" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="996699"><img id="col_996699" bgColor="996699" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC6699"><img id="col_CC6699" bgColor="CC6699" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF6699"><img id="col_FF6699" bgColor="FF6699" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="0066CC"><img id="col_0066CC" bgColor="0066CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="3366CC"><img id="col_3366CC" bgColor="3366CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="6666CC"><img id="col_6666CC" bgColor="6666CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="9966CC"><img id="col_9966CC" bgColor="9966CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC66CC"><img id="col_CC66CC" bgColor="CC66CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF66CC"><img id="col_FF66CC" bgColor="FF66CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="0066FF"><img id="col_0066FF" bgColor="0066FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="3366FF"><img id="col_3366FF" bgColor="3366FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="6666FF"><img id="col_6666FF" bgColor="6666FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="9966FF"><img id="col_9966FF" bgColor="9966FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC66FF"><img id="col_CC66FF" bgColor="CC66FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF66FF"><img id="col_FF66FF" bgColor="FF66FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                        </table>
+                      </td>
+                      <td valign=top>
+                  			<table align=center border=0 cellspacing=1 cellpadding=0>
+                          <tr>
+                            <td bgColor="009900"><img id="col_009900" bgColor="009900" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="339900"><img id="col_339900" bgColor="339900" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="669900"><img id="col_669900" bgColor="669900" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="999900"><img id="col_999900" bgColor="999900" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC9900"><img id="col_CC9900" bgColor="CC9900" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF9900"><img id="col_FF9900" bgColor="FF9900" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="009933"><img id="col_009933" bgColor="009933" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="339933"><img id="col_339933" bgColor="339933" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="669933"><img id="col_669933" bgColor="669933" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="999933"><img id="col_999933" bgColor="999933" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC9933"><img id="col_CC9933" bgColor="CC9933" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF9933"><img id="col_FF9933" bgColor="FF9933" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="009966"><img id="col_009966" bgColor="009966" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="339966"><img id="col_339966" bgColor="339966" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="669966"><img id="col_669966" bgColor="669966" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="999966"><img id="col_999966" bgColor="999966" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC9966"><img id="col_CC9966" bgColor="CC9966" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF9966"><img id="col_FF9966" bgColor="FF9966" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="009999"><img id="col_009999" bgColor="009999" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="339999"><img id="col_339999" bgColor="339999" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="669999"><img id="col_669999" bgColor="669999" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="999999"><img id="col_999999" bgColor="999999" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC9999"><img id="col_CC9999" bgColor="CC9999" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF9999"><img id="col_FF9999" bgColor="FF9999" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="0099CC"><img id="col_0099CC" bgColor="0099CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="3399CC"><img id="col_3399CC" bgColor="3399CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="6699CC"><img id="col_6699CC" bgColor="6699CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="9999CC"><img id="col_9999CC" bgColor="9999CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC99CC"><img id="col_CC99CC" bgColor="CC99CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF99CC"><img id="col_FF99CC" bgColor="FF99CC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="0099FF"><img id="col_0099FF" bgColor="0099FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="3399FF"><img id="col_3399FF" bgColor="3399FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="6699FF"><img id="col_6699FF" bgColor="6699FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="9999FF"><img id="col_9999FF" bgColor="9999FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CC99FF"><img id="col_CC99FF" bgColor="CC99FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FF99FF"><img id="col_FF99FF" bgColor="FF99FF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td valign=top>
+                  			<table align=center border=0 cellspacing=1 cellpadding=0>
+                          <tr>
+                            <td bgColor="00CC00"><img id="col_00CC00" bgColor="00CC00" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="33CC00"><img id="col_33CC00" bgColor="33CC00" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="66CC00"><img id="col_66CC00" bgColor="66CC00" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="99CC00"><img id="col_99CC00" bgColor="99CC00" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CCCC00"><img id="col_CCCC00" bgColor="CCCC00" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FFCC00"><img id="col_FFCC00" bgColor="FFCC00" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="00CC33"><img id="col_00CC33" bgColor="00CC33" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="33CC33"><img id="col_33CC33" bgColor="33CC33" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="66CC33"><img id="col_66CC33" bgColor="66CC33" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="99CC33"><img id="col_99CC33" bgColor="99CC33" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CCCC33"><img id="col_CCCC33" bgColor="CCCC33" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FFCC33"><img id="col_FFCC33" bgColor="FFCC33" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="00CC66"><img id="col_00CC66" bgColor="00CC66" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="33CC66"><img id="col_33CC66" bgColor="33CC66" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="66CC66"><img id="col_66CC66" bgColor="66CC66" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="99CC66"><img id="col_99CC66" bgColor="99CC66" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CCCC66"><img id="col_CCCC66" bgColor="CCCC66" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FFCC66"><img id="col_FFCC66" bgColor="FFCC66" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="00CC99"><img id="col_00CC99" bgColor="00CC99" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="33CC99"><img id="col_33CC99" bgColor="33CC99" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="66CC99"><img id="col_66CC99" bgColor="66CC99" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="99CC99"><img id="col_99CC99" bgColor="99CC99" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CCCC99"><img id="col_CCCC99" bgColor="CCCC99" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FFCC99"><img id="col_FFCC99" bgColor="FFCC99" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="00CCCC"><img id="col_00CCCC" bgColor="00CCCC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="33CCCC"><img id="col_33CCCC" bgColor="33CCCC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="66CCCC"><img id="col_66CCCC" bgColor="66CCCC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="99CCCC"><img id="col_99CCCC" bgColor="99CCCC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CCCCCC"><img id="col_CCCCCC" bgColor="CCCCCC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FFCCCC"><img id="col_FFCCCC" bgColor="FFCCCC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="00CCFF"><img id="col_00CCFF" bgColor="00CCFF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="33CCFF"><img id="col_33CCFF" bgColor="33CCFF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="66CCFF"><img id="col_66CCFF" bgColor="66CCFF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="99CCFF"><img id="col_99CCFF" bgColor="99CCFF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CCCCFF"><img id="col_CCCCFF" bgColor="CCCCFF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FFCCFF"><img id="col_FFCCFF" bgColor="FFCCFF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                        </table>
+                      </td>
+                      <td valign=top>
+              	    		<table align=center border=0 cellspacing=1 cellpadding=0>
+                          <tr>
+                            <td bgColor="00FF00"><img id="col_00FF00" bgColor="00FF00" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="33FF00"><img id="col_33FF00" bgColor="33FF00" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="66FF00"><img id="col_66FF00" bgColor="66FF00" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="99FF00"><img id="col_99FF00" bgColor="99FF00" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CCFF00"><img id="col_CCFF00" bgColor="CCFF00" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FFFF00"><img id="col_FFFF00" bgColor="FFFF00" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="00FF33"><img id="col_00FF33" bgColor="00FF33" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="33FF33"><img id="col_33FF33" bgColor="33FF33" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="66FF33"><img id="col_66FF33" bgColor="66FF33" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="99FF33"><img id="col_99FF33" bgColor="99FF33" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CCFF33"><img id="col_CCFF33" bgColor="CCFF33" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FFFF33"><img id="col_FFFF33" bgColor="FFFF33" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="00FF66"><img id="col_00FF66" bgColor="00FF66" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="33FF66"><img id="col_33FF66" bgColor="33FF66" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="66FF99"><img id="col_66FF99" bgColor="66FF99" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="99FF66"><img id="col_99FF66" bgColor="99FF66" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CCFF66"><img id="col_CCFF66" bgColor="CCFF66" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FFFF66"><img id="col_FFFF66" bgColor="FFFF66" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="00FF99"><img id="col_00FF99" bgColor="00FF99" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="33FF99"><img id="col_33FF99" bgColor="33FF99" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="66FFCC"><img id="col_66FFCC" bgColor="66FFCC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="99FFCC"><img id="col_99FFCC" bgColor="99FFCC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CCFF99"><img id="col_CCFF99" bgColor="CCFF99" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FFFF99"><img id="col_FFFF99" bgColor="FFFF99" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="00FFCC"><img id="col_00FFCC" bgColor="00FFCC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="33FFCC"><img id="col_33FFCC" bgColor="33FFCC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="66FFCC"><img id="col_66FFCC" bgColor="66FFCC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="99FFCC"><img id="col_99FFCC" bgColor="99FFCC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CCFFCC"><img id="col_CCFFCC" bgColor="CCFFCC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FFFFCC"><img id="col_FFFFCC" bgColor="FFFFCC" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                          <tr>
+                            <td bgColor="00FFFF"><img id="col_00FFFF" bgColor="00FFFF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="33FFFF"><img id="col_33FFFF" bgColor="33FFFF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="66FFFF"><img id="col_66FFFF" bgColor="66FFFF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="99FFFF"><img id="col_99FFFF" bgColor="99FFFF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="CCFFFF"><img id="col_CCFFFF" bgColor="CCFFFF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                            <td bgColor="FFFFFF"><img id="col_FFFFFF" bgColor="FFFFFF" src="/_bsJavascript/components/wysiwyg/img/spacer.gif" width="7" height="7" border="0" onMouseUp="colorOnMouseUp(this);" onMouseOver="colorOnMouseOver(this);" onMouseOut="colorOnMouseOut(this);"></td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+                <td valign="top" width="120">
+                  <table border=0 cellpadding=2 cellspacing=0>
+                    <tr>
+                      <td class="small" valign="top">Preview</td>
+                      <td width="50" height="50" colspan="2" class="small" id="col_Preview"></td>
+                    </tr>
+                    <tr>
+                      <td class="small">RGB:</td>
+                      <td class="small">Red:</td>
+                      <td class="small" width="25" align="right" id="colorRgbR"></td>
+                    </tr>
+                    <tr>
+                      <td class="small"></td>
+                      <td class="small">Green:</td>
+                      <td class="small" width="25" align="right" id="colorRgbG"></td>
+                    </tr>
+                    <tr>
+                      <td class="small"></td>
+                      <td class="small">Blue:</td>
+                      <td class="small" width="25" align="right" id="colorRgbB"></td>
+                    </tr>
+                    <tr>
+                      <td class="small">Hex:</td>
+                      <td class="small" id="colorHex" colspan="2"></td>
+                    </tr>
+                  </table>
+                </td>
+                <td valign="top">
+                  <table border=0 cellpadding=2 cellspacing=0 widht="100%">
+                    <tr><td class="small" valign="top">Custom Color:</td></tr>
+                    <tr><td class="small" valign="top"><input type="text" name="customColor" id="customColor" size="10,1"> <img ID="btnOk" src="/_bsJavascript/components/wysiwyg/buttons/btnOk_off.gif" alt="OK" width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"></td></tr>
+                    <tr><td class="small" valign="top"><b>Note:</b><br>Type in the custom color you want to use, then click into the document where you want to use that color. Finally push the OK button.</td></tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+            </td>
+          </tr>
+        </table>
+    </td>
+  </tr>
+  <tr ID="registerEditlive" style="DISPLAY: none" width="100%">
+    <td width="100%">
+      <TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%">
+        <TR width="100%">
+          <td width="100%">
+            <iframe id="editliveIframe" src="about:blank" style="border:lightgrey 0px inset; position:relative; top:0; left:0; width:612; height:437; z-index:1"></iframe>
+          </td>
+        </tr>
+        <tr>
+          <td class="bar" colspan="2">
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_lane.gif" height="2" width="100%">
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <tr ID="registerHtml" style="DISPLAY: none" width="100%">
+    <td width="100%">
+      <TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%">
+        <TR width="100%">
+          <td class="bar" colspan="2" width="100%">
+            <img ID="btnSave"           src="/_bsJavascript/components/wysiwyg/buttons/btnSave_off.gif"    alt="Save"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnNosave"         src="/_bsJavascript/components/wysiwyg/buttons/btnNosave_off.gif"  alt="Drop"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+      
+            <img id="registerHtmlSeparator1" src="/_bsJavascript/components/wysiwyg/img/buttons_separator.gif" width="2" height="22" border="0"> 
+
+            <img ID="btnCut"            src="/_bsJavascript/components/wysiwyg/buttons/btnCut_off.gif"     alt="Cut"            width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnCopy"           src="/_bsJavascript/components/wysiwyg/buttons/btnCopy_off.gif"    alt="Copy"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnPaste"          src="/_bsJavascript/components/wysiwyg/buttons/btnPaste_off.gif"   alt="Paste"          width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+						
+						<!--
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_separator.gif" width="2" height="22" border="0"> 
+            <img ID="btnUndo"           src="/_bsJavascript/components/wysiwyg/buttons/btnUndo_off.gif"    alt="Undo"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnRedo"           src="/_bsJavascript/components/wysiwyg/buttons/btnRedo_off.gif"    alt="Redo"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+						-->
+
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_separator.gif" width="2" height="22" border="0"> 
+
+            <img ID="btnSnippets"       src="/_bsJavascript/components/wysiwyg/buttons/btnSnippets_off.gif" alt="Code Snippets" width="23" height="22" border="0" unselectable="On" onMouseOver="switchMouseOver(this);" onMouseOut="switchMouseOut(this);" onMouseDown="switchMouseDown(this);" onMouseUp="switchMouseUp(this);" style="display:none;"> 
+						
+						<script>
+						//if (wysiwygObj.specialCharsSelectorUrl) {
+							//hide special chars for now. short hack for sportsmaxx. --andrej
+            	//document.writeln('<img ID="btnSpecialChars"  src="/_bsJavascript/components/wysiwyg/buttons/btnSpecialChars_off.gif" alt="Special Characters" width="23" height="22" border="0" unselectable="On" onMouseOver="switchMouseOver(this);" onMouseOut="switchMouseOut(this);" onMouseDown="switchMouseDown(this);" onMouseUp="switchMouseUp(this);" style="display:none;"> ')
+            	//document.writeln('<img ID="btnSpecialChars"  src="/_bsJavascript/components/wysiwyg/buttons/btnSpecialChars_off.gif" alt="Special Characters" width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> ')
+						//}
+						</script>
+          </td>
+        </tr>
+        <tr>
+          <td class="bar" colspan="2" width="100%">
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_lane.gif" height="2" width="100%">
+          </td>
+        </tr>
+        <!--
+        <tr ID="charsBar" style="display:none;">
+          <td colspan="2">
+            <iframe src="/_bsJavascript/components/wysiwyg/specialCharsSelector.html"></iframe>
+          </td>
+        </tr>
+        -->
+        <tr ID="snippetBar" style="display:none;">
+          <td colspan="2">
+            <TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%">
+              <tr ID="snippetRegister1" width="100%">
+                <td width="100%">
+                  <TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%">
+                    <tr>
+                      <td valign="top">
+                        <img src="/_bsJavascript/components/wysiwyg/img/captionSnippetSnippets.gif" width="23" height="63" border="0">
+                      </td>
+                      <td valign="top" width="146">
+                        <select name="snippetGroupSelect" id="snippetGroupSelect" onChange="wysiwygObj.snippetSwitchGroup(this.value);"    style="width: 140px;"></select>
+                        <select name="snippetNameSelect"  id="snippetNameSelect"  onChange="wysiwygObj.snippetShow(this.value);" style="width: 140px;" size="4"></select>
+                      </td>
+                      <!--
+                      <td valign="top" width="222">
+                        <iframe id="snippetPreview" src="empty.html" style="border:lightgrey 0px inset; position:relative; top:0; left:0; width:220; height:100; z-index:1"></iframe>
+                      </td>
+                      <td valign="bottom" width="24">
+                        <img src="/_bsJavascript/components/wysiwyg/img/captionSnippetPreview.gif" width="23" height="73" border="0">
+                        <img ID="btnPreview" src="/_bsJavascript/components/wysiwyg/buttons/btnPreview_off.gif" alt="Refresh Preview" width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+                      </td>
+                      -->
+                      <td valign="top" rowspan="2">
+                        <div id="snippetHtmlEditor" contenteditable align="left" style="height:170; width:220; background-color:white; font-face:Arial; padding:3; border:inset; overflow:auto;"></div>
+                        <!--<TEXTAREA ID="snippetClipboard1" STYLE="display:none;"></TEXTAREA>-->
+                      </td>
+                      <td valign="bottom" rowspan="2">
+                        <img src="/_bsJavascript/components/wysiwyg/img/captionSnippetHtml.gif" width="23" height="73" border="0" align="top">
+                        <img ID="btnPin" src="/_bsJavascript/components/wysiwyg/buttons/btnPin_off.gif" alt="Insert Snippet" width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+                      </td>
+                    </tr>
+                    <tr>
+                      <td valign="top">
+                        <img src="/_bsJavascript/components/wysiwyg/img/captionSnippetProperties.gif" width="23" height="71" border="0">
+                      </td>
+                      <td valign="top">
+                        <TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%">
+                          <tr>
+                            <td width="50%" align="left" class="small">Modified:</td>
+                            <td width="50%" align="left" class="small" style="color:gray;" ID="snippetPropModified"></td>
+                          </tr>
+                          <tr>
+                            <td width="50%" align="left" class="small">User:</td>
+                            <td width="50%" align="left" class="small" style="color:gray;" ID="snippetPropUser"></td>
+                          </tr>
+                          <tr>
+                            <td width="50%" align="left" class="small" colspan="2">Description:</td>
+                          </tr>
+                          <tr>
+                            <td width="50%" align="left" class="small" colspan="2">
+                              <div ID="snippetPropDescription" style="color:gray; overflow:auto; height:50; width:140;"></div>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+                <td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <TR width="100%" id="htmlEditorTr" style="display:none;">
+          <td width="100%" valign="top">
+          <div id="htmlEditor" contenteditable align="left" style="height:300; width:100%; background-color:white; font-face:Arial; padding:3; border:inset; overflow:auto;"></div>
+          </td>
+        </tr>
+        <tr id="htmlEditorTrLane" style="display:none;">
+          <td class="bar" colspan="2">
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_lane.gif" height="2" width="100%">
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <tr ID="registerScreentype" style="DISPLAY: none" width="100%">
+    <td width="100%">
+      <TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%">
+        <TR width="100%">
+          <td class="bar" colspan="2" width="100%">
+            <img ID="btnSave"           src="/_bsJavascript/components/wysiwyg/buttons/btnSave_off.gif"    alt="Save"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnNosave"         src="/_bsJavascript/components/wysiwyg/buttons/btnNosave_off.gif"  alt="Drop"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+      
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_separator.gif" width="2" height="22" border="0"> 
+
+            <img ID="btnCut"            src="/_bsJavascript/components/wysiwyg/buttons/btnCut_off.gif"     alt="Cut"            width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnCopy"           src="/_bsJavascript/components/wysiwyg/buttons/btnCopy_off.gif"    alt="Copy"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnPaste"          src="/_bsJavascript/components/wysiwyg/buttons/btnPaste_off.gif"   alt="Paste"          width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_separator.gif" width="2" height="22" border="0"> 
+      
+            <img ID="btnUndo"           src="/_bsJavascript/components/wysiwyg/buttons/btnUndo_off.gif"    alt="Undo"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+            <img ID="btnRedo"           src="/_bsJavascript/components/wysiwyg/buttons/btnRedo_off.gif"    alt="Redo"           width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver(this);" onMouseOut="buttonMouseOut(this);" onMouseDown="buttonMouseDown(this);" onMouseUp="buttonMouseUp(this);"> 
+          </td>
+        </tr>
+        <tr>
+          <td class="bar" colspan="2" width="100%">
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_lane.gif" height="2" width="100%">
+          </td>
+        </tr>
+        <TR width="100%">
+          <td valign="top">
+            <div id="screenTypeTextEditor" contenteditable align="left" style="height:100; width:405; background-color:white; font-face:Arial; padding:3; border:inset; overflow:auto;"></div>
+          </td>
+          <td valign="bottom">
+          <SPAN STYLE="writing-mode:tb-rl">Text</SPAN>
+          </td>
+        </tr>
+        <TR width="100%">
+          <td valign="top">
+          <div id="screenTypeHtmlEditor" contenteditable align="left" style="height:100; width:405; background-color:white; font-face:Arial; padding:3; border:inset; overflow:auto;"></div>
+          </td>
+          <td valign="bottom">
+          <SPAN STYLE="writing-mode:tb-rl">HTML</SPAN>
+          <img ID="screenTypeTextEditor_btnRefresh"  src="/_bsJavascript/components/wysiwyg/buttons/btnRefresh_off.gif" alt="Refresh" width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver2(this, 'btnRefresh');" onMouseOut="buttonMouseOut2(this, 'btnRefresh');" onMouseDown="buttonMouseDown2(this, 'btnRefresh');" onMouseUp="buttonMouseUp2(this, 'btnRefresh'); screenTypeHtmlEditorRefresh();"> 
+          </td>
+        </tr>
+        <TR width="100%">
+          <td valign="top">
+          <div id="screenTypePreview" align="left" style="height:100; width:405; background-color:white; font-face:Arial; padding:3; border:inset; overflow:auto;"></div>
+          </td>
+          <td valign="bottom">
+          <SPAN STYLE="writing-mode:tb-rl">Preview</SPAN>
+          <img ID="screenTypePreview_btnRefresh"  src="/_bsJavascript/components/wysiwyg/buttons/btnRefresh_off.gif" alt="Refresh" width="23" height="22" border="0" unselectable="On" onMouseOver="buttonMouseOver2(this, 'btnRefresh');" onMouseOut="buttonMouseOut2(this, 'btnRefresh');" onMouseDown="buttonMouseDown2(this, 'btnRefresh');" onMouseUp="buttonMouseUp2(this, 'btnRefresh'); screenTypePreviewRefresh();"> 
+          </td>
+        </tr>
+        <tr>
+          <td class="bar" colspan="2">
+            <img src="/_bsJavascript/components/wysiwyg/img/buttons_lane.gif" height="2" width="100%">
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  
+  <tr width="100%" id="trInfoBar">
+    <td width="100%">
+      <table border=0 cellpadding=0 cellspacing=0 width="100%">
+        <tr width="100%">
+          <td width="5%"><img src="/_bsJavascript/components/wysiwyg/buttons/btnInfo_off.gif" width="23" height="22" border="0" ID="iconInfo" onMouseOver="buttonHelpOn(this);" onMouseOut="buttonHelpOff();"></td>
+          <td width="95%" align="left" id="helpText"></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  </tr>
+</table>
+        
+
+</form>
+
+</body>
+</html>

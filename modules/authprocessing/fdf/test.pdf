@@ -1,0 +1,35 @@
+'%FDF-1.2
+1 0 obj<</FDF<< /Fields[
+<</T(topmostSubform[0].Page1[0].Patient_name[0])/V(VIVIAN NGUYEN)>>
+<</T(topmostSubform[0].Page1[0].BOB[0])/V(1970-11-23)>>
+<</T(topmostSubform[0].Page1[0].DOI[0])/V(2014-12-08 00:00:00)>>
+<</T(topmostSubform[0].Page1[0].Employer[0])/V(US POSTAL SERVICE)>>
+<</T(topmostSubform[0].Page1[0].Claim_number[0])/V(132326004)>>
+
+<</T(topmostSubform[0].Page1[0].provider_name[0])/V(HOSEA BROWN)>>
+<</T(topmostSubform[0].Page1[0].Practice_name[0])/V(PERFORMANCE HEALTH MEDICAL GROUP)>>
+<</T(topmostSubform[0].Page1[0].Address[0])/V(13252 GARDEN GROVE BLVD #112)>>
+<</T(topmostSubform[0].Page1[0].City__State__Zip[0])/V(GARDEN GROVE, CA 92843)>>
+<</T(topmostSubform[0].Page1[0].Phone_Number[0])/V(7147401778)>>
+<</T(topmostSubform[0].Page1[0].Fax_number[0])/V(7147401913)>>
+<</T(topmostSubform[0].Page1[0].Provider_specialty[0])/V()>>
+<</T(topmostSubform[0].Page1[0].provider_state_license_number[0])/V()>>
+<</T(topmostSubform[0].Page1[0].National_provider_ID_number[0])/V(1629159397)>>
+
+<</T(topmostSubform[0].Page1[0].Claims_administrator[0])/V(U.S. DEPARTMENT OF LABOR)>>
+<</T(topmostSubform[0].Page1[0].Adjustor[0])/V(REVIEW DEPT.)>>
+<</T(topmostSubform[0].Page1[0].Claims_administrator_address[0])/V(P.O. BOX 8300)>>
+<</T(topmostSubform[0].Page1[0].Claims_administrator_City__State__Zip[0])/V(LONDON, KY 40742)>>
+<</T(topmostSubform[0].Page1[0].Claims_admistrator_Phone_number[0])/V(8663558319)>>
+<</T(topmostSubform[0].Page1[0].Claimd_Administror_Fax_number[0])/V()>>
+
+<</T(topmostSubform[0].Page1[0].Diagnosis[0])/V(844.9 Sprains Strains Knee and Leg 845.10 Sprains Strains Foot Unspecified Site  )>>
+<</T(topmostSubform[0].Page1[0].ICD_Code[0])/V(844.9 845.10  )>>
+<</T(topmostSubform[0].Page1[0].Procedure_Requested[0])/V(Pool)>>
+<</T(topmostSubform[0].Page1[0].CPTHCPCS_Code[0])/V(97110, 97140, 97033, 97014, 90901, 97026, 97128, 99070)>>
+<</T(topmostSubform[0].Page1[0].Other_Information_Frequency_Duration_Quantity_Facility_etc[0])/V(Frequency: 2 Duration: 8 )>>
+] >> >>
+endobj
+trailer
+<</Root 1 0 R>>
+%%EOF'

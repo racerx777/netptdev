@@ -1,0 +1,4 @@
+#internal file used for the automatic distribution building
+
+applies: *
+restriction: enterprise

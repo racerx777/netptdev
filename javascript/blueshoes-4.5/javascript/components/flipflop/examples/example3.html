@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>BlueShoes JavaScript FlipFlop Example 3</title>
+<script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Misc.lib.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/form/Bs_FormFieldSelect.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/flipflop/Bs_FlipFlop.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_Button.class.js"></script>
+<script>
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_ie.css'>");
+}
+
+function init() {
+	myFlipFlop = new Bs_FlipFlop();
+	myFlipFlop.fieldAvailableCssClass = 'flipFlopField';
+	myFlipFlop.fieldSelectedCssClass  = 'flipFlopField';
+	myFlipFlop.showCaptionLine        = true;
+	myFlipFlop.convertField('mySelect');
+}
+
+function updateOptions() {
+	var options = new Array();
+	options['aaa'] = 'aaaa';
+	options['ddd'] = 'ddd';
+	options['eee'] = 'eee';
+	options['fff'] = 'fff';
+	options['ggg'] = 'gggg';
+	options['hhh'] = 'hhhh';
+	myFlipFlop.setOptions(options);
+}
+
+</script>
+<style>
+.flipFlopField {
+  font-family:arial,helvetica;
+	font-size:11px;
+	width:100px;
+}
+body {
+  font-family:arial,helvetica;
+	font-size:11px;
+}
+td {
+  font-family:arial,helvetica;
+	font-size:11px;
+}
+</style>
+</head>
+
+<body onload="init();">
+
+<h1>BlueShoes JavaScript FlipFlop Example 3</h1>
+
+<ul>
+	<li></li>
+</ul>
+
+<span onclick="updateOptions();">update options</span><br><br>
+
+<form name="myForm" action="/postDump.php" method="post">
+
+<table border="0" cellspacing="5" cellpadding="2">
+	<tr>
+		<td valign="top"><b>Languages:</b></td>
+		<td valign="top">
+			<select name="mySelect[]" id="mySelect" size="7" multiple>
+			<option>aaa</option>
+			<option>bbb</option>
+			<option selected>ccc</option>
+			<option selected>ddd</option>
+			<option>eee</option>
+			<option>fff</option>
+			</select>
+		</td>
+	</tr>
+</table>
+
+<input type="submit" name="send" value="submit">
+</form>
+
+</body>
+</html>

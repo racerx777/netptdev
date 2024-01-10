@@ -1,0 +1,7 @@
+[default]
+#we put everything into the [default] section for this file. that is hardcoded. if you need more sections, recode.
+md5       = vous n'avez pas le droit de changer les cases cachées ('hidden') du formulaire. Contactez l'administrateur/webmaster si vous ne comprenez pas ce que cela veut dire.
+yes       = oui
+no        = non
+errorsOccured   = Errors occured
+

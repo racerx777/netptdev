@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Untitled</title>
+<style>
+	.bsTabset {
+		border-top: 1px solid white;
+		border-left: 1px solid white;
+		border-right: 2px outset;
+		font-family:arial,helvetica,sans-serif;
+		font-size: 12px;
+		padding-left:3px;
+		padding-right:3px;
+		background-color:menu;
+	}
+	.bsTabsetActive {
+		border-bottom: 1px solid menu;
+		cursor: default;
+		padding-top:3px;
+		padding-bottom:2px;
+		vertical-align:middle;
+	}
+	.bsTabsetInactive {
+		border-bottom: 1px solid white;
+		cursor: hand; cursor:pointer;
+		padding-top:1px;
+		/*padding-bottom:1px;*/
+		vertical-align : bottom;
+	}
+	.tabsetContentDiv {
+		border-bottom:2px outset;
+		border-left:1px solid white; 
+		border-bottom:2px outset; 
+		border-right:2px outset;
+		padding:5px;
+	}
+	.tabsetTabsDiv {
+		border-bottom:1px solid white;
+		background-color:transparent;
+	}
+</style>
+<script>
+function Bs_TabSet(objectName, outerElmId) {
+	this.tabs = new Array;
+	this._objectName = objectName;
+	this._outerElmId = outerElmId;
+	
+	this.addTab = function(caption, container) {
+		var o = new Object;
+		o.caption   = caption;
+		o.container = container;
+		this.tabs[this.tabs.length] = o;
+	}
+	
+	this.render = function() {
+		var ret = new Array;
+		//ret[ret.length] = '<div>';
+		ret[ret.length] = '<div class="tabsetTabsDiv">';
+		for (var i=0; i<this.tabs.length; i++) {
+			if (i == 0) {
+				var cls = 'bsTabsetActive';
+			} else {
+				var cls = 'bsTabsetInactive';
+				this.tabs[i].container.style.display = 'none';
+			}
+			ret[ret.length] = '<span id="' + this._objectName + '_tabCap_' + i + '" class="bsTabset ' + cls + '" onclick="' + this._objectName + '.switchTo(' + i + ');">' + this.tabs[i].caption + '</span>';
+		}
+		ret[ret.length] = '</div>';
+		//ret[ret.length] = '</div>';
+		return ret.join('');
+	}
+	
+	this.draw = function() {
+		document.getElementById(this._outerElmId + '_tabs').innerHTML = this.render();
+	}
+	
+	/*
+	this.drawInto = function(tagId) {
+		var content = this.render();
+		document.getElementById(tagId).insertAdjacentHTML('afterbegin', content);
+	}
+	*/
+	
+	this.switchTo = function(newReg) {
+		for (var i=0; i<this.tabs.length; i++) {
+			//alert(i);
+			if (newReg == i) {
+				document.getElementById(this._objectName + '_tabCap_' + i).className = 'bsTabset bsTabsetActive';
+				this.tabs[i].container.style.display = 'block';
+			} else {
+				document.getElementById(this._objectName + '_tabCap_' + i).className = 'bsTabset bsTabsetInactive';
+				this.tabs[i].container.style.display = 'none';
+			}
+		}
+	}
+	
+}
+
+function init() {
+	t = new Bs_TabSet('t', 'tabset');
+	t.addTab('Foo', document.getElementById('foo'));
+	t.addTab('Bar', document.getElementById('bar'));
+	t.addTab('Lalala', document.getElementById('lalala'));
+	t.draw();
+}
+</script>
+</head>
+
+<body onload="init();" bgcolor="menu">
+
+<div id="tabset" style="background-color:menu; padding:0px;">
+	<div id="tabset_tabs"></div>
+	<div id="tabset_content" class="tabsetContentDiv">
+		<div id="foo">
+		foo foo foo foo foo foo foo foo foo foo foo <br>
+		foo foo foo foo foo foo foo foo foo foo foo <br>
+		foo foo foo foo foo foo foo foo foo foo foo <br>
+		foo foo foo foo foo foo foo foo foo foo foo <br>
+		foo foo foo foo foo foo foo foo foo foo foo <br>
+		foo foo foo foo foo foo foo foo foo foo foo <br>
+		</div>
+		<div id="bar">
+		barbarbarbarbarbarbarbarbarbarbarbarbarbar <br>
+		barbarbarbarbarbarbarbarbarbarbarbarbarbar <br>
+		barbarbarbarbarbarbarbarbarbarbarbarbarbar <br>
+		barbarbarbarbarbarbarbarbarbarbarbarbarbar <br>
+		barbarbarbarbarbarbarbarbarbarbarbarbarbar <br>
+		barbarbarbarbarbarbarbarbarbarbarbarbarbar <br>
+		barbarbarbarbarbarbarbarbarbarbarbarbarbar <br>
+		</div>
+		<div id="lalala">
+		lalala lalala lalala lalala lalala lalala  <br>
+		lalala lalala lalala lalala lalala lalala  <br>
+		lalala lalala lalala lalala lalala lalala  <br>
+		lalala lalala lalala lalala lalala lalala  <br>
+		</div>
+	</div>
+</div>
+
+
+
+
+</body>
+</html>

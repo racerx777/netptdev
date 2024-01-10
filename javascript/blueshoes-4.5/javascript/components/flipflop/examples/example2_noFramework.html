@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>BlueShoes JavaScript FlipFlop Example 2</title>
+<script type="text/javascript" src="../../../core/lang/Bs_Misc.lib.js"></script>
+<script type="text/javascript" src="../../../core/form/Bs_FormFieldSelect.class.js"></script>
+<script type="text/javascript" src="../../../components/flipflop/Bs_FlipFlop.class.js"></script>
+<script type="text/javascript" src="../../../components/toolbar/Bs_Button.class.js"></script>
+<script>
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_ie.css'>");
+}
+
+function init() {
+	myFlipFlop = new Bs_FlipFlop();
+	myFlipFlop.fieldAvailableCssClass = 'flipFlopFieldAvailable';
+	myFlipFlop.fieldSelectedCssClass  = 'flipFlopFieldSelected';
+	myFlipFlop.textAvailable          = 'Choose:';
+	myFlipFlop.textAvailableCssClass  = 'flipTd';
+	myFlipFlop.textSelected           = 'Mine:';
+	myFlipFlop.textSelectedCssClass   = 'flipTd';
+	myFlipFlop.moveOnClick            = true;
+	myFlipFlop.maxSelectedNumber      = 3;
+	myFlipFlop.setRenderOrientation(true);
+	myFlipFlop.convertField('mySelect');
+}
+</script>
+<style>
+	.flipFlopFieldAvailable {
+		font-family:arial,helvetica;
+		font-size:11px;
+		width:280px;
+		background-color:#C0FFFF;
+	}
+	.flipFlopFieldSelected {
+		font-family:arial,helvetica;
+		font-size:11px;
+		width:280px;
+		background-color:#C0FFC0;
+	}
+	.flipTd {
+		font-family:arial,helvetica;
+		font-size:  11px;
+		color:      gray;
+		text-align: right;
+	}
+	body {
+		font-family:arial,helvetica;
+		font-size:11px;
+	}
+</style>
+</head>
+
+<body onload="init();">
+
+<h1>BlueShoes JavaScript FlipFlop Example 2</h1>
+
+<ul>
+	<li>Like example 1: FlipFlop init by convertField(): an existing select field is converted on the fly.</li>
+	<li>Very long captions here, thus we've used the top-bottom rendering here (instead of the default left-right).</li>
+	<li>A single click on an option already moves the element to the other field. Thus 2 of the buttons are not shown... they make no sense.</li>
+	<li>A max of 3 selected options is specified.</li>
+	<li>Custom captions and styles for the titles above the select fields ('Choose' and 'Mine').</li>
+</ul>
+
+<form name="myForm" action="/postDump.php" method="post">
+
+<select name="mySelect[]" id="mySelect" size="4" multiple>
+<option>this is a wordy option</option>
+<option selected>sometimes short captions won't do</option>
+<option>here we have five words</option>
+<option>PHP hypertext preprocessor</option>
+<option>BlueShoes PHP Application Framework and CMS</option>
+</select>
+
+<input type="submit" name="send" value="submit">
+</form>
+
+</body>
+</html>

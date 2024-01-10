@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>BlueShoes NumberField Examples</title>
+
+<script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Misc.lib.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_Button.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/numberfield/Bs_NumberField.class.js"></script>
+<script>
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_ie.css'>");
+}
+
+function init() {
+	nf1 = new Bs_NumberField('myNumberField1');
+	nf1.draw();
+	
+	nf2 = new Bs_NumberField('myNumberField2');
+	nf2.minValue = 0;
+	nf2.maxValue = 10;
+	nf2.buttonUp.backgroundColor   = '#F3DBB5';
+	nf2.buttonDown.backgroundColor = '#F3DBB5';
+	nf2.draw();
+	
+	nf3 = new Bs_NumberField('myNumberField3');
+	nf3.minValue = -100;
+	nf3.maxValue = -50;
+	nf3.buttonUp.cssClassDefault   = 'bsBtnDefault';
+	nf3.buttonDown.cssClassDefault = 'bsBtnDefault';
+	nf3.attachEvent('onAfterChange', updateLog);
+	nf3.draw();
+	
+	nf4 = new Bs_NumberField('myNumberField4');
+	nf4.draw();
+	
+	function updateLog(obj) {
+		var fld = document.getElementById('logField');
+		fld.value = "New value: " + obj.getValue() + '\n' + fld.value;
+	}
+}
+</script>
+
+<style>
+.foo {
+position:absolute;
+}
+</style>
+</head>
+
+<body onload="init();" bgcolor="#D6D3CE">
+
+<h1>BlueShoes NumberField Examples</h1>
+
+This example demonstrates the <a href="http://www.blueshoes.org/en/javascript/numberfield/">Number Field</a> component.<br><br>
+
+<h4>Change values by</h4>
+<ul>
+	<li>Typing</li>
+	<li>Cursor up/down</li>
+	<li>Clicking the buttons</li>
+	<li>Scrolling the mouse wheel (ie6 only)</li>
+</ul>
+<br><br>
+
+<form name="myForm">
+
+<table border="1" cellspacing="6" cellpadding="2">
+	<tr>
+		<td valign="top">
+			<h4>Field 1</h4>
+			<ul>
+				<li>Range not specified, thus 0 to n (default)</li>
+			</ul>
+			<input id="myNumberField1" name="myNumberField1" type="text" value="5" style="width:50; height:20;">
+		</td>
+		<td valign="top">
+			<h4>Field 2</h4>
+			<ul>
+				<li>Range 0 to 10</li>
+				<li>Using a background color</li>
+				<li></li>
+			</ul>
+			<input id="myNumberField2" name="myNumberField2" type="text" value="3" style="width:40; height:30; font-size:20px; background-color:#F3DBB5; color:brown;">
+		</td>
+		<td valign="top">
+			<h4>Field 3</h4>
+			<ul>
+				<li>Range -100 to -50</li>
+				<li>the buttons only show up as buttons onMouseOver</li>
+				<li>attached onAfterChange() event</li>
+			</ul>
+			<div style="position:relative; height:100;" class="foo">
+			<input id="myNumberField3" name="myNumberField3" type="text" style="width:100; height:50; font-size:40px;">
+			</div>
+		</td>
+		<td valign="top">
+			<h4>Field 4</h4>
+			<ul>
+				<li>Special case: we need the redraw() method once the div becomes visible.</li>
+			</ul>
+			<span style="cursor:hand;cursor:pointer; text-decoration:underline;" onclick="document.getElementById('field4container').style.display = 'block'; nf4.redraw();">click to make it visible</span>
+			<div id="field4container" style="display:none; margin:5px;">
+				<div style="height:100; " class="foo">
+				<input id="myNumberField4" name="myNumberField4" type="text" size="5">
+				</div>
+			</div>
+		</td>
+	</tr>
+</table>
+
+<br><br><br>
+onAfterChange() log of the 3rd button:<br>
+<textarea id="logField" name="logField" cols="40" rows="8"></textarea>
+</form>
+
+</body>
+</html>

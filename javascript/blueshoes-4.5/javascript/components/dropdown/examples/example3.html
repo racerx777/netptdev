@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title>JavaScript Bs_Dropdown example 3</title>
+  <script type="text/javascript" src='/_bsJavascript/core/lang/Bs_Misc.lib.js'></script>
+  <script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Array.class.js"></script>
+  <script type="text/javascript" src="/_bsJavascript/core/form/Bs_FormUtil.lib.js"></script>
+  <script type="text/javascript" src="/_bsJavascript/core/form/Bs_FormFieldSelect.class.js"></script>
+  <script type="text/javascript" src="/_bsJavascript/components/dropdown/Bs_Dropdown.class.js"></script>
+
+<script type="text/javascript">
+function init() {
+  myDropdown = new Bs_Dropdown();
+  myDropdown.setValue('http://www.blueshoes.org/');
+  myDropdown.addOption('http://www.php.net/');
+  myDropdown.addOption('http://www.apache.org/');
+  myDropdown.addOption('http://www.zend.com/');
+  myDropdown.addOption('http://www.mysql.com/');
+  myDropdown.addOption('http://www.redhat.com/');
+  myDropdown.addOption('http://www.linux.org/');
+  myDropdown.addOption('http://www.yahoo.com/');
+	myDropdown.setSize(250, 'pixel');
+  myDropdown.attachEvent('onChange', myAlert);
+  myDropdown.drawInto('myDropdownDiv');
+}
+
+function myAlert(comboObj) {
+  alert(comboObj.getValue());
+}
+</script>
+</head>
+
+<body onLoad="init();">
+
+<h1>JavaScript Bs_Dropdown example 3</h1>
+
+<ul>
+  <li>Similar to example 1.</li>
+  <li>Uses an attached onChange event that alerts the new value.</li>
+	<li>
+		Since myDropdown.fieldName is not defined, the field name of the hidden field is "myDropdown_value". This is the value you should use from the submitted form data.
+		"myDropdown_input" and "myDropdown_select" are only the helper fields, they may not be up to date when submitting the form.
+	</li>
+	<li>The width is defined using setSize().</li>
+</ul>
+<hr>
+<br>
+
+<form  name="test" id="test" action="http://www.blueshoes.org/postDump.php" method="post">
+	<div id="myDropdownDiv"></div>
+	<input type="submit" name="send" value="submit">
+</form>
+
+</body>
+</html>

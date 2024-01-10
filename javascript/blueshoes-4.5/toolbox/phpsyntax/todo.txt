@@ -1,0 +1,28 @@
+function f() {
+  global $a;
+  unset ($a);
+}
+
+$a = 'foo';
+f();
+what is $a? 
+options: a) not set   b) 'foo'
+answer: 'foo'. 
+comments: it works like a reference. see the documentation http://www.php.net/manual/en/function.unset.php
+
+
+
+
+function f() {
+  unset ($GLOBALS['a');
+}
+
+$a = 'foo';
+f();
+what is $a? 
+options: a) not set   b) 'foo'
+answer: not set. 
+comments: see the documentation http://www.php.net/manual/en/function.unset.php
+
+
+

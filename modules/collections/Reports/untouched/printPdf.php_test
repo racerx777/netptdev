@@ -1,0 +1,89 @@
+<?php
+set_time_limit(0);
+ini_set('max_execution_time', '0');
+ini_set('memory_limit', '5G');
+/*error_reporting(E_ALL);
+ini_set('display_errors',true);
+*/
+mail('testcheckcron3@mailinator.com','testmail','cron test');
+$rootpath = $_SERVER['DOCUMENT_ROOT'];
+
+require_once  $rootpath.'/TCPDF-main/tcpdf.php';
+include($rootpath.'/modules/collections/Reports/untouched/pdftemplate.php');
+
+class MYPDF extends TCPDF {
+
+    //Page header
+    public function Header() {
+        // Logo
+        $image_file = $rootpath.'/modules/collections/wsptn_logo_bw_outline.jpg';
+        $this->Image($image_file, 10, 10, 50, '', 'JPG', '', 'T', false, 300, '', false, false, 0, false, false, false);
+        // Set font
+        $this->SetFont('helvetica', 'B', 15);
+        // Title
+        $this->Cell(0, 15, 'Untouched Accounts Report', 0, false, 'C', 0, '', 0, false, 'M', 'M');
+    }
+
+ 
+}
+
+
+// add a page
+
+$htmlarr = explode("Break", $html);
+
+$file = $rootpath."/modules/collections/Reports/untouched/my-pdf.zip";
+$zip = new ZipArchive();
+$zip->open($file, ZipArchive::CREATE);
+$i  = 1;
+foreach ($htmlarr as $key => $htmlcontent) {
+
+	$pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, 'A4', true, 'UTF-8', false);
+
+	// set document information
+	$pdf->SetCreator(PDF_CREATOR);
+	$pdf->SetAuthor('');
+	$pdf->SetTitle('Untouched Accounts Report');
+	$pdf->SetSubject('Untouched Accounts Report');
+	$pdf->SetKeywords('TCPDF, PDF, example, test, guide');
+
+	// set default header data
+	$pdf->SetHeaderData(PDF_HEADER_LOGO,'300', PDF_HEADER_TITLE, PDF_HEADER_STRING);
+
+	// set header and footer fonts
+	$pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+	$pdf->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+
+	// set default monospaced font
+	$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+
+	// set margins
+	$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+	$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+	$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+
+	// set auto page breaks
+	$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM-15);
+
+	// set image scale factor
+	$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+
+	$pdf->AddPage();
+	// ---------------------------------------------------------
+
+	// set font
+	$pdf->SetFont('dejavusans', '', 8);
+
+	$pdf->writeHTML($htmlcontent, true, false, true, false, '');
+	$pdffile = $rootpath."/modules/collections/Reports/untouched/untouchedaccountsreport".$i.".pdf";
+	$pdf->Output($pdffile,'F');
+
+    // ADD PDF FILE TO ZIP
+    $zip->addFile($pdffile);
+
+	$i++;
+}
+$zip->close();
+header('Content-type: application/zip');
+header('Content-Disposition: attachment; filename="my-pdf.zip"');
+readfile($file);

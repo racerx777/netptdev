@@ -1,0 +1,9 @@
+INSERT INTO `master_clinics` (`cmcnum`, `cmname`, `cmphone`) VALUES
+('01', 'Long Beach', ''),
+('02', 'Montebello', ''),
+('03', 'Montclair', ''),
+('04', 'City of Industry', ''),
+('05', 'Santa Ana', ''),
+('06', 'Anaheim', ''),
+('07', 'Riverside', ''),
+('08', 'Hawthorne', '');

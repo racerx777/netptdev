@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>BlueShoes ColorPicker Example</title>
+
+<script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Misc.lib.js"></script>
+<script type="text/javascript" src='/_bsJavascript/core/gfx/Bs_ColorUtil.lib.js'></script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_Button.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/colorpicker/Bs_ColorPicker.class.js"></script>
+<script>
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_ie.css'>");
+}
+
+function init() {
+	myColorObj = new Bs_ColorPicker('myColorFld');
+	myColorObj.draw();
+	
+	myColorObj2 = new Bs_ColorPicker('myColorFld2');
+	myColorObj2.colorizeBackground = true;
+	myColorObj2.setColorByHex('FF0033');
+	myColorObj2.draw();
+	
+	myColorObj3 = new Bs_ColorPicker('myColorFld3');
+	myColorObj3.button.imgName = 'bs_fgColor';
+	myColorObj3.button.title   = 'Pick a text color';
+	myColorObj3.attachEvent('onAfterChange', alertColor);
+	myColorObj3.draw();
+}
+
+function alertColor(colorPickerObj) {
+	alert(colorPickerObj.getColorAsHex());
+}
+</script>
+</head>
+
+<body onload="init();">
+
+<h1>BlueShoes ColorPicker Example</h1>
+
+This is an example of the <a href="/en/javascript/colorpicker/">BlueShoes Color Picker</a>.
+<br><br>
+
+<form>
+<table border="0" cellspacing="2" cellpadding="2">
+	<tr>
+		<td valign="top">
+			Color 1: <input type="text" name="myColorFld"  id="myColorFld"  maxlength="7" size="7">
+		</td>
+		<td valign="top">
+			<ul>
+				<li>Standard color picker.</li>
+			</ul>
+		</td>
+	</tr>
+	<tr><td colspan="2" height="20">&nbsp;</td></tr>
+	<tr>
+		<td valign="top">
+			Color 2: <input type="text" name="myColorFld2" id="myColorFld2" maxlength="7" size="7">
+		</td>
+		<td valign="top">
+			<ul>
+				<li>Using the colorizeBackground feature here.</li>
+				<li>A default value is defined using setColorByHex().</li>
+			</ul>
+		</td>
+	</tr>
+	<tr><td colspan="2" height="20">&nbsp;</td></tr>
+	<tr>
+		<td valign="top">
+			Color 3: <input type="text" name="myColorFld3" id="myColorFld3" maxlength="7" size="7" value="#523D45">
+		</td>
+		<td valign="top">
+			<ul >
+				<li>Different button icon and title are used.</li>
+				<li>A default value is defined in the html tag.</li>
+				<li>Attached an 'onAfterChange' event that alerts the value.</li>
+			</ul>
+		</td>
+	</tr>
+</table>
+</form>
+
+</body>
+</html>

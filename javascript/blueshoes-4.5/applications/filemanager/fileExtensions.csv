@@ -1,0 +1,37 @@
+pdf;pdf;Adobe Acrobat PDF
+jpg;jpg;Jpeg Image
+jpeg;jpg;Jpeg Image
+xml;xml;XML File
+xnode;xml;XML Node Definition File
+xpage;xml;XML Page Definition File
+xblock;xml;XML Block Definition File
+xlay;xml;XML Layout Definition File
+js;js;Javascript Source File
+vbs;js;VBScript Source File
+jscript;js;Javascript Source File
+doc;doc;Word Document
+dot;doc;Word Document Template
+gif;gif;GIF Image
+zip;zip;Zip File Archive
+tar;zip;Tar Archive
+tgz;zip;TGZ Archive
+gz;zip;GZ Archive
+xls;xls;Excel Document
+css;css;Cascading Style Sheet
+txt;txt;Text Document
+csv;txt;Comma Separated Values
+asc;txt;Ascii Text File
+bmp;bmp;Bitmap Image
+ini;ini;Ini Settings File
+hlp;hlp;Help File
+swf;swf;Flash Player-Film
+php;php;PHP Script
+html;html;HTML Document
+htm;html;HTML Document
+ps;ps;Adobe Photoshop Image
+fdf;fdf;Adobe Acrobat Forms Document
+xfdf;fdf;Adobe Acrobat Forms Document
+fla;fla;Flash Movie
+fon;fon;Font file
+tcl;tcl;Tcl Script
+xsl;xsl;XSL Stylesheet

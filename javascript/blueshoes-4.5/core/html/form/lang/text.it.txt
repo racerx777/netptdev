@@ -1,0 +1,8 @@
+[default]
+#we put everything into the [default] section for this file. that is hardcoded. if you need more sections, recode.
+md5       = Non si possono modificare i campi del modulo nascosti ('hidden') . se non sapete che cosa significa, siete pregati di rivolgervi all'Administrator/Webmaster.
+yes       = si
+no        = no
+errorsOccured   = Errors occured
+
+

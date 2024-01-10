@@ -1,0 +1,35 @@
+'%FDF-1.2
+1 0 obj<</FDF<< /Fields[
+<</T(topmostSubform[0].Page1[0].Patient_name[0])/V(CECILIA MOY)>>
+<</T(topmostSubform[0].Page1[0].BOB[0])/V(1974-09-22)>>
+<</T(topmostSubform[0].Page1[0].DOI[0])/V(2010-02-04 00:00:00)>>
+<</T(topmostSubform[0].Page1[0].Employer[0])/V(OMNI HOTEL)>>
+<</T(topmostSubform[0].Page1[0].Claim_number[0])/V(002097-004377-WC-01)>>
+
+<</T(topmostSubform[0].Page1[0].provider_name[0])/V(RICK POSPISIL)>>
+<</T(topmostSubform[0].Page1[0].Practice_name[0])/V(LEXINGTON PHONE:(800) 660-2448 FAX:)>>
+<</T(topmostSubform[0].Page1[0].Address[0])/V(0)>>
+<</T(topmostSubform[0].Page1[0].City__State__Zip[0])/V(LEXINGTON, CA )>>
+<</T(topmostSubform[0].Page1[0].Phone_Number[0])/V(8006602448)>>
+<</T(topmostSubform[0].Page1[0].Fax_number[0])/V()>>
+<</T(topmostSubform[0].Page1[0].Provider_specialty[0])/V()>>
+<</T(topmostSubform[0].Page1[0].provider_state_license_number[0])/V()>>
+<</T(topmostSubform[0].Page1[0].National_provider_ID_number[0])/V(1265450837)>>
+
+<</T(topmostSubform[0].Page1[0].Claims_administrator[0])/V(GALLAGHER BASSETT)>>
+<</T(topmostSubform[0].Page1[0].Adjustor[0])/V(CLAUDIA GUTIERREZ)>>
+<</T(topmostSubform[0].Page1[0].Claims_administrator_address[0])/V(P.O. BOX 9875)>>
+<</T(topmostSubform[0].Page1[0].Claims_administrator_City__State__Zip[0])/V(CALABASAS, CA 91372-0875)>>
+<</T(topmostSubform[0].Page1[0].Claims_admistrator_Phone_number[0])/V((818) 746-9925)>>
+<</T(topmostSubform[0].Page1[0].Claimd_Administror_Fax_number[0])/V((818) 880-4213)>>
+
+<</T(topmostSubform[0].Page1[0].Diagnosis[0])/V(847.0 Sprains Strains Anterior Longitudinal Ligament Cervical 842 Sprains And Strains Of Wrist And Hand 840 Sprains And Strains Of Shoulder And Upper Arm )>>
+<</T(topmostSubform[0].Page1[0].ICD_Code[0])/V(847.0 842 840 )>>
+<</T(topmostSubform[0].Page1[0].Procedure_Requested[0])/V(Physical Therapy)>>
+<</T(topmostSubform[0].Page1[0].CPTHCPCS_Code[0])/V(97110, 97140, 97033, 97014, 90901, 97026, 97128, 99070)>>
+<</T(topmostSubform[0].Page1[0].Other_Information_Frequency_Duration_Quantity_Facility_etc[0])/V(Frequency: 3 Duration: 6 )>>
+] >> >>
+endobj
+trailer
+<</Root 1 0 R>>
+%%EOF'

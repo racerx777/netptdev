@@ -1,0 +1,28 @@
+array (
+  '_fld_packageName' => 'bs4.3_standard',
+  '_fld_targetDir' => '/tmp/',
+  '_fld_baseDir' => '/usr/local/lib/php/',
+  '_fld_subDirs' => '/blueshoes-4.3/',
+  '_fld_mainFilter' => '- ¦/CVS/¦
+- ¦/cms/¦
+- ¦\\.#¦',
+  '_fld_noChangeFilter' => '+ ¦/howtos?/¦
++ ¦/examples?/¦
++ ¦/lib/¦
++ ¦/images/¦
++ ¦\\.html¦
++ ¦\\.txt$¦
++ ¦\\.csv$¦i
++ ¦\\.gif¦
++ ¦\\.css$¦
++ ¦\\.styles?$¦
++ ¦\\.pdf$¦
++ ¦\\.doc$¦
++ ¦\\.xml$¦
+',
+  '_fld_unCommentFilter' => '+ ¦Bs_Wse_Searcher¦
++ ¦\\.conf$¦i
++ ¦\\.sql$¦
+',
+  '_fld_obfuseFilter' => '',
+)

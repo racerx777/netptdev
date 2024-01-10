@@ -1,0 +1,45 @@
+//////////////////////////////////////////////////////////////////////////////
+// ini-file for Bs_HtmlTableWindrose.class.php (blueshoes.org)
+// ===========================================================
+// o) The Relative Position mnomics ID's (or keys)
+//    - ALL
+//      All cells
+//    - Borders And Corners 
+//      Defined by the wind rose mnomics. E.g. NW is top/left cell and N is top row
+//                 N                +----+---+----+
+//            NW   ¦   NE           ¦ NW ¦ N ¦ NE ¦
+//               \ ¦ /              +----+---+----+
+//          W ---- C ---- E         ¦ W  ¦ C ¦  E ¦
+//               / ¦ \              +----+---+----+
+//            SW   ¦   SE           ¦ SW ¦ S ¦ SE ¦
+//                 S                +----+---+----+
+//    - C (Center)
+//       C (the center cells)
+//    - DD (Diogonal Down) and DU (Diogonal Up)
+//    - ZR_0/ZR_1 and ZC_0/ZC_1 (Zebra Row and Zebra Col)
+//
+// o) See sample below for setup. 
+//    - NOTE: %TRANSPARENT% is default.
+// E.g.
+//  [style]
+//      N = color:black; background-color:white; font-size:20px;
+//      NE= %OPAQUE% color:#0066CC; font-size:12px; font-family:Verdana,Arial; font-weight:bold;
+//  [attr]
+//      W = %TRANSPARENT% aline="center"
+//      E = aline="left"
+//////////////////////////////////////////////////////////////////////////////
+
+[info]
+    isFirstRowTitle = false
+    isLastRowTitle  = false
+    isFirstColTitle = true
+    isLastColTitle  = false
+    tableTag        = <table border="1">
+
+[style]
+    ALL = color:black; weight:normal; font-size:12px; font-style:normal; font-family:Verdana,Arial; border-left:thin solid #58A29E;  
+    ZR_0 = background-color:white;  
+    ZR_1 = background-color:#DBEFEB;  
+    N = color:white; background-color:#58A29E; font-weight:bold;  
+
+[attr]

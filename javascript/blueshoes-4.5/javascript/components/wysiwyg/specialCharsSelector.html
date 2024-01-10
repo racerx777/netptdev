@@ -1,0 +1,561 @@
+
+        <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+        <html>
+        <head>
+        <title>BlueShoes Html-Special-Chars Selector</title>
+      
+      <style>
+      .bsEnvE {
+      	font-family : Arial, Helvetica, sans-serif;
+      	width:20;
+      	height:20;
+      	border:1px solid silver;
+      	margin:0px;
+      }
+      .bsEnvLoupe {
+      	display:none;
+      	position:absolute;
+      	width:40;
+      	height:40;
+      	border:1px solid gray;
+      	background-color:antiquewhite;
+      	font-family : Arial, Helvetica, sans-serif;
+      	font-size: 30px;
+      	text-align : center;
+      }
+</style>
+    <script>var bsEnvData = new Array();
+bsEnvData['161'] = new Array();
+bsEnvData['161']['entity'] = "iexcl";
+bsEnvData['161']['char'] = "¡";
+bsEnvData['161']['desc-en'] = "inverted exclamation";
+
+bsEnvData['162'] = new Array();
+bsEnvData['162']['entity'] = "cent";
+bsEnvData['162']['char'] = "¢";
+bsEnvData['162']['desc-en'] = "cent sign";
+
+bsEnvData['163'] = new Array();
+bsEnvData['163']['entity'] = "pound";
+bsEnvData['163']['char'] = "£";
+bsEnvData['163']['desc-en'] = "pound sterling";
+
+bsEnvData['164'] = new Array();
+bsEnvData['164']['entity'] = "curren";
+bsEnvData['164']['char'] = "¤";
+bsEnvData['164']['desc-en'] = "general currency sign";
+
+bsEnvData['165'] = new Array();
+bsEnvData['165']['entity'] = "yen";
+bsEnvData['165']['char'] = "¥";
+bsEnvData['165']['desc-en'] = "yen sign";
+
+bsEnvData['166'] = new Array();
+bsEnvData['166']['entity'] = "brvbar";
+bsEnvData['166']['char'] = "¦";
+bsEnvData['166']['desc-en'] = "broken vertical bar";
+
+bsEnvData['167'] = new Array();
+bsEnvData['167']['entity'] = "sect";
+bsEnvData['167']['char'] = "§";
+bsEnvData['167']['desc-en'] = "section sign";
+
+bsEnvData['168'] = new Array();
+bsEnvData['168']['entity'] = "uml";
+bsEnvData['168']['char'] = "¨";
+bsEnvData['168']['desc-en'] = "umlaut (dieresis)";
+
+bsEnvData['169'] = new Array();
+bsEnvData['169']['entity'] = "copy";
+bsEnvData['169']['char'] = "©";
+bsEnvData['169']['desc-en'] = "copyright";
+
+bsEnvData['170'] = new Array();
+bsEnvData['170']['entity'] = "ordf";
+bsEnvData['170']['char'] = "ª";
+bsEnvData['170']['desc-en'] = "feminine ordinal";
+
+bsEnvData['171'] = new Array();
+bsEnvData['171']['entity'] = "laquo";
+bsEnvData['171']['char'] = "«";
+bsEnvData['171']['desc-en'] = "left angle quote, guillemotleft";
+
+bsEnvData['172'] = new Array();
+bsEnvData['172']['entity'] = "not";
+bsEnvData['172']['char'] = "¬";
+bsEnvData['172']['desc-en'] = "not sign";
+
+bsEnvData['173'] = new Array();
+bsEnvData['173']['entity'] = "shy";
+bsEnvData['173']['char'] = "­";
+bsEnvData['173']['desc-en'] = "soft hyphen";
+
+bsEnvData['174'] = new Array();
+bsEnvData['174']['entity'] = "reg";
+bsEnvData['174']['char'] = "®";
+bsEnvData['174']['desc-en'] = "registered trademark";
+
+bsEnvData['175'] = new Array();
+bsEnvData['175']['entity'] = "macr";
+bsEnvData['175']['char'] = "¯";
+bsEnvData['175']['desc-en'] = "macron accent";
+
+bsEnvData['176'] = new Array();
+bsEnvData['176']['entity'] = "deg";
+bsEnvData['176']['char'] = "°";
+bsEnvData['176']['desc-en'] = "degree sign";
+
+bsEnvData['177'] = new Array();
+bsEnvData['177']['entity'] = "plusmn";
+bsEnvData['177']['char'] = "±";
+bsEnvData['177']['desc-en'] = "plus or minus";
+
+bsEnvData['178'] = new Array();
+bsEnvData['178']['entity'] = "sup2";
+bsEnvData['178']['char'] = "²";
+bsEnvData['178']['desc-en'] = "superscript two";
+
+bsEnvData['179'] = new Array();
+bsEnvData['179']['entity'] = "sup3";
+bsEnvData['179']['char'] = "³";
+bsEnvData['179']['desc-en'] = "superscript three";
+
+bsEnvData['180'] = new Array();
+bsEnvData['180']['entity'] = "acute";
+bsEnvData['180']['char'] = "´";
+bsEnvData['180']['desc-en'] = "acute accent";
+
+bsEnvData['181'] = new Array();
+bsEnvData['181']['entity'] = "micro";
+bsEnvData['181']['char'] = "µ";
+bsEnvData['181']['desc-en'] = "micro sign";
+
+bsEnvData['182'] = new Array();
+bsEnvData['182']['entity'] = "para";
+bsEnvData['182']['char'] = "¶";
+bsEnvData['182']['desc-en'] = "paragraph sign";
+
+bsEnvData['183'] = new Array();
+bsEnvData['183']['entity'] = "middot";
+bsEnvData['183']['char'] = "·";
+bsEnvData['183']['desc-en'] = "middle dot";
+
+bsEnvData['184'] = new Array();
+bsEnvData['184']['entity'] = "cedil";
+bsEnvData['184']['char'] = "¸";
+bsEnvData['184']['desc-en'] = "cedilla";
+
+bsEnvData['185'] = new Array();
+bsEnvData['185']['entity'] = "sup1";
+bsEnvData['185']['char'] = "¹";
+bsEnvData['185']['desc-en'] = "superscript one";
+
+bsEnvData['186'] = new Array();
+bsEnvData['186']['entity'] = "ordm";
+bsEnvData['186']['char'] = "º";
+bsEnvData['186']['desc-en'] = "masculine ordinal";
+
+bsEnvData['187'] = new Array();
+bsEnvData['187']['entity'] = "raquo";
+bsEnvData['187']['char'] = "»";
+bsEnvData['187']['desc-en'] = "right angle quote, guillemotright";
+
+bsEnvData['188'] = new Array();
+bsEnvData['188']['entity'] = "frac14";
+bsEnvData['188']['char'] = "¼";
+bsEnvData['188']['desc-en'] = "fraction one-fourth";
+
+bsEnvData['189'] = new Array();
+bsEnvData['189']['entity'] = "frac12";
+bsEnvData['189']['char'] = "½";
+bsEnvData['189']['desc-en'] = "fraction one-half";
+
+bsEnvData['190'] = new Array();
+bsEnvData['190']['entity'] = "frac34";
+bsEnvData['190']['char'] = "¾";
+bsEnvData['190']['desc-en'] = "fraction three-fourths";
+
+bsEnvData['191'] = new Array();
+bsEnvData['191']['entity'] = "iquest";
+bsEnvData['191']['char'] = "¿";
+bsEnvData['191']['desc-en'] = "inverted question mark";
+
+bsEnvData['192'] = new Array();
+bsEnvData['192']['entity'] = "Agrave";
+bsEnvData['192']['char'] = "À";
+bsEnvData['192']['desc-en'] = "capital A, grave accent";
+
+bsEnvData['193'] = new Array();
+bsEnvData['193']['entity'] = "Aacute";
+bsEnvData['193']['char'] = "Á";
+bsEnvData['193']['desc-en'] = "capital A, acute accent";
+
+bsEnvData['194'] = new Array();
+bsEnvData['194']['entity'] = "Acirc";
+bsEnvData['194']['char'] = "Â";
+bsEnvData['194']['desc-en'] = "capital A, circumflex accent";
+
+bsEnvData['195'] = new Array();
+bsEnvData['195']['entity'] = "Atilde";
+bsEnvData['195']['char'] = "Ã";
+bsEnvData['195']['desc-en'] = "capital A, tilde";
+
+bsEnvData['196'] = new Array();
+bsEnvData['196']['entity'] = "Auml";
+bsEnvData['196']['char'] = "Ä";
+bsEnvData['196']['desc-en'] = "capital A, dieresis or umlaut mark";
+
+bsEnvData['197'] = new Array();
+bsEnvData['197']['entity'] = "Aring";
+bsEnvData['197']['char'] = "Å";
+bsEnvData['197']['desc-en'] = "capital A, ring";
+
+bsEnvData['198'] = new Array();
+bsEnvData['198']['entity'] = "AElig";
+bsEnvData['198']['char'] = "Æ";
+bsEnvData['198']['desc-en'] = "capital AE diphthong (ligature)";
+
+bsEnvData['199'] = new Array();
+bsEnvData['199']['entity'] = "Ccedil";
+bsEnvData['199']['char'] = "Ç";
+bsEnvData['199']['desc-en'] = "capital C, cedilla";
+
+bsEnvData['200'] = new Array();
+bsEnvData['200']['entity'] = "Egrave";
+bsEnvData['200']['char'] = "È";
+bsEnvData['200']['desc-en'] = "capital E, grave accent";
+
+bsEnvData['201'] = new Array();
+bsEnvData['201']['entity'] = "Eacute";
+bsEnvData['201']['char'] = "É";
+bsEnvData['201']['desc-en'] = "capital E, acute accent";
+
+bsEnvData['202'] = new Array();
+bsEnvData['202']['entity'] = "Ecirc";
+bsEnvData['202']['char'] = "Ê";
+bsEnvData['202']['desc-en'] = "capital E, circumflex accent";
+
+bsEnvData['203'] = new Array();
+bsEnvData['203']['entity'] = "Euml";
+bsEnvData['203']['char'] = "Ë";
+bsEnvData['203']['desc-en'] = "capital E, dieresis or umlaut mark";
+
+bsEnvData['204'] = new Array();
+bsEnvData['204']['entity'] = "Igrave";
+bsEnvData['204']['char'] = "Ì";
+bsEnvData['204']['desc-en'] = "capital I, grave accent";
+
+bsEnvData['205'] = new Array();
+bsEnvData['205']['entity'] = "Iacute";
+bsEnvData['205']['char'] = "Í";
+bsEnvData['205']['desc-en'] = "capital I, acute accent";
+
+bsEnvData['206'] = new Array();
+bsEnvData['206']['entity'] = "Icirc";
+bsEnvData['206']['char'] = "Î";
+bsEnvData['206']['desc-en'] = "capital I, circumflex accent";
+
+bsEnvData['207'] = new Array();
+bsEnvData['207']['entity'] = "Iuml";
+bsEnvData['207']['char'] = "Ï";
+bsEnvData['207']['desc-en'] = "capital I, dieresis or umlaut mark";
+
+bsEnvData['208'] = new Array();
+bsEnvData['208']['entity'] = "ETH";
+bsEnvData['208']['char'] = "Ð";
+bsEnvData['208']['desc-en'] = "capital Eth, Icelandic";
+
+bsEnvData['209'] = new Array();
+bsEnvData['209']['entity'] = "Ntilde";
+bsEnvData['209']['char'] = "Ñ";
+bsEnvData['209']['desc-en'] = "capital N, tilde";
+
+bsEnvData['210'] = new Array();
+bsEnvData['210']['entity'] = "Ograve";
+bsEnvData['210']['char'] = "Ò";
+bsEnvData['210']['desc-en'] = "capital O, grave accent";
+
+bsEnvData['211'] = new Array();
+bsEnvData['211']['entity'] = "Oacute";
+bsEnvData['211']['char'] = "Ó";
+bsEnvData['211']['desc-en'] = "capital O, acute accent";
+
+bsEnvData['212'] = new Array();
+bsEnvData['212']['entity'] = "Ocirc";
+bsEnvData['212']['char'] = "Ô";
+bsEnvData['212']['desc-en'] = "capital O, circumflex accent";
+
+bsEnvData['213'] = new Array();
+bsEnvData['213']['entity'] = "Otilde";
+bsEnvData['213']['char'] = "Õ";
+bsEnvData['213']['desc-en'] = "capital O, tilde";
+
+bsEnvData['214'] = new Array();
+bsEnvData['214']['entity'] = "Ouml";
+bsEnvData['214']['char'] = "Ö";
+bsEnvData['214']['desc-en'] = "capital O, dieresis or umlaut mark";
+
+bsEnvData['215'] = new Array();
+bsEnvData['215']['entity'] = "times";
+bsEnvData['215']['char'] = "×";
+bsEnvData['215']['desc-en'] = "multiply sign";
+
+bsEnvData['216'] = new Array();
+bsEnvData['216']['entity'] = "Oslash";
+bsEnvData['216']['char'] = "Ø";
+bsEnvData['216']['desc-en'] = "capital O, slash";
+
+bsEnvData['217'] = new Array();
+bsEnvData['217']['entity'] = "Ugrave";
+bsEnvData['217']['char'] = "Ù";
+bsEnvData['217']['desc-en'] = "capital U, grave accent";
+
+bsEnvData['218'] = new Array();
+bsEnvData['218']['entity'] = "Uacute";
+bsEnvData['218']['char'] = "Ú";
+bsEnvData['218']['desc-en'] = "capital U, acute accent";
+
+bsEnvData['219'] = new Array();
+bsEnvData['219']['entity'] = "Ucirc";
+bsEnvData['219']['char'] = "Û";
+bsEnvData['219']['desc-en'] = "capital U, circumflex accent";
+
+bsEnvData['220'] = new Array();
+bsEnvData['220']['entity'] = "Uuml";
+bsEnvData['220']['char'] = "Ü";
+bsEnvData['220']['desc-en'] = "capital U, dieresis or umlaut mark";
+
+bsEnvData['221'] = new Array();
+bsEnvData['221']['entity'] = "Yacute";
+bsEnvData['221']['char'] = "Ý";
+bsEnvData['221']['desc-en'] = "capital Y, acute accent";
+
+bsEnvData['222'] = new Array();
+bsEnvData['222']['entity'] = "THORN";
+bsEnvData['222']['char'] = "Þ";
+bsEnvData['222']['desc-en'] = "capital THORN, Icelandic";
+
+bsEnvData['223'] = new Array();
+bsEnvData['223']['entity'] = "szlig";
+bsEnvData['223']['char'] = "ß";
+bsEnvData['223']['desc-en'] = "small sharp s, German (sz ligature)";
+
+bsEnvData['224'] = new Array();
+bsEnvData['224']['entity'] = "agrave";
+bsEnvData['224']['char'] = "à";
+bsEnvData['224']['desc-en'] = "small a, grave accent";
+
+bsEnvData['225'] = new Array();
+bsEnvData['225']['entity'] = "aacute";
+bsEnvData['225']['char'] = "á";
+bsEnvData['225']['desc-en'] = "small a, acute accent";
+
+bsEnvData['226'] = new Array();
+bsEnvData['226']['entity'] = "acirc";
+bsEnvData['226']['char'] = "â";
+bsEnvData['226']['desc-en'] = "small a, circumflex accent";
+
+bsEnvData['227'] = new Array();
+bsEnvData['227']['entity'] = "atilde";
+bsEnvData['227']['char'] = "ã";
+bsEnvData['227']['desc-en'] = "small a, tilde";
+
+bsEnvData['228'] = new Array();
+bsEnvData['228']['entity'] = "auml";
+bsEnvData['228']['char'] = "ä";
+bsEnvData['228']['desc-en'] = "small a, dieresis or umlaut mark";
+
+bsEnvData['229'] = new Array();
+bsEnvData['229']['entity'] = "aring";
+bsEnvData['229']['char'] = "å";
+bsEnvData['229']['desc-en'] = "small a, ring";
+
+bsEnvData['230'] = new Array();
+bsEnvData['230']['entity'] = "aelig";
+bsEnvData['230']['char'] = "æ";
+bsEnvData['230']['desc-en'] = "small ae diphthong (ligature)";
+
+bsEnvData['231'] = new Array();
+bsEnvData['231']['entity'] = "ccedil";
+bsEnvData['231']['char'] = "ç";
+bsEnvData['231']['desc-en'] = "small c, cedilla";
+
+bsEnvData['232'] = new Array();
+bsEnvData['232']['entity'] = "egrave";
+bsEnvData['232']['char'] = "è";
+bsEnvData['232']['desc-en'] = "small e, grave accent";
+
+bsEnvData['233'] = new Array();
+bsEnvData['233']['entity'] = "eacute";
+bsEnvData['233']['char'] = "é";
+bsEnvData['233']['desc-en'] = "small e, acute accent";
+
+bsEnvData['234'] = new Array();
+bsEnvData['234']['entity'] = "ecirc";
+bsEnvData['234']['char'] = "ê";
+bsEnvData['234']['desc-en'] = "small e, circumflex accent";
+
+bsEnvData['235'] = new Array();
+bsEnvData['235']['entity'] = "euml";
+bsEnvData['235']['char'] = "ë";
+bsEnvData['235']['desc-en'] = "small e, dieresis or umlaut mark";
+
+bsEnvData['236'] = new Array();
+bsEnvData['236']['entity'] = "igrave";
+bsEnvData['236']['char'] = "ì";
+bsEnvData['236']['desc-en'] = "small i, grave accent";
+
+bsEnvData['237'] = new Array();
+bsEnvData['237']['entity'] = "iacute";
+bsEnvData['237']['char'] = "í";
+bsEnvData['237']['desc-en'] = "small i, acute accent";
+
+bsEnvData['238'] = new Array();
+bsEnvData['238']['entity'] = "icirc";
+bsEnvData['238']['char'] = "î";
+bsEnvData['238']['desc-en'] = "small i, circumflex accent";
+
+bsEnvData['239'] = new Array();
+bsEnvData['239']['entity'] = "iuml";
+bsEnvData['239']['char'] = "ï";
+bsEnvData['239']['desc-en'] = "small i, dieresis or umlaut mark";
+
+bsEnvData['240'] = new Array();
+bsEnvData['240']['entity'] = "eth";
+bsEnvData['240']['char'] = "ð";
+bsEnvData['240']['desc-en'] = "small eth, Icelandic";
+
+bsEnvData['241'] = new Array();
+bsEnvData['241']['entity'] = "ntilde";
+bsEnvData['241']['char'] = "ñ";
+bsEnvData['241']['desc-en'] = "small n, tilde";
+
+bsEnvData['242'] = new Array();
+bsEnvData['242']['entity'] = "ograve";
+bsEnvData['242']['char'] = "ò";
+bsEnvData['242']['desc-en'] = "small o, grave accent";
+
+bsEnvData['243'] = new Array();
+bsEnvData['243']['entity'] = "oacute";
+bsEnvData['243']['char'] = "ó";
+bsEnvData['243']['desc-en'] = "small o, acute accent";
+
+bsEnvData['244'] = new Array();
+bsEnvData['244']['entity'] = "ocirc";
+bsEnvData['244']['char'] = "ô";
+bsEnvData['244']['desc-en'] = "small o, circumflex accent";
+
+bsEnvData['245'] = new Array();
+bsEnvData['245']['entity'] = "otilde";
+bsEnvData['245']['char'] = "õ";
+bsEnvData['245']['desc-en'] = "small o, tilde";
+
+bsEnvData['246'] = new Array();
+bsEnvData['246']['entity'] = "ouml";
+bsEnvData['246']['char'] = "ö";
+bsEnvData['246']['desc-en'] = "small o, dieresis or umlaut mark";
+
+bsEnvData['247'] = new Array();
+bsEnvData['247']['entity'] = "divide";
+bsEnvData['247']['char'] = "÷";
+bsEnvData['247']['desc-en'] = "division sign";
+
+bsEnvData['248'] = new Array();
+bsEnvData['248']['entity'] = "oslash";
+bsEnvData['248']['char'] = "ø";
+bsEnvData['248']['desc-en'] = "small o, slash";
+
+bsEnvData['249'] = new Array();
+bsEnvData['249']['entity'] = "ugrave";
+bsEnvData['249']['char'] = "ù";
+bsEnvData['249']['desc-en'] = "small u, grave accent";
+
+bsEnvData['250'] = new Array();
+bsEnvData['250']['entity'] = "uacute";
+bsEnvData['250']['char'] = "ú";
+bsEnvData['250']['desc-en'] = "small u, acute accent";
+
+bsEnvData['251'] = new Array();
+bsEnvData['251']['entity'] = "ucirc";
+bsEnvData['251']['char'] = "û";
+bsEnvData['251']['desc-en'] = "small u, circumflex accent";
+
+bsEnvData['252'] = new Array();
+bsEnvData['252']['entity'] = "uuml";
+bsEnvData['252']['char'] = "ü";
+bsEnvData['252']['desc-en'] = "small u, dieresis or umlaut mark";
+
+bsEnvData['253'] = new Array();
+bsEnvData['253']['entity'] = "yacute";
+bsEnvData['253']['char'] = "ý";
+bsEnvData['253']['desc-en'] = "small y, acute accent";
+
+bsEnvData['254'] = new Array();
+bsEnvData['254']['entity'] = "thorn";
+bsEnvData['254']['char'] = "þ";
+bsEnvData['254']['desc-en'] = "small thorn, Icelandic";
+
+bsEnvData['255'] = new Array();
+bsEnvData['255']['entity'] = "yuml";
+bsEnvData['255']['char'] = "ÿ";
+bsEnvData['255']['desc-en'] = "small y, dieresis or umlaut mark";
+
+function loaded() {
+  try {
+    if (opener) {
+      opener.bsSpecialCharsOnloadCallback();
+    } else if (parent) {
+      parent.bsSpecialCharsOnloadCallback();
+    }
+  } catch (e) {
+  }
+  document.focus();
+}
+
+    function bsEntOver(obj) {
+      document.getElementById('bsEntHtmlCodeDiv').innerText    = bsEnvData[obj.eCode]['entity'];
+      document.getElementById('bsEntDescriptionDiv').innerText = bsEnvData[obj.eCode]['desc-en'];
+      //return;
+      
+      var l = document.getElementById('bsEnvLoupe');
+      l.innerHTML     = obj.innerHTML;
+      l.style.top     = parseInt(obj.offsetTop) -10;
+      l.style.left    = parseInt(obj.offsetLeft) -10;
+      l.style.display = 'block';
+    }
+    function bsEntOut() {
+      return;
+      var l = document.getElementById('bsEnvLoupe');
+      l.innerHTML     = '';
+      l.style.display = 'none';
+    }
+    function bsEntClick() {
+      //try {
+        //var val = obj.innerHTML;
+        var val = document.getElementById('bsEntHtmlCodeDiv').innerText;
+        if (opener) {
+          opener.bsSpecialCharsDoneCallback(val);
+        } else if (parent) {
+          parent.bsSpecialCharsDoneCallback(val);
+        }
+        //window.close();
+      //} catch (e) {
+      //  alert("Sorry, failed to give back your selected character.");
+      //}
+    }
+    </script>
+    
+        </head>
+        <body bgcolor="white" onLoad="loaded();">
+      <div style="position:relative; width:400; height:160; overflow:auto; border:1px solid black; cursor:default; padding:10px;">
+      <span class="bsEnvE" eCode="161" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&iexcl;</span><span class="bsEnvE" eCode="162" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&cent;</span><span class="bsEnvE" eCode="163" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&pound;</span><span class="bsEnvE" eCode="164" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&curren;</span><span class="bsEnvE" eCode="165" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&yen;</span><span class="bsEnvE" eCode="166" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&brvbar;</span><span class="bsEnvE" eCode="167" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&sect;</span><span class="bsEnvE" eCode="168" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&uml;</span><span class="bsEnvE" eCode="169" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&copy;</span><span class="bsEnvE" eCode="170" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&ordf;</span><span class="bsEnvE" eCode="171" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&laquo;</span><span class="bsEnvE" eCode="172" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&not;</span><span class="bsEnvE" eCode="173" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&shy;</span><span class="bsEnvE" eCode="174" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&reg;</span><span class="bsEnvE" eCode="175" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&macr;</span><span class="bsEnvE" eCode="176" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&deg;</span><span class="bsEnvE" eCode="177" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&plusmn;</span><span class="bsEnvE" eCode="178" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&sup2;</span><span class="bsEnvE" eCode="179" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&sup3;</span><span class="bsEnvE" eCode="180" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&acute;</span><span class="bsEnvE" eCode="181" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&micro;</span><span class="bsEnvE" eCode="182" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&para;</span><span class="bsEnvE" eCode="183" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&middot;</span><span class="bsEnvE" eCode="184" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&cedil;</span><span class="bsEnvE" eCode="185" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&sup1;</span><span class="bsEnvE" eCode="186" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&ordm;</span><span class="bsEnvE" eCode="187" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&raquo;</span><span class="bsEnvE" eCode="188" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&frac14;</span><span class="bsEnvE" eCode="189" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&frac12;</span><span class="bsEnvE" eCode="190" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&frac34;</span><span class="bsEnvE" eCode="191" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&iquest;</span><span class="bsEnvE" eCode="192" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Agrave;</span><span class="bsEnvE" eCode="193" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Aacute;</span><span class="bsEnvE" eCode="194" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Acirc;</span><span class="bsEnvE" eCode="195" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Atilde;</span><span class="bsEnvE" eCode="196" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Auml;</span><span class="bsEnvE" eCode="197" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Aring;</span><span class="bsEnvE" eCode="198" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&AElig;</span><span class="bsEnvE" eCode="199" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Ccedil;</span><span class="bsEnvE" eCode="200" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Egrave;</span><span class="bsEnvE" eCode="201" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Eacute;</span><span class="bsEnvE" eCode="202" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Ecirc;</span><span class="bsEnvE" eCode="203" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Euml;</span><span class="bsEnvE" eCode="204" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Igrave;</span><span class="bsEnvE" eCode="205" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Iacute;</span><span class="bsEnvE" eCode="206" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Icirc;</span><span class="bsEnvE" eCode="207" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Iuml;</span><span class="bsEnvE" eCode="208" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&ETH;</span><span class="bsEnvE" eCode="209" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Ntilde;</span><span class="bsEnvE" eCode="210" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Ograve;</span><span class="bsEnvE" eCode="211" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Oacute;</span><span class="bsEnvE" eCode="212" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Ocirc;</span><span class="bsEnvE" eCode="213" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Otilde;</span><span class="bsEnvE" eCode="214" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Ouml;</span><span class="bsEnvE" eCode="215" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&times;</span><span class="bsEnvE" eCode="216" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Oslash;</span><span class="bsEnvE" eCode="217" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Ugrave;</span><span class="bsEnvE" eCode="218" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Uacute;</span><span class="bsEnvE" eCode="219" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Ucirc;</span><span class="bsEnvE" eCode="220" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Uuml;</span><span class="bsEnvE" eCode="221" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&Yacute;</span><span class="bsEnvE" eCode="222" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&THORN;</span><span class="bsEnvE" eCode="223" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&szlig;</span><span class="bsEnvE" eCode="224" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&agrave;</span><span class="bsEnvE" eCode="225" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&aacute;</span><span class="bsEnvE" eCode="226" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&acirc;</span><span class="bsEnvE" eCode="227" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&atilde;</span><span class="bsEnvE" eCode="228" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&auml;</span><span class="bsEnvE" eCode="229" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&aring;</span><span class="bsEnvE" eCode="230" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&aelig;</span><span class="bsEnvE" eCode="231" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&ccedil;</span><span class="bsEnvE" eCode="232" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&egrave;</span><span class="bsEnvE" eCode="233" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&eacute;</span><span class="bsEnvE" eCode="234" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&ecirc;</span><span class="bsEnvE" eCode="235" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&euml;</span><span class="bsEnvE" eCode="236" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&igrave;</span><span class="bsEnvE" eCode="237" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&iacute;</span><span class="bsEnvE" eCode="238" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&icirc;</span><span class="bsEnvE" eCode="239" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&iuml;</span><span class="bsEnvE" eCode="240" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&eth;</span><span class="bsEnvE" eCode="241" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&ntilde;</span><span class="bsEnvE" eCode="242" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&ograve;</span><span class="bsEnvE" eCode="243" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&oacute;</span><span class="bsEnvE" eCode="244" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&ocirc;</span><span class="bsEnvE" eCode="245" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&otilde;</span><span class="bsEnvE" eCode="246" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&ouml;</span><span class="bsEnvE" eCode="247" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&divide;</span><span class="bsEnvE" eCode="248" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&oslash;</span><span class="bsEnvE" eCode="249" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&ugrave;</span><span class="bsEnvE" eCode="250" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&uacute;</span><span class="bsEnvE" eCode="251" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&ucirc;</span><span class="bsEnvE" eCode="252" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&uuml;</span><span class="bsEnvE" eCode="253" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&yacute;</span><span class="bsEnvE" eCode="254" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&thorn;</span><span class="bsEnvE" eCode="255" onMouseEnter="bsEntOver(this);" onMouseLeave="bsEntOut();" onClick="bsEntClick();">&yuml;</span>
+      <div id="bsEnvLoupe" class="bsEnvLoupe" onClick="bsEntClick();"></div>
+      </div>
+      <div style="font-family: Arial, Helvetica, sans-serif; font-size:11px; color:gray">
+        HTML-Code: <span id="bsEntHtmlCodeDiv" style="color:black; width:40;"></span> 
+        Description: <span id="bsEntDescriptionDiv" style="color:black;"></span>
+      </div>
+    
+        </body>
+        </html>
+      

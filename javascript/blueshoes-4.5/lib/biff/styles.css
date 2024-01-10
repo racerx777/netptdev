@@ -1,0 +1,64 @@
+body {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 10pt;
+}
+
+enewsbox {
+	background : #008080;
+	border : 0px solid;
+	color : #FFFFFF;
+	table-layout : fixed;
+}
+
+h1, h2, h3, h4, h5, h6{
+	color : #666699;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+}
+
+select,  textarea, input {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 10pt;
+}
+
+td {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 10pt;
+}
+
+th{
+	background-color : #666699;
+	color : #FFFFFF;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 10pt;
+	font-weight : normal;
+	text-align : left;
+}
+
+.blue {
+	color : #666699;
+}
+
+.justified {
+	font-family : Verdana, Arial, Helvetica, sans-serif;
+	font-size : 10pt;
+	line-height : 1.5;
+	text-align : justify;
+}
+
+.pink {
+	color : #EA98AC;
+}
+
+.sourcecode{
+	background-color : #E5E5E5;
+	border : none;
+	color : #000000;
+	display : block;
+	font-family : "Courier New", Courier, monospace;
+	font-size : 12px;
+	padding-bottom : 4px;
+	padding-left : 4px;
+	padding-right : 4px;
+	padding-top : 4px;
+	text-align : left;
+}

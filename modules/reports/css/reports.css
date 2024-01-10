@@ -1,0 +1,38 @@
+#collection-report-controls {
+    margin: 10px 0;
+}
+
+#lien-report thead th {
+    color: black;
+}
+
+#lien-report tfoot th {
+    color: black;
+    background-color: white;
+}
+
+#lien-report-controls {
+    margin: 10px 0;
+}
+
+#reconciliation-report {
+    margin: 10px 0;
+}
+
+h1.detail-header {
+    font-size: 20pt;
+}
+
+.report-table thead th, .footer-table thead th, .report-table tfoot th, .footer-table tfoot th {
+    color:black;
+    background-color: white;
+}
+
+.footer-table {
+    margin-bottom: 3em;
+    page-break-after: always;
+}
+
+.number-cell {
+    text-align:right;
+}

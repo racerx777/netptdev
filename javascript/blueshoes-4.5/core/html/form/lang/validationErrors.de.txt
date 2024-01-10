@@ -1,0 +1,43 @@
+[default]
+# the default error messages for each field are here. other field types may 
+# overwrite some or all error messages. 
+must                       = Dieses Feld muss zwingend ausgefüllt werden.
+mustIf                     = Dieses Feld muss unter den gegebenen Umständen zwingend ausgefüllt werden.
+mustOneOf                  = Dieses oder ein anderes Feld muss zwingend ausgefüllt werden.
+mustOneOfIf                = Dieses oder ein anderes Feld muss unter den gegebenen Umständen zwingend ausgefüllt werden.
+onlyOneOf                  = Nur eines der Felder %s darf ausgefüllt sein.
+onlyIf                     = Dieses Feld darf nicht ausgefüllt werden.
+minLength                  = Die Mindestlänge dieses Feldes ist %s Zeichen. Die Eingabe ist %s Zeichen.
+maxLength                  = Die Maximallänge dieses Feldes ist %s Zeichen. Die Eingabe ist %s Zeichen.
+mustStartWith              = Der eingegebene Wert muss mit einem dieser Werte beginnen: %s.
+notStartWith               = Der eingegebene Wert darf nicht mit '%s' beginnen.
+mustEndWith                = Der eingegebene Wert muss mit einem dieser Werte enden: %s.
+notEndWith                 = Der eingegebene Wert darf nicht mit '%s' enden.
+mustContain                = Der eingegebene Wert muss einen dieser Werte enthalten: %s.
+notContain                 = Der eingegebene Wert darf '%s' nicht enthalten.
+equalTo                    = Der eingegebene Wert muss mit dem Feld '%s' übereinstimmen.
+notEqualTo                 = Der eingegebene Wert darf nicht mit dem Feld '%s' übereinstimmen.
+dataType                   = Der Datentyp ist falsch.
+dataType_text2             = Es darf nur benutzt werden: a-z, A-Z und 0-9.
+dataType_text3             = Es darf nur benutzt werden: a-z und A-Z.
+dataType_text4             = Es darf nur benutzt werden: 
+dataType_number_nan        = Der eingegebene Wert ist keine Nummer.
+dataType_number_range      = Die eingegebene Nummer befindet sich nicht im erlaubten Bereich.
+dataType_number_high       = Die eingegebene Nummer ist zu gross.
+dataType_number_low        = Die eingegebene Nummer ist zu klein.
+dataType_email_unknown     = Ungültige E-Mail Adresse.
+dataType_email_syntax      = Ungültige E-Mail Adresse (syntax).
+dataType_email_host        = Ungültige E-Mail Adresse (host).
+dataType_email_account     = Ungültige E-Mail Adresse (account).
+dataType_email_newAddress  = Die E-Mail Adresse hat geändert. Die neue Adresse lautet '%s'.
+dataType_date_invalid      = Das eingegebene Datum ist nicht gültig oder die Schreibweise ist falsch.
+dataType_ip_invalid        = Die eingegebene IP Adresse ist nicht gültig oder die Schreibweise ist falsch.
+dataType_url_invalid       = Die URL Schreibweise ist falsch. Merke: Der URL muss mit einem scheme (zB http://) beginnen.
+regularExpression          = Der eingegebene Wert wurde nicht akzeptiert (regexp).
+additionalCheck            = Der eingegebene Wert wurde nicht akzeptiert (manuelle Checks).
+mustBeUnique               = '%s' existiert bereits, bitte wählen Sie etwas anderes.
+
+[select]
+must                       = Treffen Sie Ihre Wahl.
+minLength                  = Die minimale Anzahl ist %s, es wurden bloss %s ausgewühlt.
+maxLength                  = Die maximale Anzahl ist %s, es wurden %s ausgewählt.

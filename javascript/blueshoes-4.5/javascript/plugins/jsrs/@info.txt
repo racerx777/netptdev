@@ -1,0 +1,15 @@
+Files in this Dir 
+-------------------
+  All files ending with '.js' are the javascripts for the client-side 
+  html-page.  With a little trick you only have to include jsrsCore.js.
+    jsrsCore.js    : Only purpose is to load the used js-files below. 
+    jsrsClient.js  : Is the main code.
+    wddx.js        : WDDX encoder
+    wddxDes.js     : WDDX decoder
+
+  NOTE : Some js-files have the ending _c (e.g. jsrsClient_c.js). These 
+         files have been squeezed, by removing all comments.
+
+@author Sam Blum  bs_php@users.sourceforge.net
+@doc    http://js-rs.sourceforge.net
+@source http://sourceforge.net/projects/js-rs/

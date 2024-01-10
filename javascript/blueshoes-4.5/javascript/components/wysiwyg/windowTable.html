@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Table - BlueShoes Wysiwyg Editor &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </title>
+
+<script type="text/javascript" src='/_bsJavascript/core/lang/Bs_Misc.lib.js'></script>
+<script language="JavaScript" src="/_bsJavascript/components/numberfield/Bs_NumberField.class.js" type="text/javascript"></script>
+
+<script language="JavaScript" src="/_bsJavascript/components/tabset/Bs_TabSet.class.js" type="text/javascript"></script>
+<link rel='stylesheet' href='/_bsJavascript/components/tabset/default.css'>
+
+<style>
+body {
+	font-family: arial,verdana,sans-serif,helvetica;
+	font-size:11px;
+}
+td {
+	font-size:11px;
+}
+.tabContent {
+	height:150px;
+}
+input.inputText {
+	width: 40px;
+}
+input.inputButton {
+	width:100px; 
+	height:20px; 
+	font-size:12px;
+}
+.tabsetContentDiv {
+	padding:10px;
+}
+</style>
+
+<script>
+
+/**
+* the caller object, instance of Bs_Wysiwyg.
+* @var object wysiwygObj
+*/
+var wysiwygObj;
+
+/**
+* name of the callback function in the wysiwygObj that we need to call 
+* once this page has loaded (onload).
+* @var string callbackLoad
+*/
+var callbackLoad;
+
+/**
+* name of the callback function in the wysiwygObj that we need to call 
+* to save our value back.
+* @var string callbackSave
+*/
+var callbackSave;
+
+
+/**
+* fires onload().
+*/
+function init() {
+	t = new Bs_TabSet('t', 'tabset');
+	
+	var tableDesignTab = new Object;
+	tableDesignTab.caption   = 'Table Design';
+	tableDesignTab.container = document.getElementById('tableDesign');
+	t.addTab(tableDesignTab);
+	
+	var tablePropertiesTab = new Object;
+	tablePropertiesTab.caption   = 'Table Properties';
+	tablePropertiesTab.container = document.getElementById('tableProperties');
+	t.addTab(tablePropertiesTab);
+	
+	var cellPropertiesTab = new Object;
+	cellPropertiesTab.caption   = 'Cell Properties';
+	cellPropertiesTab.container = document.getElementById('cellProperties');
+	t.addTab(cellPropertiesTab);
+	
+	t.draw();
+	
+	if (window.dialogArguments) {
+		//setDefaultValues(window.dialogArguments);
+	} else { //popup
+		var qsArr      = queryStringToHash(window.location.search);
+		wysiwygObjName = qsArr['objectName'];
+		callbackLoad   = qsArr['callbackLoad'];
+		callbackSave   = qsArr['callbackSave'];
+		var parentOpener = (opener) ? opener : parent;
+		//eval('wysiwygObj = parentOpener.' + wysiwygObjName + ';');
+		//setDefaultValues(wysiwygObj[callbackLoad]()); //tell that i'm ready
+	}
+
+}
+
+/**
+* @param object paramObj
+*/
+function setDefaultValues(paramObj) {
+}
+
+function setBack(i) {
+	var ret = '';
+	if (window.dialogArguments) {
+		window.returnValue = ret;
+	} else {
+		wysiwygObj[callbackSave](ret);
+	}
+	window.close();
+}
+
+</script>
+
+</head>
+
+<body bgcolor="#D6D6CE" onload="init();" leftmargin="10" topmargin="10" style="margin:10px;">
+
+<div id="tabset" style="background-color:menu;">
+	<div id="tabset_tabs"></div>
+	<div id="tabset_content" class="tabsetContentDiv">
+		<div id="tableDesign" class="tabContent">
+		</div>
+		
+		<div id="tableProperties" class="tabContent">
+		</div>
+		
+		<div id="cellProperties" class="tabContent">
+		</div>
+	</div>
+</div>
+
+</body>
+</html>

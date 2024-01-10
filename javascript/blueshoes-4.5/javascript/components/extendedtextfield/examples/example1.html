@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Untitled</title>
+  <title>JavaScript Bs_ExtendedTextField Example 1</title>
+  <script type="text/javascript" src='/_bsJavascript/core/lang/Bs_Misc.lib.js'></script>
+  <script type="text/javascript" src='/_bsJavascript/core/html/Bs_HtmlUtil.lib.js'></script>
+  <script type="text/javascript" src='/_bsJavascript/components/extendedtextfield/Bs_ExtendedTextField.class.js'></script>
+
+<script type="text/javascript">
+function init() {
+	var values = new Array;
+	values['foo'] = new Array('foo2', 'foo3');
+	values['bar'] = new Array();
+	values['hello'] = true;
+	values['world'] = new Array('globe');
+	/*
+	etf = new Bs_ExtendedTextField();
+	etf.initByArray(values);
+	*/
+	
+	etf = new Bs_ExtendedTextField();
+	etf.objectName = 'etf';
+	//etf.initByString("\"foo bar\" and hello not ~world", values);
+	etf.initByField('fooField', values);
+	//etf.renderInto('fooDiv');
+	etf.renderReplace('fooField');
+}
+
+</script>
+</head>
+
+<body onload="init();">
+<br><br><br>
+
+<input type="text" name="fooField" id="fooField" value='"foo bar" and hello not ~world' size="50">
+<!--<div id="fooDiv"></div>-->
+
+</body>
+</html>

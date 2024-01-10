@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<title>Blueshoes SpreadSheet example 1</title>
+  <style>
+    td {
+    	font-family : Arial, Helvetica, sans-serif;
+    	font-size : 12px;
+    }
+  </style>
+<script type="text/javascript" src="/_bsJavascript/core/html/Bs_HtmlUtil.lib.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Array.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/util/Bs_String.lib.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/util/Bs_CsvUtil.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Misc.lib.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/spreadsheet/Bs_SpreadSheet.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/spreadsheet/Bs_SpreadSheet.inc.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_ButtonBar.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_Button.class.js"></script>
+
+<script type="text/javascript">
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_ie.css'>");
+}
+
+function init() {
+  var data = new Array();
+  data[0] = new Array();
+  data[0][0] = '1A';
+  data[0][1] = '1B';
+  data[0][2] = '1C';
+  data[0][3] = '1D';
+  data[1] = new Array();
+  data[1][0] = '2A';
+  data[1][1] = '2B';
+  data[1][2] = '2C';
+  data[1][3] = '2D';
+  data[2] = new Array();
+  data[2][0] = '3A';
+  data[2][1] = '3B';
+  data[2][2] = '3C';
+  data[2][3] = '3D';
+  mySpreadSheet = new Bs_SpreadSheet;
+  mySpreadSheet.objectName = 'mySpreadSheet';
+	mySpreadSheet.mayUseWysiwyg = false;
+	mySpreadSheet.sheetWidth  = 550;
+	mySpreadSheet.sheetHeight = 250;
+  mySpreadSheet.init(data, 'dataTableDiv');
+}
+
+function exportDataToTextarea() {
+	var elm = document.getElementById('cvsTextarea');
+	elm.value = mySpreadSheet.exportDataToCsv(); //note that formatting information (bold etc) is not exported.
+}
+
+</script>
+</head>
+
+<body id="body" onLoad="init();">
+
+<div id="dataTableDiv" style="width:600; height:300; border:1px solid black;"></div>
+<form>
+<button name="btnExportCvs" value="Export Spreadsheet to CVS" type="button" onclick="exportDataToTextarea();">Export Spreadsheet to CVS</button><br>
+<textarea id="cvsTextarea" cols="50" rows="10" name="cvs" wrap="off"></textarea>
+</form>
+</body>
+</html>

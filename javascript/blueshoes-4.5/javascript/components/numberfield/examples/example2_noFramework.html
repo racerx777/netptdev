@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>BlueShoes NumberField Example 2</title>
+
+<script type="text/javascript" src="../../../core/lang/Bs_Misc.lib.js"></script>
+<script type="text/javascript" src="../../../components/toolbar/Bs_Button.class.js"></script>
+<script type="text/javascript" src="../../../components/numberfield/Bs_NumberField.class.js"></script>
+<script type="text/javascript" src="../../../core/util/Bs_TitleToTooltip.lib.js"></script>
+<script>
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_ie.css'>");
+}
+
+function init() {
+	//udpate the form with the current time:
+	var dateNow = new Date();
+	document.getElementById('fldHour').value = 8; //dateNow.getHours();
+	document.getElementById('fldMin').value  = dateNow.getMinutes();
+	document.getElementById('fldSec').value  = dateNow.getSeconds();
+	
+	//title to tooltip feature:
+	bs_ttt_initAll();
+	
+	hourObj = new Bs_NumberField('fldHour');
+	hourObj.buttonUp.imgPath   = '../../../components/numberfield/img/';
+	hourObj.buttonDown.imgPath = '../../../components/numberfield/img/';
+	hourObj.drawButtonsInside = true;
+	hourObj.zeroFill          = 2;
+	hourObj.minValue          = 0;
+	hourObj.maxValue          = 23;
+	hourObj.draw();
+	
+	minObj = new Bs_NumberField('fldMin');
+	minObj.buttonUp.imgPath   = '../../../components/numberfield/img/';
+	minObj.buttonDown.imgPath = '../../../components/numberfield/img/';
+	minObj.drawButtonsInside = true;
+	minObj.zeroFill          = 2;
+	minObj.minValue          = 0;
+	minObj.maxValue          = 59;
+	minObj.draw();
+	
+	secObj = new Bs_NumberField('fldSec');
+	secObj.buttonUp.imgPath   = '../../../components/numberfield/img/';
+	secObj.buttonDown.imgPath = '../../../components/numberfield/img/';
+	secObj.drawButtonsInside = true;
+	secObj.zeroFill          = 2;
+	secObj.minValue          = 0;
+	secObj.maxValue          = 59;
+	secObj.draw();
+}
+</script>
+
+<style>
+.foo {
+position:absolute;
+}
+</style>
+</head>
+
+<body onload="init();" bgcolor="#D6D3CE">
+
+<h1>BlueShoes NumberField Example 2</h1>
+
+This example demonstrates the <a href="http://www.blueshoes.org/en/javascript/numberfield/">Number Field</a> component.<br><br>
+
+<ul>
+	<li>Using the "drawButtonsInside" feature. The buttons look like they're inside the number fields.</li>
+	<li>Using the "zeroFill" feature. If the hour is below 10, it will be shown as for example 09, not 9.</li>
+	<li>You might have notices it: The fields show your systems time of the moment when the page loaded.</li>
+	<li>Using the <a href="http://www.blueshoes.org/en/javascript/titletotooltip/">TitleToTooltip</a> feature. Click into a field to see it.</li>
+</ul>
+<br><br>
+
+Time: <input id="fldHour" name="fldHour" type="text" value="15" maxlength="2" style="width:35; height:20;" title="Hour">:<input id="fldMin"  name="fldMin"  type="text" value="30" maxlength="2" style="width:35; height:20;" title="Minute">:<input id="fldSec"  name="fldSec"  type="text" value="59" maxlength="2" style="width:35; height:20;" title="Second">
+
+</body>
+</html>

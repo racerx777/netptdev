@@ -1,0 +1,44 @@
+[default]
+# the default error messages for each field are here. other field types may 
+# overwrite some or all error messages. 
+must                       = E' obbligatorio riempire questo campo.
+mustIf                     = E' obbligatorio riempire questo campo in base alle condizioni date.
+mustOneOf                  = E' obbligatorio riempire questo o un altro campo.
+mustOneOfIf                = E' obbligatorio riempire questo o un altro campo in base alle condizioni date.
+onlyOneOf                  = Solo uno dei campi %s pu˜ essere riempito.
+onlyIf                     = Questo campo non pu˜ essere riempito.
+minLength                  = La lunghezza minima di questo campo di %s caratteri. L'immissione di %s caratteri.
+maxLength                  = La lunghezza massima di questo campo di %s caratteri. L'immissione di %s caratteri.
+mustStartWith              = Il valore immesso deve iniziare con uno di questi valori: %s.
+notStartWith               = Il valore immesso non pu˜ cominciare con '%s' .
+mustEndWith                = Il valore immesso deve finire con uno di questi valori: %s.
+notEndWith                 = Il valore immesso non pu˜ finire con '%s' .
+mustContain                = Il valore immesso deve presentare uno di questi valori: %s.
+notContain                 = Il valore immesso non pu˜ presentare '%s' .
+equalTo                    = Il valore immesso deve concordare con il campo '%s' .
+notEqualTo                 = Il valore immesso non pu˜ concordare con il campo '%s' .
+dataType                   = Il tipo di dato sbagliato.
+dataType_text2             = Si possono usare solo: a-z, A-Z e 0-9.
+dataType_text3             = Si possono usare solo: a-z e A-Z.
+dataType_text4             = Si possono usare solo: 
+dataType_number_nan        = Il valore immesso non un numero.
+dataType_number_range      = Il numero immesso si trova in un campo non permesso.
+dataType_number_high       = Il numero immesso troppo grande.
+dataType_number_low        = Il numero immesso troppo piccolo.
+dataType_email_unknown     = Indirizzo e-mail non valido.
+dataType_email_syntax      = Indirizzo e-mail non valido (sintassi).
+dataType_email_host        = Indirizzo e-mail non valido (host).
+dataType_email_account     = Indirizzo e-mail non valido (account).
+dataType_email_newAddress  = L'indirizzo e-mail cambiato. Il nuovo indirizzo '%s'.
+dataType_date_invalid      = La data immessa non valida oppure scritta in modo sbagliato.
+dataType_ip_invalid        = L'IP immessa non valida oppure scritta in modo sbagliato.
+dataType_url_invalid       = The URL syntax is wrong. Note that the URL must beginn with a scheme (eg http://).
+regularExpression          = Il valore immesso non stato accettato (regexp).
+additionalCheck            = Il valore immesso non stato accettato  (checks manuali).
+mustBeUnique               = '%s' giˆ esiste, si prega di fare un'altra scelta.
+
+[select]
+must                       = Fate la vostra scelta.
+minLength                  = Il numero minimo %s, sono stati selezionati %s .
+maxLength                  = Il numero massimo %s, sono stati selezionati %s .
+

@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>BlueShoes Limited Textarea Example 2</title>
+
+	<script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Misc.lib.js"></script>
+	<script type="text/javascript" src="/_bsJavascript/components/limitedtextarea/Bs_LimitedTextarea.class.js"></script>
+	<script type="text/javascript" src="/_bsJavascript/core/gfx/Bs_ColorUtil.lib.js"></script>
+	<script>
+	function init() {
+		myLimitedFoo = new Bs_LimitedTextarea('foo', 50);
+		myLimitedFoo.setBgColorWarning();
+		myLimitedFoo.draw();
+		
+		myLimitedBar = new Bs_LimitedTextarea('bar', 100);
+		myLimitedBar.setBgColorWarning(60, 'char', 'FFC0C0');
+		myLimitedBar.draw();
+	}
+	</script>
+</head>
+
+<body onload="init();">
+
+<h1>BlueShoes Limited Textarea Example 2</h1>
+
+This is an example of the <a href="http://www.blueshoes.org/en/javascript/limitedtextarea/">Limited Textarea</a> component.
+<br><br>
+
+<ul>
+	<li>Demonstration of the "bg color warning" feature, see setBgColorWarning().</li>
+</ul>
+
+<table border="0" cellspacing="0" cellpadding="10" width="580">
+	<tr>
+		<td valign="top">
+			<b>Field 1</b><br>
+			When 80% of the 50 chars are used, the background color starts to transform into red.<br><br>
+			<textarea name="foo" id="foo" cols="25" rows="4"></textarea>
+		</td>
+		<td valign="top">
+			<b>Field 2</b><br>
+			When 60 chars are used, the background color starts to transform into red.<br><br>
+			<textarea name="bar" id="bar" cols="25" rows="4" style="background-color:#C0FFFF;">this is a default value. this is a default value.</textarea>
+		</td>
+	</tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+<html>
+<head>
+	<title>Chat Box</title>
+
+  <script language="Javascript" src="/_bsJavascript/plugins/jsrs/JsrsCore.lib.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    /**
+    * Make the Chatbox object
+    */
+    function chatBox() {
+      /**
+      */
+      this.init = function(formObj) {
+        this.theForm = formObj;
+        this.get();
+      };       
+      /**
+      */
+      this.send = function(formObj) {
+        var text, callId;
+        text = this.theForm['toSend'].value;
+        callId = jsrsCall("ChatboxServer.class.php", "Chatbox._callback", "ChatboxServer.write", text); 
+      }
+      /**
+      */
+      this.get = function() {
+        if (this.theForm) {
+          var callId = jsrsCall("ChatboxServer.class.php", "Chatbox._callback", "ChatboxServer.read");
+        }
+      }
+      /**
+      */
+      this._callback = function(text, callId) {
+        this.theForm['box'].value = text;
+        //setTimeout('Chatbox.get()',100000); 
+      }
+    }
+    
+    var Chatbox = new chatBox(); // global 
+    /**
+    *
+    */
+    this.onload = function() {
+      Chatbox.init(this.document.forms['form1']);
+      //Chatbox.get();
+    }
+  </script>
+</head>
+
+<body onHelp="return jsrsDebugInfo();" bgcolor="#ddddff">
+<P><FONT size=2>Press F1 to open a debug window (Only IE)</FONT></P>
+<P><FONT face=Arial>This is simple chat box demo. <BR>You may open a 
+few browsers (IE5.5+ and/or NS 6.2) and fill in text to send.<BR>In ALL browsers you will see the sent text.</FONT></P>
+          
+  <form name='form1' onsubmit="Chatbox.send(this);return false;">
+    <TEXTAREA name=box rows=9 cols=60></TEXTAREA><br>
+    <input type="text" name="toSend" size="60">
+    <input type="submit" value="Send">
+  </form>
+</body>
+</html>

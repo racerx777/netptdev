@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+	<title>Indexed List Manager</title>
+  <script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Misc.lib.js"></script>
+  <script type="text/javascript" src="/_bsJavascript/plugins/jsrs/JsrsCore.lib.js"></script> 
+  <script type="text/javascript" src="/_bsJavascript/core/form/Bs_FormFieldSelect.class.js"></script>
+  <script type="text/javascript" src="/_bsApplications/indexedlistmanager/functions.js"></script>
+  <link rel="stylesheet" type="text/css" href="/_bsApplications/indexedlistmanager/default.css">
+</head>
+
+<body onload="init();">
+
+<form name="ilmForm">
+
+<fieldset class="ilmOuterFieldset">
+<legend>Indexed List Manager</legend>
+
+<table border="0" cellspacing="0" cellpadding="2">
+  <tr>
+    <td valign="top">
+      List<br>
+      <select name="fldSelect" id="fldSelect" size="20" class="ilmFieldSelect" onclick="clickSelectField();">
+      </select>
+    </td>
+    <td valign="top">
+      <fieldset class="ilmFieldset">
+        <legend>Add</legend>
+        <div class="ilmFieldsetContainer">
+          <input type="text" name="txtAdd" size="20" class="ilmFieldText ilmFieldTextAdd"> <input type="button" name="btnAdd" value="Add" onclick="ilm_add();" class="ilmButton ilmButtonAdd">
+        </div>
+      </fieldset>
+      
+      <fieldset class="ilmFieldset">
+        <legend>Edit</legend>
+        <div class="ilmFieldsetContainer">
+          <input type="hidden" name="hidEdit">
+          <input type="text" name="txtEdit" size="20" class="ilmFieldText ilmFieldTextEdit"> <input type="button" name="btnEdit" value="Edit" onclick="ilm_edit();" class="ilmButton ilmButtonEdit">
+        </div>
+      </fieldset>
+      
+      <fieldset class="ilmFieldset">
+        <legend>Delete</legend>
+        <div class="ilmFieldsetContainer">
+          <input type="hidden" name="hidDelete">
+          <input type="text" name="txtDelete" size="20" class="ilmFieldText ilmFieldTextDelete" readonly> <input type="button" name="btnDelete" value="Delete" onclick="ilm_delete();" class="ilmButton ilmButtonDelete">
+        </div>
+      </fieldset>
+    </td>
+  </tr>
+</table>
+
+</fieldset>
+
+</form>
+
+</body>
+</html>

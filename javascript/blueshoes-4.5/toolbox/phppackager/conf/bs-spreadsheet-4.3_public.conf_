@@ -1,0 +1,25 @@
+array (
+  '_fld_packageName' => 'bs-spreadsheet-4.3_public',
+  '_fld_targetDir' => '/tmp/bs-spreadsheet-4.3_public/',
+  '_fld_baseDir' => '/usr/local/lib/php/',
+  '_fld_subDirs' => '/blueshoes-4.3/javascript/components/spreadsheet/
+/blueshoes-4.3/javascript/components/toolbar/
+/blueshoes-4.3/javascript/core/
+/blueshoes-4.3/images/buttons/',
+  '_fld_mainFilter' => '- |/CVS/|
+- |\\.#|
+- |.php$|
+',
+  '_fld_noChangeFilter' => '+ ~/howtos/~
++ ~/examples?/~
++ ~/skin/~
++ ~[^\\.php|\\.js]$~
++ |\\.css|
++ |\\.txt|
++ |\\.ht|
+
+',
+  '_fld_unCommentFilter' => '+ |\\.js|
+',
+  '_fld_obfuseFilter' => '',
+)

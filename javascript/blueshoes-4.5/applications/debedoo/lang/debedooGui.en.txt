@@ -1,0 +1,11 @@
+[default]
+view               = view
+add                = add record
+edit               = edit
+delete             = delete
+search             = search
+list               = list
+forward            = forward
+backward           = back
+records            = records
+savesuccess        = saved successfully

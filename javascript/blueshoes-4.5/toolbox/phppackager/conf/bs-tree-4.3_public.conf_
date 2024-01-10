@@ -1,0 +1,26 @@
+array (
+  '_fld_packageName' => 'bs-tree-4.3_public',
+  '_fld_targetDir' => '/tmp/bs-tree-4.3_public/',
+  '_fld_baseDir' => '/usr/local/lib/php/',
+  '_fld_subDirs' => '/blueshoes-4.3/javascript/components/tree/
+/blueshoes-4.3/javascript/components/checkbox/
+/blueshoes-4.3/javascript/components/radio/
+/blueshoes-4.3/javascript/lib/
+/blueshoes-4.3/javascript/core/',
+  '_fld_mainFilter' => '- |/CVS/|
+- |\\.#|
+- |.php$|
+',
+  '_fld_noChangeFilter' => '+ ~/howtos/~
++ ~/examples?/~
++ ~/skin/~
++ ~[^\\.php|\\.js]$~
++ |\\.css|
++ |\\.txt|
++ |\\.ht|
+
+',
+  '_fld_unCommentFilter' => '+ |\\.js|
+',
+  '_fld_obfuseFilter' => '',
+)

@@ -1,0 +1,55 @@
+array (
+  '_fld_packageName' => 'bs4.3_developer',
+  '_fld_targetDir' => '/tmp/bs4.3_developer/',
+  '_fld_baseDir' => '/usr/local/lib/php/',
+  '_fld_subDirs' => '/blueshoes-4.3/',
+  '_fld_mainFilter' => '- |/CVS/|
+- |/cms/|
+- |/lib/JpGraph/|
+- |\\.#|',
+  '_fld_noChangeFilter' => '+ ~/howtos/~
++ ~/examples?/~
++ ~/skin/~
++ ~/lib/~
++ ~[^\\.php|\\.js]$~
++ |\\.css|
++ |\\.txt|
++ |\\.ht|
++ |blueshoes.ini.php$|
++ |/blueshoes-4.4$|
++ |/core/auth/|
++ |/core/crypt/|
++ |/core/date/|
++ |/core/db/|
++ |/core/file/|
++ |/core/gfx/|
++ |/core/html/|
++ |/core/lang/|
++ |/core/net/|
++ |/core/text/|
++ |/core/util/|
++ |/core/xml/|
++ |/applications/chartwizard/|
++ |/applications/contactform/|
++ |/applications/faq/|
++ |/applications/filebrowser/|
++ |/applications/simplequiz/|
++ |/javascript/core/|
++ |/javascript/plugins/|
++ |/javascript/components/checkbox/|
++ |/javascript/components/datepicker/|
++ |/javascript/components/dropdown/|
++ |/javascript/components/radio/|
++ |/javascript/components/toolbar/|
++ |/javascript/plugins/jsrs/|
++ |/toolbox/phpunit/|
++ |/toolbox/phpsyntax/|
++ |/toolbox/packager/|
++ |/toolbox/html/table/tableParser/|
++ |/toolbox/html/table/windroseEditor/|
+
+',
+  '_fld_unCommentFilter' => '+ |\\.js|
++ |Bs_Wse_Searcher|',
+  '_fld_obfuseFilter' => '',
+)

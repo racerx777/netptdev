@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+<title>BlueShoes JavaScript Button: Example 2</title>
+<style>
+body {
+	font-family: arial, helvetica;
+	font-size:   12px;
+}
+</style>
+<script>
+function bs_isGecko() {
+  //rather poor implementation.
+  if (navigator.appName == "Microsoft Internet Explorer") return false;
+  return (navigator.userAgent.match(/gecko/i));
+}
+if (bs_isGecko()) {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_ie.css'>");
+}
+</script>
+<script type="text/javascript" src="../../../components/toolbar/Bs_ButtonBar.class.js"></script>
+<script type="text/javascript" src="../../../components/toolbar/Bs_Button.class.js"></script>
+<script>
+function btnClicked(btnObj) {
+	alert('Clicked the button: ' + btnObj.title);
+}
+
+function go() {
+  bar = new Bs_ButtonBar();
+  bar.useHelpBar = true;
+  
+  b1 = new Bs_Button();
+  b1.title = 'New';
+	b1.imgPath = '../../../../images/buttons/';
+  b1.imgName = 'bs_new';
+  b1.attachEvent(btnClicked);
+  bar.addButton(b1, 'Create a new document.');
+  
+  b2 = new Bs_Button();
+  b2.title = 'Open';
+	b2.imgPath = '../../../../images/buttons/';
+  b2.imgName = 'bs_open';
+  b2.attachEvent(btnClicked);
+  bar.addButton(b2, 'Open an existing document.');
+  
+  b3 = new Bs_Button();
+  b3.title = 'Save';
+	b3.imgPath = '../../../../images/buttons/';
+  b3.imgName = 'bs_save';
+  b3.attachEvent(btnClicked);
+  bar.addButton(b3, 'Save the active document.');
+  
+  bar.newGroup();
+  
+  b4 = new Bs_Button();
+  b4.title = 'Cut';
+	b4.imgPath = '../../../../images/buttons/';
+  b4.imgName = 'bs_cut';
+  b4.attachEvent(btnClicked);
+  bar.addButton(b4, 'Cut out the selection and put it into the clipboard.');
+  
+  b5 = new Bs_Button();
+  b5.title = 'Copy';
+	b5.imgPath = '../../../../images/buttons/';
+  b5.imgName = 'bs_copy';
+  b5.attachEvent(btnClicked);
+  bar.addButton(b5, 'Copy the selection and put it into the clipboard.');
+  
+  b6 = new Bs_Button();
+  b6.title = 'Paste';
+	b6.imgPath = '../../../../images/buttons/';
+  b6.imgName = 'bs_paste';
+  b6.attachEvent(btnClicked);
+  bar.addButton(b6, 'Paste data in clipboard at current position.');
+  
+  bar.drawInto('buttonBar');
+}
+</script>
+</head>
+<body bgcolor="white" onLoad="go();">
+
+<h1>JavaScript Toolbar Example 2</h1>
+
+Simple usage of the button and buttonbar classes. Features used:
+<ul>
+  <li>Used premade icons (16x16 pixel).</li>
+  <li>Attached a onClick events to the buttons.</li>
+  <li>Attached titles to the buttons.</li>
+  <li>Used the built-in "help bar" for button mouseovers to describe in more detail what a button click does.</li>
+</ul>
+
+Move your mouse over the buttons, and click them.
+<hr>
+<br>
+
+<div id="buttonBar"></div>
+
+</body>
+</html>

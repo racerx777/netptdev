@@ -1,0 +1,6 @@
+[default]
+#we put everything into the [default] section for this file. that is hardcoded. if you need more sections, recode.
+md5             = Sie dürfen versteckte ('hidden') Formularfelder nicht verändern. Falls Sie nicht wissen, was dies bedeutet, so wenden Sie sich bitte an den Administrator/Webmaster.
+yes             = ja
+no              = nein
+errorsOccured   = Fehler aufgetreten

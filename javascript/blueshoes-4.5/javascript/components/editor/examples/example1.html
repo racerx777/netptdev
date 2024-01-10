@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+	<title>BlueShoes Wysiwyg Editor Example 1</title>
+
+<script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Misc.lib.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/html/Bs_HtmlUtil.lib.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/tabset/Bs_TabSet.class.js"></script>
+<link rel='stylesheet' href='/_bsJavascript/components/tabset/default.css'>
+
+<script type="text/javascript" src="/_bsJavascript/components/editor/Bs_Editor.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/editor/lang/en.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/core/form/Bs_FormFieldSelect.class.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_ButtonBar.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_Button.class.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/resizegrip/Bs_ResizeGrip.class.js"></script>
+
+<script>
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_ie.css'>");
+}
+
+onload = function() {
+	myWysiwyg = new Bs_Editor('myWysiwyg');
+	myWysiwyg.setValue('this is a <b>browser-based</b> <a href="http://www.blueshoes.org/">wysiwyg</a> <font color="#008200">editor</font><br><br>An image: <img src="/img/logo/shoe_grayOnWhite_blueDot_xxs.gif" alt="alt foo"><br><br><ul><li><font color="red">unordered list</font></li><li><i>italic</i></li><li>&euro; $ £</li></ul><br><br>');
+	myWysiwyg.imageSelector[3] = new Array('/_bsApplications/filebrowser/examples/example1.php', 500, 300);
+	myWysiwyg.drawInto('editorDiv');
+}
+</script>
+</head>
+
+<body bgcolor="white" id="body">
+
+<h1>BlueShoes Wysiwyg Editor Example 1</h1>
+
+<ul>
+	<li>Basic example of the editor as wysiwyg html editor.</li>
+	<li>Setting a default value.</li>
+	<li>Attached an image selector so that the user can browse the images on the server, also see the <a href="/en/applications/filebrowser/">FileBrowser Application</a>.</li>
+	<li>Drawing the editor into an existing div tag.</li>
+</ul>
+<br><br>
+
+<div id="editorDiv" style="width:446; height:400;"></div>
+
+</body>
+</html>

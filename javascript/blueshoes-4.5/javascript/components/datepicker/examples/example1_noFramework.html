@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title>JavaScript Bs_DatePicker example 1</title>
+
+	<script type="text/javascript" src="../../../core/lang/Bs_Misc.lib.js"></script>
+	<script type="text/javascript" src="../../../components/toolbar/Bs_Button.class.js"></script>
+	<script type="text/javascript" src="../../../components/numberfield/Bs_NumberField.class.js"></script>
+  <script type="text/javascript" src="../../../components/datepicker/Bs_DatePicker.class.js"></script>
+  <script type="text/javascript" src="../../../core/form/Bs_FormFieldSelect.class.js"></script>
+<script type="text/javascript">
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_ie.css'>");
+}
+
+function init() {
+  myDatePicker = new Bs_DatePicker();
+	myDatePicker.jsBaseDir = '../../../';
+	myDatePicker.toggleButton.imgPath = '../../../../images/buttons/';
+  myDatePicker.fieldName  = 'datePicker1';
+	myDatePicker.setDateByIso('2003-12-31');
+  myDatePicker.drawInto('myDatePickerDiv');
+}
+</script>
+
+</head>
+
+<body onLoad="init();">
+
+<h1>JavaScript Bs_DatePicker example 1</h1>
+
+<ul>
+  <li>very simple use of the datepicker. no customization.</li>
+</ul>
+<hr>
+<br>
+
+<form  name="test" id="test" action="http://www.blueshoes.org/postDump.php" method="post">
+  <div id="myDatePickerDiv"></div>
+	<br>
+	<input type="submit">
+</form>
+
+</body>
+</html>
+

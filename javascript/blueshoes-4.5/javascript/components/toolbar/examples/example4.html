@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+<title>BlueShoes JavaScript Button: Example 4</title>
+<style>
+body {
+	font-family: arial, helvetica;
+	font-size:   12px;
+}
+</style>
+<script>
+function bs_isGecko() {
+  //rather poor implementation.
+  if (navigator.appName == "Microsoft Internet Explorer") return false;
+  return (navigator.userAgent.match(/gecko/i));
+}
+if (bs_isGecko()) {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_ie.css'>");
+}
+</script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_ButtonBar.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_Button.class.js"></script>
+<script>
+function btnClicked(btnObj) {
+	alert('Clicked the button: ' + btnObj.title);
+}
+
+function go() {
+  bar = new Bs_ButtonBar();
+  bar.useHelpBar = false;
+  
+  b1 = new Bs_Button();
+  b1.title      = 'Bold';
+	b1.caption    = 'Bold';
+  b1.imgName    = 'bs_formatBold_en';
+  b1.attachEvent(btnClicked);
+	b1.setStatus(0);
+  bar.addButton(b1);
+  
+  b2 = new Bs_Button();
+  b2.title      = 'Italic';
+	b2.caption    = true; //means: use the title as caption too.
+  b2.imgName    = 'bs_formatItalic_en';
+  b2.attachEvent(btnClicked);
+  bar.addButton(b2);
+  
+  b3 = new Bs_Button();
+  b3.title      = 'Underline';
+	b3.caption    = 'Underline';
+  b3.imgName    = 'bs_formatUnderline';
+  b3.attachEvent(btnClicked);
+  bar.addButton(b3);
+  
+  b4 = new Bs_Button();
+	b4.caption    = 'No Image';
+  b4.attachEvent(btnClicked);
+  bar.addButton(b4);
+  
+  bar.drawInto('buttonBar');
+}
+</script>
+</head>
+<body bgcolor="white" onLoad="go();">
+
+<h1>JavaScript Toolbar Example 4</h1>
+
+<ul>
+  <li>The buttons use visible captions.</li>
+  <li>The first button (Bold) is deactivated.</li>
+  <li>The last button (No Image) does not use an icon.</li>
+</ul>
+
+Move your mouse over the buttons, and click them.
+<hr>
+<br>
+
+<div id="buttonBar"></div>
+
+</body>
+</html>

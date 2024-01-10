@@ -1,0 +1,23 @@
+a form field has these values:
+  valueDefault
+  valueReceived
+  valueInternal
+  valueDisplay
+
+read the class documentation about those.
+
+when the form gets submitted valueReceived gets set to exactly what we got.
+this will never be changed.
+inputManipulate() works on this value, for example it may trim what we got. 
+hrm, let's make an example:
+the form field has the bsDataType 'date' and the bsDataInfo 4. so we expect 
+to get an eu-style date like '15-01-2003'. 
+now the user submits '15.1.03 '. 
+the value gets trimmed, and then converted to what we want.
+valueInternal will be '2003-01-15' while valueDisplay will be '15.01.2003'.
+
+this gets done in inputManipulate(). later inputValidate will validate the 
+valueInternal().
+
+
+

@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+	<title>BS Wysiwyg Example 1</title>
+
+<script type="text/javascript" src="/_bsJavascript/components/wysiwyg/Bs_Wysiwyg.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/form/Bs_FormFieldSelect.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/html/Bs_HtmlUtil.lib.js"></script>
+
+<script>
+onload = function() {
+	w = new Bs_Wysiwyg('w');
+	w.setValue('blah <b>bold</b> <i>italic</i>');
+	w.setImageBrowser('http://www.blueshoes.org/_bsApplications/filebrowser/examples/example1.php');
+	
+	var arr = new Array;
+	arr['site'] = new Array;
+	arr['site']['webmasterEmail'] = new Array;
+	arr['site']['webmasterEmail']['value']       = '<a href="webmaster@domain.com">Webmaster</a>';
+	arr['site']['webmasterEmail']['description'] = 'The main webmaster email address as link.';
+	arr['site']['webmasterEmail']['lastMod']     = '2002/12/31'; //just a text string, whatever
+	arr['site']['webmasterEmail']['user']        = 'tom';        //user that last modified the snipped
+	arr['site']['anotherKey'] = new Array;
+	arr['site']['anotherKey']['value']       = 'some <b>bold</b> text';
+	arr['site']['anotherKey']['description'] = 'Just some text. Just some text. Just some text. Just some text. Just some text. Just some text.';
+	arr['user'] = new Array;
+	arr['user']['mySnippet'] = new Array;
+	arr['user']['mySnippet']['value']       = 'this is my personal snippet';
+	w.setCodeSnippets(arr);
+	
+	var status = w.drawInto('test');
+	
+	w2 = new Bs_Wysiwyg('w2');
+	w2.setValue('blah <b>bold</b> <i>italic</i>');
+	w2.setImageBrowser('http://www.blueshoes.org/_bsApplications/filebrowser/examples/example1.php');
+	w2.editareaOnPaste = 4;
+	var status = w2.drawInto('test2');
+}
+</script>
+</head>
+
+<body bgcolor="white">
+
+<h1>Wysiwyg Editor Example 1</h1>
+features used:
+<ul>
+	<li>2 instances on the same page.</li>
+	<li>Instance 1 uses code snippets (go to the HTML tab).</li>
+	<li>Instance 2 uses customized onPaste handling.</li>
+</ul>
+
+<a href="javascript:void(0);" onclick="alert(w.getValue()); return false;">alert the current value of instance 1</a><br>
+<a href="javascript:void(0);" onclick="alert(w2.getValue()); return false;">alert the current value of instance 2</a><br>
+<br><br>
+
+<!-- make it at least 446 pixel in width! -->
+<div id="test" style="width:446; height:400;"></div>
+<br><br><br><br><br><br><br><br><br>
+<div id="test2" style="width:446; height:400;"></div>
+
+</body>
+</html>

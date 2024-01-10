@@ -1,0 +1,5 @@
+[access]
+view    = login
+add     = u:sam
+edit    = u:sam
+delete  = u:sam

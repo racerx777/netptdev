@@ -1,0 +1,127 @@
+tag to include all hidden fields at once in the form using just one tag.
+
+
+
+          case 'container':
+            $ret .= "<tr><td colspan='100%'>";
+            $t = &$this->formElements[$k]->getElement($level);
+            $ret .= $t . "</td></tr>\n";
+          case 'field':
+            switch ($this->formElements[$k]->fieldType) {
+              case 'hidden':
+                break;
+              case 'button':
+              case 'reset':
+              case 'submit':
+                $ret .= "<tr><td colspan='2' valign='top' align='left'>";
+                $ret .= $this->formElements[$k]->getElement();
+                $ret .= "</td></tr>\n";
+              default:
+                  $ret .= "<tr><td nowrap valign='top' align='left' width='20%'>";
+                  $ret .= $this->formElements[$k]->getCaptionForFormOutput() . "</td><td>";
+                  $ret .= $this->formElements[$k]->getElement();
+                  $ret .= "</td></tr>\n";
+          default:
+            $ret .= "<tr><td colspan='100%' valign='top' align='left'>";
+            $t = &$this->formElements[$k]->getElement();
+            $ret .= $t . "</td></tr>\n";
+        }
+      }
+
+
+<table border='0' cellpadding='2' cellspacing='0' width='100%'>
+</table>
+
+<input type="" readonly disabled name="" value="" size="" dir="" maxlength="">
+<br>ignoreCheckbox
+
+$this->_getTagStringStyles()
+$this->_getTagStringEvents()
+$this->_getTagStringAdditionalTags()
+    
+    //add enforce checkbox if needed.
+    if ($addEnforceCheckbox) $ret .= $this->addEnforceCheckbox();
+    return $this->_doElementStringFormat($ret);
+
+FIELD
+<tr>
+  <td nowrap valign='top' align='left' width='20%'>__CAPTION_FOR_FORM_OUTPUT__</td>
+  <td>__ELEMENT__</td>
+</tr>
+
+CONTAINER
+<tr>
+  <td colspan='2' valign='top' align='left'>__ELEMENT__</td>
+</tr>
+
+BUTTON
+<tr>
+  <td colspan='100%'>__ELEMENT__</td>
+</tr>
+
+$x = array(
+  'field' => array(
+    '_default_' => '', 
+    'button'    => '', 
+    'reset'     => '_button_', 
+    'submit'    => '_button_', 
+  ), 
+  'container' => '', 
+  'text' => '', 
+)
+
+
+<bs:field if="x=y"/>
+
+<fieldset>
+  <legend style="cursor:default;" onClick="toggleContainer('containerXXX');">
+
+    __FIELD__ __CAPTION__
+  </legend>
+  <span ID="container" name="" style="display:none;">
+    <table border='0' cellpadding='10' cellspacing='0' width='100%'>
+      <tr>
+        <td>
+          __TEXT__
+          <br><br>
+
+    __CAPTION__
+  </legend>
+  <span ID="container" name="" style="display:none;">
+    <table border='0' cellpadding='10' cellspacing='0' width='100%'>
+      <tr>
+        <td>
+
+
+        </td>
+      </tr>
+    </table>
+  </span>
+</fieldset>
+<br>
+
+
+
+
+
+<bs:field if="x=y"/>
+
+<fieldset>
+  <legend style="cursor:default;" __ONCLICK__>
+    __CAPTION__
+  </legend>
+  <span ID="container" name="" __STYLE__>
+    <table border='0' cellpadding='10' cellspacing='0' width='100%'>
+      <tr>
+        <td>
+          __FOO__
+        </td>
+      </tr>
+    </table>
+  </span>
+</fieldset>
+<br>
+
+
+__ONCLICK__ onClick="toggleContainer('containerXXX');"
+__STYLE__   style="display:none;"

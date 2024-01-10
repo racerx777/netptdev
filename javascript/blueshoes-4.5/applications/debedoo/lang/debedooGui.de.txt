@@ -1,0 +1,11 @@
+[default]
+view               = anzeigen
+add                = Datensatz hinzufügen
+edit               = bearbeiten
+delete             = löschen
+search             = suchen
+list               = Liste anzeigen
+forward            = vorwärts
+backward           = zurück
+records            = Datensätze
+savesuccess        = erfolgreich gespeichert

@@ -1,0 +1,47 @@
+body {
+  background-color:menu;
+  font-family: arial, helvetica;
+  font-size:   12px;
+}
+td {
+  font-size:   12px;
+}
+
+.ilmOuterFieldset {
+  padding-left: 5px;
+}
+.ilmFieldset {
+  margin:   10px;
+  margin-bottom: 20px;
+  padding:  0px;
+}
+.ilmFieldsetContainer {
+  margin:   0px;
+  padding: 10px;
+}
+.ilmFieldText {
+  width: 200px;
+}
+.ilmFieldTextAdd {
+}
+.ilmFieldTextEdit {
+}
+.ilmFieldTextDelete {
+  background-color: menu;
+}
+
+.ilmFieldSelect {
+  width: 200px;
+  height: 230px;
+}
+
+.ilmButton {
+  width:70px;
+  font-size:   12px;
+}
+.ilmButtonAdd {
+}
+.ilmButtonEdit {
+}
+.ilmButtonDelete {
+}

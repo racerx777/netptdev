@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>BlueShoes TabSet Example 2</title>
+
+  <script type="text/javascript" src="/_bsJavascript/components/tabset/Bs_TabSet.class.js"></script>
+  <link rel='stylesheet' href='/_bsJavascript/components/tabset/default.css'>
+  
+  <script>
+  function myTabEventHandler(tabSetObject) {
+    var out = "You pressed Tab:\n"
+    var tab = tabSetObject.getActiveTab();
+    for (x in tab) {
+      out += x +" = " + tab[x] +"\n";
+    }
+    alert(out);
+  }
+  
+  function init() {
+  	t = new Bs_TabSet('tabset');
+  	t.addTab('Foo', document.getElementById('foo'));
+  	t.addTab('Bar', document.getElementById('bar'));
+  	t.addTab('Lalala', document.getElementById('lalala'));
+  	t.draw();
+    t.switchTo('Bar');
+  	t.onTabSelect(myTabEventHandler);
+  }
+  </script>
+</head>
+
+<body onload="init();" bgcolor="#D6D3CE">
+
+  <h1>BlueShoes TabSet Example 1</h1>
+  
+  <hr>
+  Same as example 1 but in addition 
+  <ul compact>
+    <li>The Tab with name 'Bar' is set as default to start with</li>
+    <li>A click on any Tab will trigger an onTabChange event</li>
+  </ul>
+  <hr>
+  
+  <div id="tabset" style="background-color:menu;">
+  	<div id="tabset_tabs"></div>
+  	<div id="tabset_content" class="tabsetContentDiv">
+  		<div id="foo">
+  		foo foo foo foo foo foo foo foo foo foo foo <br>
+  		foo foo foo foo foo foo foo foo foo foo foo <br>
+  		foo foo foo foo foo foo foo foo foo foo foo <br>
+  		foo foo foo foo foo foo foo foo foo foo foo <br>
+  		foo foo foo foo foo foo foo foo foo foo foo <br>
+  		foo foo foo foo foo foo foo foo foo foo foo <br>
+  		</div>
+  		<div id="bar">
+  		bar bar bar bar bar bar bar bar bar bar bar <br>
+  		bar bar bar bar bar bar bar bar bar bar bar <br>
+  		bar bar bar bar bar bar bar bar bar bar bar <br>
+  		bar bar bar bar bar bar bar bar bar bar bar <br>
+  		bar bar bar bar bar bar bar bar bar bar bar <br>
+  		bar bar bar bar bar bar bar bar bar bar bar <br>
+  		</div>
+  		<div id="lalala">
+  		lalala lalala lalala lalala lalala lalala  <br>
+  		lalala lalala lalala lalala lalala lalala  <br>
+  		lalala lalala lalala lalala lalala lalala  <br>
+  		lalala lalala lalala lalala lalala lalala  <br>
+  		</div>
+  	</div>
+  </div>
+
+
+</body>
+</html>

@@ -1,0 +1,637 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Untitled</title>
+
+<script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Misc.lib.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Array.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/form/Bs_FormUtil.lib.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/form/Bs_FormFieldSelect.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/html/Bs_HtmlUtil.lib.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/gfx/Bs_ColorUtil.lib.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/util/Bs_TitleToTooltip.lib.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/util/Bs_String.lib.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/util/Bs_CsvUtil.class.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/lib/LibCrossBrowser.js"></script>
+<script type="text/javascript" src="/_bsJavascript/lib/EventHandler.js"></script>
+
+<!--
+<script type="text/javascript" src="/_bsJavascript/components/editor/Bs_Editor.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/editor/lang/en.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/spreadsheet/Bs_SpreadSheet.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/spreadsheet/Bs_SpreadSheet.inc.js"></script>
+-->
+
+<script type="text/javascript" src="/_bsJavascript/components/checkbox/Bs_Checkbox.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/radio/Bs_Radio.class.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/tree/Bs_Tree.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/tree/Bs_TreeElement.class.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/slider/Bs_Slider.class.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/limitedtextarea/Bs_LimitedTextarea.class.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/dropdown/Bs_Dropdown.class.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/tabset/Bs_TabSet.class.js"></script>
+<link rel='stylesheet' href='/_bsJavascript/components/tabset/default.css'>
+
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_ButtonBar.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_Button.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/colorpicker/Bs_ColorPicker.class.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/numberfield/Bs_NumberField.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/datepicker/Bs_DatePicker.class.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/flipflop/Bs_FlipFlop.class.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/resizegrip/Bs_ResizeGrip.class.js"></script>
+
+<script type="text/javascript">
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_ie.css'>");
+}
+
+function init() {
+	if (!ie || moz) {
+		var warnMsg = "please use ie6 for this example.";
+		try {
+			document.body.innerHTML = warnMsg;
+		} catch (e) {
+			alert(warnMsg);
+		}
+		return;
+	}
+	
+	myTabSet = new Bs_TabSet('myTabSet', 'tabset');
+	myTabSet.addTab('Tree',        document.getElementById('tabTree'));
+	//myTabSet.addTab('Wysiwyg',     document.getElementById('tabWysiwyg'));
+	//myTabSet.addTab('Spreadsheet', document.getElementById('tabSpreadsheet'));
+	var tabYouParams = new Object;
+	tabYouParams.caption   = 'You';
+	tabYouParams.container = document.getElementById('tabYou');
+	tabYouParams.onFocus   = tabYouFocus;
+	myTabSet.addTab(tabYouParams);
+	myTabSet.addTab('Languages',   document.getElementById('tabLanguages'));
+	myTabSet.draw();
+	
+	myTree = new Bs_Tree('myTree');
+	//myTree.imageDir = '/_bsJavascript/components/tree/img/bobby/blue/';
+	myTree.useAutoSequence	         = false;
+	myTree.useFolderIcon             = false;
+	myTree.useCheckboxSystem         = true;
+	myTree.checkboxSystemWalkTree    = 4; //3;
+  myTree.checkboxSystemGuiNochange = true;
+  myTree.checkboxSystemImgDir      = '/_bsJavascript/components/checkbox/img/trueFalse/';
+	
+	myTree.initByArray(a);
+	myTree.drawInto('tabTree_treeDiv');
+	
+	
+  bsChkRate = new Bs_Checkbox('bsChkRate');
+  bsChkRate.caption      = 'I have seen it';
+  bsChkRate.checkboxName = 'checkboxRateIt';
+  bsChkRate.imgDir       = '/_bsJavascript/components/checkbox/img/bobby/';
+  bsChkRate.imgWidth     = '11';
+  bsChkRate.imgHeight    = '11';
+  bsChkRate.useMouseover = true;
+	bsChkRate.attachOnChange(updateLikeDataCheckbox);
+  bsChkRate.drawInto('tabTree_rateLegend');
+	
+	myLimitedTextarea2 = new Bs_LimitedTextarea('myLimitedTextarea2', 'textareaComment', 400);
+	//myLimitedTextarea2.infolineText     = 'Verbleibende Anzahl Zeichen:';
+	//myLimitedTextarea2.infolineCssStyle = "font-family:arial; font-size:11px; color:gray;";
+	myLimitedTextarea2.numberCssStyle   = "border:2px inset; width:40px; text-align:right;";
+	myLimitedTextarea2.setBgColorWarning();
+	myLimitedTextarea2.draw();
+	
+	myDropdown = new Bs_Dropdown('myDropdown');
+	myDropdown.setSize(150, 'pixel');
+	myDropdown.addOption('USA');
+	myDropdown.addOption('Canada');
+	myDropdown.addOption('Germany');
+	myDropdown.addOption('France');
+	myDropdown.addOption('Switzerland');
+	myDropdown.addOption('China');
+	myDropdown.convertField('liveCountry');	
+	
+	myColorObj2 = new Bs_ColorPicker('myColorObj2', 'myColorFld2');
+	myColorObj2.colorizeBackground = true;
+	myColorObj2.setColorByHex('ffffff');
+	myColorObj2.draw();
+	
+  myDatePicker = new Bs_DatePicker();
+  myDatePicker.convertField('myBirthday');
+	
+	
+	myFlipFlop = new Bs_FlipFlop();
+	myFlipFlop.fieldAvailableCssClass = 'flipFlopField';
+	myFlipFlop.fieldSelectedCssClass  = 'flipFlopField';
+	myFlipFlop.moveOnClick            = true;
+	myFlipFlop.convertField('selectLanguages');
+	
+	myRadioObj = new Bs_Radio();
+	myRadioObj.imgDir     = '/_bsJavascript/components/radio/img/bobby/';
+	myRadioObj.imgWidth   = 12;
+	myRadioObj.imgHeight  = 12;
+	myRadioObj.convertField('myRadio');
+	
+	/*
+	myEditor = new Bs_Editor('myEditor');
+	myEditor.dataType = 'whtml'; //'text';
+	myEditor.convertField('wysiwygEditorField');
+	
+  mySpreadSheet = new Bs_SpreadSheet;
+  mySpreadSheet.objectName = 'mySpreadSheet';
+	mySpreadSheet.mayUseWysiwyg = false;
+	mySpreadSheet.sheetWidth  = 470;
+	mySpreadSheet.sheetHeight = 265;
+  mySpreadSheet.init(new Array(), 'dataTableDiv');
+	*/
+	
+	//udpate the form with the current time:
+	var dateNow = new Date();
+	document.getElementById('fldHour').value = 8; //dateNow.getHours();
+	document.getElementById('fldMin').value  = dateNow.getMinutes();
+	document.getElementById('fldSec').value  = dateNow.getSeconds();
+	
+	//title to tooltip feature:
+	bs_ttt_initAll();
+	
+	hourObj = new Bs_NumberField('hourObj', 'fldHour');
+	hourObj.drawButtonsInside = true;
+	hourObj.zeroFill          = 2;
+	hourObj.minValue          = 0;
+	hourObj.maxValue          = 23;
+	hourObj.draw();
+	
+	minObj = new Bs_NumberField('minObj', 'fldMin');
+	minObj.drawButtonsInside = true;
+	minObj.zeroFill          = 2;
+	minObj.minValue          = 0;
+	minObj.maxValue          = 59;
+	minObj.draw();
+	
+	secObj = new Bs_NumberField('secObj', 'fldSec');
+	secObj.drawButtonsInside = true;
+	secObj.zeroFill          = 2;
+	secObj.minValue          = 0;
+	secObj.maxValue          = 59;
+	secObj.draw();
+}
+
+function initSlider() {
+  mySlider = new Bs_Slider('mySlider');
+  mySlider.attachOnChange(updateLikeDataSlider);
+  mySlider.width         = 121;
+  mySlider.height        = 26;
+  mySlider.minVal        = 1;
+  mySlider.maxVal        = 10;
+  mySlider.valueInterval = 1;
+  mySlider.arrowAmount   = 1;
+  mySlider.valueDefault  = 0;
+  mySlider.imgDir   = '/_bsJavascript/components/slider/img/bob/';
+  mySlider.setBackgroundImage('background.gif', 'no-repeat');
+  mySlider.setSliderIcon('slider.gif', 13, 18);
+  mySlider.setArrowIconLeft('arrowLeft_white.gif', 10, 13);
+  mySlider.setArrowIconRight('arrowRight_white.gif', 12, 13);
+  mySlider.useInputField = 3;
+  //mySlider.styleValueFieldClass = 'sliderInput';
+  mySlider.colorbar = new Object();
+  mySlider.colorbar['color']           = 'blue';
+  mySlider.colorbar['height']          = 5;
+  mySlider.colorbar['widthDifference'] = -9;
+  mySlider.colorbar['offsetLeft']      = 5;
+  mySlider.colorbar['offsetTop']       = 9;
+  mySlider.drawInto('tabTree_rateSlider');
+}
+
+
+function tabYouFocus() {
+	hourObj.redraw();
+	minObj.redraw();
+	secObj.redraw();
+}
+
+var likeData = new Object;
+
+var currentParentKey;
+var currentSelfKey;
+var currentSelfId;
+
+function updateLikeDataCheckbox(chkObj) {
+	var checkboxValue = chkObj.value;
+	likeData[currentParentKey][currentSelfKey]['checkboxValue'] = checkboxValue;
+	updateLikeContainer(checkboxValue == 2);
+	
+	//update the tree:
+	var treeElm = myTree.getElement(currentSelfId); //executeOnElement(currentSelfId, func, params) {
+	treeElm.checkboxEvent(checkboxValue);
+}
+
+function updateLikeContainer(editable) {
+	if (editable) {
+		document.getElementById('tabTree_rateLegend_inner').style.filter = null;
+	} else {
+		document.getElementById('tabTree_rateLegend_inner').style.filter = 'progid:DXImageTransform.Microsoft.BasicImage(grayScale=1); progid:DXImageTransform.Microsoft.BasicImage(opacity=.5)';
+	}
+	document.getElementById('textareaComment').disabled = !editable;
+	mySlider.setDisabled(!editable);
+}
+
+function updateLikeDataSlider(sliderObj) {
+	var newVal = sliderObj.getValue();
+	likeData[currentParentKey][currentSelfKey]['sliderValue'] = newVal;
+	if (newVal == 0) {
+		var imgSrc = "/_bsImages/spacer.gif";
+	} else {
+		var imgSrc = "/_bsImages/smiley/happyMode/happy" + parseInt(newVal) + ".gif";
+	}
+	document.getElementById('smiley').src = imgSrc;
+}
+
+function updateLikeDataTextarea(textareaElm) {
+	likeData[currentParentKey][currentSelfKey]['textareaValue'] = textareaElm.value;
+}
+
+function updateLikeDiv(treeElm) {
+	var likeDivElm = document.getElementById('tabTree_likeDiv');
+	if (likeDivElm.style.display = 'none') {
+		likeDivElm.style.display = 'inline';
+		initSlider();
+	}
+	
+	var parentKey = currentParentKey = treeElm.parent.caption;
+	var selfKey   = currentSelfKey   = treeElm.caption;
+	currentSelfId = treeElm.id;
+	
+	//update the link to the component. a bit hacky.
+	if ((selfKey == "Number Field") || (selfKey == "Limited Textarea") || (selfKey == "Date Picker") || (selfKey == "Color Picker")) {
+		var linkDir = selfKey.toLowerCase().replace(/ /, '');
+	} else if (selfKey == "Wysiwyg Editor") {
+		var linkDir = 'editor';
+	} else {
+		var linkDir = selfKey.toLowerCase().split(' ')[0];
+	}
+	document.getElementById('componentLink').href = "http://www.blueshoes.org/en/javascript/" + linkDir + '/';
+	
+	if (typeof(likeData[parentKey])          == 'undefined') likeData[parentKey]          = new Object;
+	if (typeof(likeData[parentKey][selfKey]) == 'undefined') likeData[parentKey][selfKey] = new Object;
+	
+	var checkbox = bsChkRate;
+	var slider   = mySlider;
+	var textarea = myLimitedTextarea2;
+	
+	var checkboxValue = (typeof(likeData[parentKey][selfKey]['checkboxValue']) != 'undefined') ? likeData[parentKey][selfKey]['checkboxValue'] : 0;
+	checkbox.setTo(checkboxValue, true);
+	updateLikeContainer(checkboxValue == 2);
+	
+	var sliderValue = (typeof(likeData[parentKey][selfKey]['sliderValue']) != 'undefined') ? likeData[parentKey][selfKey]['sliderValue'] : 0;
+	slider.setValue(sliderValue);
+	
+	document.getElementById('textareaComment').value = (typeof(likeData[parentKey][selfKey]['textareaValue']) != 'undefined') ? likeData[parentKey][selfKey]['textareaValue'] : '';
+	textarea.checkLength();
+	textarea._updateBgColorWarning();
+	textarea._updateProgressBar();
+}
+
+var inputArr = new Array(
+	"Wysiwyg Editor", "SpreadSheet Editor", "Slider", "Checkbox Field", 
+	"Radio Button", "Dropdown Field", "FlipFlop Field", "Number Field", "Limited Textarea", 
+	"Date Picker", "Color Picker"
+);
+var otherArr = new Array("Tree", "Toolbar", "TabSet", "ResizeGrip", "TitleToTooltip", "JSRS");
+
+var a = new Array;
+a[0] = new Array;
+a[0]['id']               = "InputComponents";
+a[0]['caption']          = "Input Components";
+a[0]['isOpen']           = true;
+a[0]['children']         = new Array;
+for (var i=0; i<inputArr.length; i++) {
+	a[0]['children'][i] = new Array;
+	a[0]['children'][i]['id']      = inputArr[i].replace(/ /, '');;
+	a[0]['children'][i]['caption'] = inputArr[i];
+	a[0]['children'][i]['events']  = new Array;
+	a[0]['children'][i]['events']['onClickCaption'] = updateLikeDiv;
+}
+a[1] = new Array;
+a[1]['id']               = "OtherComponents";
+a[1]['caption']          = "Other Components";
+a[1]['isOpen']           = true;
+a[1]['children']         = new Array;
+for (var i=0; i<otherArr.length; i++) {
+	a[1]['children'][i] = new Array;
+	a[1]['children'][i]['id']      = otherArr[i].replace(/ /, '');;
+	a[1]['children'][i]['caption'] = otherArr[i];
+	a[1]['children'][i]['events']  = new Array;
+	a[1]['children'][i]['events']['onClickCaption'] = updateLikeDiv;
+}
+
+
+function doSubmit() {
+	var dataHash = likeData;
+	dataHash['liveCountry']     = document.myExampleForm.liveCountry.value; //myDropdown.convertField('liveCountry');	
+	dataHash['myColorFld2']     = document.myExampleForm.myColorFld2.value;
+	dataHash['myBirthday']      = document.myExampleForm.myBirthday.value;
+	dataHash['fldHour']         = document.myExampleForm.fldHour.value;
+	dataHash['fldMin']          = document.myExampleForm.fldMin.value;
+	dataHash['fldSec']          = document.myExampleForm.fldSec.value;
+	dataHash['myRadio']         = myRadioObj.getValue();
+	dataHash['selectLanguages'] = myFlipFlop.getValue(); //document.myExampleForm.selectLanguages.value;
+	
+	bsFormDoHiddenSubmit('', '', '', '', dataHash, './submit.php')
+}
+
+
+</script>
+<style>
+body {
+	font-family:arial,helvetica;
+	font-size:11px;
+}
+td {
+	font-size:11px;
+}
+.flipFlopField {
+  font-family:arial,helvetica;
+	font-size:11px;
+	width:160px;
+}
+</style>
+</head>
+
+<body onload="init();" bgcolor="#D6D3CE">
+
+<form name="myExampleForm" action="./submit.php" method="post">
+
+<div id="tabset" style="background-color:menu;">
+	<div id="tabset_tabs"></div>
+	<div id="tabset_content" class="tabsetContentDiv" style="height:300px; width:500px; padding:10px;">
+		<div id="tabTree">
+			<div id="tabTree_treeDiv" style="display:inline; border:2px inset; height:270px; width:170px; background-color:white; overflow:auto; margin-right:10px;"></div>
+			<div id="tabTree_likeDiv" style="display:none; height:270px; width:290px; overflow:auto;">
+				<a id="componentLink" href="http://www.blueshoes.org/en/javascript/" target="_blank">Visit the website of this component</a><br><br>
+				<fieldset>
+					<legend id="tabTree_rateLegend"></legend>
+					<!-- this table tag is needed, a filter style cannot be applied to a div here. seems to be a bug in ie. -->
+					<table id="tabTree_rateLegend_inner" border="0" cellspacing="0" cellpadding="0"><tr><td>
+					<div style="padding:10px;">
+						<table border="0" cellspacing="0" cellpadding="0">
+							<tr>
+							<td height="30" valign="top">Like it?</td>
+							<td width="10">&nbsp;</td>
+							<td valign="top" width="180"><div id="tabTree_rateSlider"></div></td>
+							<td valign="top"><img id="smiley" src="/_bsImages/spacer.gif"></td>
+							</tr>
+						</table>
+						My comment: <br>
+						<textarea name="textareaComment" id="textareaComment" cols="30" rows="4" onblur="updateLikeDataTextarea(this);"></textarea>
+					</div>
+					</td></tr></table>
+				</fieldset>
+			</div>
+		</div>
+		<!--
+		<div id="tabWysiwyg">
+			<textarea id="wysiwygEditorField" cols="40" rows="10" style="width:470px; height:265px;">this is a default value</textarea>
+		</div>
+		<div id="tabSpreadsheet">
+			<div id="dataTableDiv" style="width:600; height:300; overflow:auto; border:1px solid black;"></div>
+		</div>
+		-->
+		<div id="tabYou">
+			<fieldset>
+				<legend>About me</legend>
+					<div style="padding:10px;">
+					<table border="0" cellspacing="0" cellpadding="2">
+						<tr>
+							<td>I live in:</td>
+							<td><input type="text" name="liveCountry" id="liveCountry" size="30" maxlength="50"> (select OR type in)</td>
+						</tr>
+						<tr>
+							<td>My favorite color:</td>
+							<td><input type="text" name="myColorFld2" id="myColorFld2" maxlength="7" size="7"></td>
+						</tr>
+						<tr>
+							<td>My birthday:</td>
+							<td><input type="text" name="myBirthday" id="myBirthday" value="" style="width:126px;"></td>
+						</tr>
+						<tr>
+							<td>I get up at:</td>
+							<td><input id="fldHour" name="fldHour" type="text" value="15" maxlength="2" style="width:35; height:20;" title="Hour"><b>:</b><input id="fldMin"  name="fldMin"  type="text" value="30" maxlength="2" style="width:35; height:20;" title="Minute"><b>:</b><input id="fldSec"  name="fldSec"  type="text" value="59" maxlength="2" style="width:35; height:20;" title="Second"></td>
+						</tr>
+						<tr>
+							<td>I prefer:</td>
+							<td>
+								<input type="radio" name="myRadio" id="myRadio_one"   value="one"  > <label for="myRadio_one">Linux</label> 
+								<input type="radio" name="myRadio" id="myRadio_two"   value="two"  > <label for="myRadio_two">Windows</label> 
+								<input type="radio" name="myRadio" id="myRadio_three" value="three"> <label for="myRadio_three">Mac</label>
+								<input type="radio" name="myRadio" id="myRadio_four"  value="four" > <label for="myRadio_four">Other</label>
+							</td>
+						</tr>
+					</table>
+					</div>
+			</fieldset>
+		</div>
+		<div id="tabLanguages">
+			<fieldset>
+				<legend>Computer Languages I Know</legend>
+					<div style="padding:10px;">
+		
+			<select name="selectLanguages" id="selectLanguages" size="12" multiple>
+			<option>ABC </option>
+			<option>ABEL </option>
+			<option>Ada </option>
+			<option>ADL </option>
+			<option>Aleph </option>
+			<option>Algol 60 </option>
+			<option>Algol 68 </option>
+			<option>APL </option>
+			<option>AppleScript </option>
+			<option>ASP </option>
+			<option>Assembly </option>
+			<option>Awk </option>
+			<option>BASIC </option>
+			<option>Befunge </option>
+			<option>BETA </option>
+			<option>Bigwig </option>
+			<option>Bistro </option>
+			<option>Blue </option>
+			<option>Brainfuck </option>
+			<option>C </option>
+			<option>C++ </option>
+			<option>C-sharp </option>
+			<option>Caml </option>
+			<option>Cecil </option>
+			<option>CHILL </option>
+			<option>Clarion </option>
+			<option>Clean </option>
+			<option>Clipper </option>
+			<option>CLU </option>
+			<option>Cobol </option>
+			<option>CobolScript </option>
+			<option>Cocoa </option>
+			<option>Comparison and Review </option>
+			<option>Compiled </option>
+			<option>Component Pascal </option>
+			<option>Concurrent </option>
+			<option>Constraint </option>
+			<option>Curl </option>
+			<option>D </option>
+			<option>Database </option>
+			<option>Dataflow </option>
+			<option>Declarative </option>
+			<option>Delphi </option>
+			<option>Directories </option>
+			<option>DOS Batch </option>
+			<option>Dylan </option>
+			<option>E </option>
+			<option>Eiffel </option>
+			<option>ElastiC </option>
+			<option>Erlang </option>
+			<option>Euphoria </option>
+			<option>Forth </option>
+			<option>Fortran </option>
+			<option>FP </option>
+			<option>Frontier </option>
+			<option>Functional </option>
+			<option>Garbage Collected </option>
+			<option>Goedel </option>
+			<option>Hardware Description </option>
+			<option>Haskell </option>
+			<option>History </option>
+			<option>HTML </option>
+			<option>HTMLScript </option>
+			<option>HyperCard </option>
+			<option>ICI </option>
+			<option>Icon </option>
+			<option>IDL </option>
+			<option>Imperative </option>
+			<option>Intercal </option>
+			<option>Interface </option>
+			<option>Interpreted </option>
+			<option>Java </option>
+			<option>JavaScript </option>
+			<option>LabVIEW </option>
+			<option>Lagoona </option>
+			<option>Language-OS Hybrids </option>
+			<option>Leda </option>
+			<option>Limbo </option>
+			<option>Lisp </option>
+			<option>Logic-based </option>
+			<option>Logo </option>
+			<option>Lua </option>
+			<option>m4 </option>
+			<option>Markup </option>
+			<option>MATLAB </option>
+			<option>Mercury </option>
+			<option>Miranda </option>
+			<option>Miva </option>
+			<option>ML </option>
+			<option>Modula-2 </option>
+			<option>Modula-3 </option>
+			<option>Moto </option>
+			<option>Multiparadigm </option>
+			<option>Mumps </option>
+			<option>NET </option>
+			<option>Oberon </option>
+			<option>Obfuscated </option>
+			<option>Object-Oriented </option>
+			<option>Objective-C </option>
+			<option>Objective Caml </option>
+			<option>Obliq </option>
+			<option>Occam </option>
+			<option>Open Source </option>
+			<option>Oz </option>
+			<option>Parallel </option>
+			<option>Pascal </option>
+			<option>Perl </option>
+			<option>PHP </option>
+			<option>Pike </option>
+			<option>PL </option>
+			<option>PL-SQL </option>
+			<option>Pliant </option>
+			<option>POP-11 </option>
+			<option>Postscript </option>
+			<option>PowerBuilder </option>
+			<option>Procedural </option>
+			<option>Prograph </option>
+			<option>Prolog </option>
+			<option>Proteus </option>
+			<option>Prototype-based </option>
+			<option>Python </option>
+			<option>REBOL </option>
+			<option>Reflective </option>
+			<option>Regular Expressions </option>
+			<option>Rexx </option>
+			<option>Rigal </option>
+			<option>RPG </option>
+			<option>Ruby </option>
+			<option>S-Lang </option>
+			<option>SAS </option>
+			<option>Sather </option>
+			<option>Scheme </option>
+			<option>Scripting </option>
+			<option>Self </option>
+			<option>SETL </option>
+			<option>SGML </option>
+			<option>Simula </option>
+			<option>Sisal </option>
+			<option>Smalltalk </option>
+			<option>Snobol </option>
+			<option>Specification </option>
+			<option>SQL </option>
+			<option>Squeak </option>
+			<option>T3X </option>
+			<option>Tcl-Tk </option>
+			<option>Tempo </option>
+			<option>TOM </option>
+			<option>TRAC </option>
+			<option>Turing </option>
+			<option>UML </option>
+			<option>VBA </option>
+			<option>VBScript </option>
+			<option>Verilog </option>
+			<option>VHDL </option>
+			<option>Visual </option>
+			<option>Visual Basic </option>
+			<option>Visual DialogScript </option>
+			<option>Visual FoxPro </option>
+			<option>Water </option>
+			<option>Wirth </option>
+			<option>XML </option>
+			<option>XOTcl </option>
+			<option>YAFL </option>
+			<option>Yorick </option>
+			<option>Z </option>
+			</select>
+					</div>
+			</fieldset>
+		</div>
+		
+	</div>
+</div>
+
+<input 
+    type="submit" 
+    name="mySubmitButton" 
+    value="Submit" 
+    onclick="
+      this.disabled=true; 
+      this.value='Please wait...'; 
+			doSubmit();
+      /*this.form.submit();*/
+    "
+		style="margin-top:5px; margin-left:438px;"
+>
+</form>
+
+</body>
+</html>

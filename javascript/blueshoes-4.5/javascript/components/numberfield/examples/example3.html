@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>BlueShoes NumberField Example 3</title>
+
+<script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Misc.lib.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_Button.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/numberfield/Bs_NumberField.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/util/Bs_TitleToTooltip.lib.js"></script>
+
+<script>
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_ie.css'>");
+}
+
+function init() {
+	myNumberField = new Bs_NumberField('myField');
+	myNumberField.drawButtonsInside = true;
+	myNumberField.zeroFill          = 2;
+	myNumberField.minValue          = 0;
+	myNumberField.maxValue          = 23;
+	myNumberField.draw();
+}
+
+function toggleDiv() {
+	var elm = document.getElementById('foo');
+	elm.style.display = (elm.style.display == 'none') ? 'block' : 'none';
+}
+</script>
+
+<style>
+.foo {
+position:absolute;
+}
+</style>
+</head>
+
+<body onload="init();" bgcolor="#D6D3CE">
+
+<h1>BlueShoes NumberField Example 3</h1>
+
+This example demonstrates the <a href="http://www.blueshoes.org/en/javascript/numberfield/">Number Field</a> component.<br><br>
+
+<ul>
+	<li>Like the other examples.</li>
+	<li>Shows the redrawing of the buttons. Read on.</li>
+</ul>
+<br><br>
+
+<span onclick="toggleDiv();" style="text-decoration:underline; cursor:hand; cursor:pointer;">show/hide block</span><br>
+<div id="foo" style="border:1px solid black;">
+The problem: This is a block of text that may disappear and re-appear. It is above the number field. 
+When this block disappears, the number field moves up. And what about the absolutely positioned buttons? 
+2 options: You can call myNumberField.redraw() to actualize the positions. But most likely you don't want to 
+care about redrawing buttons just because something in the page changes. So just wait until option 2 kicks in: 
+Once a second the location of the buttons is checked, and if something changed, they will be redrawn. 
+Hide/show this div to see it.
+</div><br>
+
+<input id="myField" name="myField" type="text" value="15" maxlength="2" style="width:35; height:20;">
+
+</body>
+</html>

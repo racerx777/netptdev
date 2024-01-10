@@ -1,0 +1,606 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Special Chars - BlueShoes Wysiwyg Editor &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </title>
+
+<script>
+function bs_isGecko() {
+  //rather poor implementation.
+  if (navigator.appName == "Microsoft Internet Explorer") return false;
+  return (navigator.userAgent.match(/gecko/i));
+}
+if (bs_isGecko()) {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_ie.css'>");
+}
+</script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_Button.class.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/numberfield/Bs_NumberField.class.js"></script>
+
+<script type="text/javascript" src='/_bsJavascript/core/lang/Bs_Misc.lib.js'    ></script>
+<script type="text/javascript" src='/_bsJavascript/core/gfx/Bs_ColorUtil.lib.js'></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/tabset/Bs_TabSet.class.js"></script>
+<link rel='stylesheet' href='/_bsJavascript/components/tabset/default.css'>
+
+<style>
+body {
+	font-family: arial,verdana,sans-serif,helvetica;
+	font-size:11px;
+}
+td {
+	font-size:11px;
+}
+.tabContent {
+	height:150px;
+}
+input.inputText {
+	width: 40px;
+}
+input.inputButton {
+	width:100px; 
+	height:20px; 
+	font-size:12px;
+}
+.tabsetContentDiv {
+	padding:10px;
+}
+</style>
+
+<script>
+
+/**
+* the caller object, instance of Bs_Wysiwyg.
+* @var object wysiwygObj
+*/
+var wysiwygObj;
+
+/**
+* name of the callback function in the wysiwygObj that we need to call 
+* once this page has loaded (onload).
+* @var string callbackLoad
+*/
+var callbackLoad;
+
+/**
+* name of the callback function in the wysiwygObj that we need to call 
+* to save our value back.
+* @var string callbackSave
+*/
+var callbackSave;
+
+
+
+/**
+* fires onload().
+*/
+function init() {
+	t = new Bs_TabSet('t', 'tabset');
+	
+	var currenciesTab = new Object;
+	currenciesTab.caption   = 'Currencies';
+	currenciesTab.container = document.getElementById('Currencies');
+	t.addTab(currenciesTab);
+	
+	var signsTab = new Object;
+	signsTab.caption   = 'Signs';
+	signsTab.container = document.getElementById('Signs');
+	t.addTab(signsTab);
+	
+	var numbersTab = new Object;
+	numbersTab.caption   = 'Numbers, Math';
+	numbersTab.container = document.getElementById('Numbers');
+	t.addTab(numbersTab);
+	
+	var languagesTab = new Object;
+	languagesTab.caption   = 'Languages';
+	languagesTab.container = document.getElementById('Languages');
+	t.addTab(languagesTab);
+	
+	t.draw();
+	
+
+	if (window.dialogArguments) {
+		//setDefaultValues(window.dialogArguments);
+	} else { //popup
+		var qsArr      = queryStringToHash(window.location.search);
+		wysiwygObjName = qsArr['objectName'];
+		callbackLoad   = qsArr['callbackLoad'];
+		callbackSave   = qsArr['callbackSave'];
+		var parentOpener = (opener) ? opener : parent;
+		eval('wysiwygObj = parentOpener.' + wysiwygObjName + ';');
+		//setDefaultValues(wysiwygObj[callbackLoad]()); //tell that i'm ready
+	}
+
+}
+
+/**
+* @param object paramObj
+*/
+function setDefaultValues(paramObj) {
+}
+
+function setBack(i) {
+	var ret = '&' + bsEnvData[i]['entity'] + ';';
+	if (window.dialogArguments) {
+		window.returnValue = ret;
+	} else {
+		wysiwygObj[callbackSave](ret);
+	}
+	window.close();
+}
+
+function charMouseOver(i) {
+	if (bs_isEmpty(bsEnvData[i]['entity'])) {
+		bsEnvData[i]['entity'] = '#' + bsEnvData[i]['char'].charCodeAt(0);
+	}
+	document.getElementById('charHtmlCode').innerText = '&' + bsEnvData[i]['entity'] + ';';
+	document.getElementById('charDescription').innerHTML = bsEnvData[i]['desc-en'];
+}
+
+function charClick(i) {
+	setBack(i);
+}
+
+function renderChars(from, to) {
+	for (var i=from; i<to; i++) { //bsEnvData.length
+		tag  = '<div';
+		tag += ' style="display:inline; width:20px; height:20px; margin:3px; border:2px inset; vertical-align:middle; text-align:center; cursor:default;"';
+		tag += ' onmouseover="charMouseOver(' + i + ');"';
+		tag += ' onclick="charClick(' + i + ');"';
+		tag += '>';
+		tag += bsEnvData[i]['char'];
+		tag += '</div>';
+		document.write(tag);
+	}
+}
+
+
+var bsEnvData = new Array();
+bsEnvData[0] = new Array();
+bsEnvData[0]['entity'] = "";
+bsEnvData[0]['char'] = "$";
+bsEnvData[0]['desc-en'] = "dollar";
+bsEnvData[1] = new Array();
+bsEnvData[1]['entity'] = "euro";
+bsEnvData[1]['char'] = "€";
+bsEnvData[1]['desc-en'] = "euro";
+bsEnvData[2] = new Array();
+bsEnvData[2]['entity'] = "pound";
+bsEnvData[2]['char'] = "£";
+bsEnvData[2]['desc-en'] = "pound sterling";
+bsEnvData[3] = new Array();
+bsEnvData[3]['entity'] = "yen";
+bsEnvData[3]['char'] = "¥";
+bsEnvData[3]['desc-en'] = "yen sign";
+bsEnvData[4] = new Array();
+bsEnvData[4]['entity'] = "cent";
+bsEnvData[4]['char'] = "¢";
+bsEnvData[4]['desc-en'] = "cent sign";
+bsEnvData[5] = new Array();
+bsEnvData[5]['entity'] = "curren";
+bsEnvData[5]['char'] = "¤";
+bsEnvData[5]['desc-en'] = "general currency sign";
+bsEnvData[6] = new Array();
+bsEnvData[6]['entity'] = "copy";
+bsEnvData[6]['char'] = "©";
+bsEnvData[6]['desc-en'] = "copyright";
+bsEnvData[7] = new Array();
+bsEnvData[7]['entity'] = "reg";
+bsEnvData[7]['char'] = "®";
+bsEnvData[7]['desc-en'] = "registered trademark";
+bsEnvData[8] = new Array();
+bsEnvData[8]['entity'] = "laquo";
+bsEnvData[8]['char'] = "«";
+bsEnvData[8]['desc-en'] = "left angle quote, guillemotleft";
+bsEnvData[9] = new Array();
+bsEnvData[9]['entity'] = "raquo";
+bsEnvData[9]['char'] = "»";
+bsEnvData[9]['desc-en'] = "right angle quote, guillemotright";
+bsEnvData[10] = new Array();
+bsEnvData[10]['entity'] = "brvbar";
+bsEnvData[10]['char'] = "¦";
+bsEnvData[10]['desc-en'] = "broken vertical bar";
+bsEnvData[11] = new Array();
+bsEnvData[11]['entity'] = "sect";
+bsEnvData[11]['char'] = "§";
+bsEnvData[11]['desc-en'] = "section sign";
+bsEnvData[12] = new Array();
+bsEnvData[12]['entity'] = "deg";
+bsEnvData[12]['char'] = "°";
+bsEnvData[12]['desc-en'] = "degree sign";
+bsEnvData[13] = new Array();
+bsEnvData[13]['entity'] = "para";
+bsEnvData[13]['char'] = "¶";
+bsEnvData[13]['desc-en'] = "paragraph sign";
+bsEnvData[14] = new Array();
+bsEnvData[14]['entity'] = "middot";
+bsEnvData[14]['char'] = "·";
+bsEnvData[14]['desc-en'] = "middle dot";
+bsEnvData[15] = new Array();
+bsEnvData[15]['entity'] = "times";
+bsEnvData[15]['char'] = "×";
+bsEnvData[15]['desc-en'] = "multiply sign";
+bsEnvData[16] = new Array();
+bsEnvData[16]['entity'] = "divide";
+bsEnvData[16]['char'] = "÷";
+bsEnvData[16]['desc-en'] = "division sign";
+bsEnvData[17] = new Array();
+bsEnvData[17]['entity'] = "plusmn";
+bsEnvData[17]['char'] = "±";
+bsEnvData[17]['desc-en'] = "plus or minus";
+bsEnvData[18] = new Array();
+bsEnvData[18]['entity'] = "not";
+bsEnvData[18]['char'] = "¬";
+bsEnvData[18]['desc-en'] = "not sign";
+bsEnvData[19] = new Array();
+bsEnvData[19]['entity'] = "ordf";
+bsEnvData[19]['char'] = "ª";
+bsEnvData[19]['desc-en'] = "feminine ordinal";
+bsEnvData[20] = new Array();
+bsEnvData[20]['entity'] = "ordm";
+bsEnvData[20]['char'] = "º";
+bsEnvData[20]['desc-en'] = "masculine ordinal";
+bsEnvData[21] = new Array();
+bsEnvData[21]['entity'] = "frac14";
+bsEnvData[21]['char'] = "¼";
+bsEnvData[21]['desc-en'] = "fraction one-fourth";
+bsEnvData[22] = new Array();
+bsEnvData[22]['entity'] = "frac12";
+bsEnvData[22]['char'] = "½";
+bsEnvData[22]['desc-en'] = "fraction one-half";
+bsEnvData[23] = new Array();
+bsEnvData[23]['entity'] = "frac34";
+bsEnvData[23]['char'] = "¾";
+bsEnvData[23]['desc-en'] = "fraction three-fourths";
+bsEnvData[24] = new Array();
+bsEnvData[24]['entity'] = "sup1";
+bsEnvData[24]['char'] = "¹";
+bsEnvData[24]['desc-en'] = "superscript one";
+bsEnvData[25] = new Array();
+bsEnvData[25]['entity'] = "sup2";
+bsEnvData[25]['char'] = "²";
+bsEnvData[25]['desc-en'] = "superscript two";
+bsEnvData[26] = new Array();
+bsEnvData[26]['entity'] = "sup3";
+bsEnvData[26]['char'] = "³";
+bsEnvData[26]['desc-en'] = "superscript three";
+bsEnvData[27] = new Array();
+bsEnvData[27]['entity'] = "iexcl";
+bsEnvData[27]['char'] = "¡";
+bsEnvData[27]['desc-en'] = "inverted exclamation";
+bsEnvData[28] = new Array();
+bsEnvData[28]['entity'] = "uml";
+bsEnvData[28]['char'] = "¨";
+bsEnvData[28]['desc-en'] = "umlaut (dieresis)";
+bsEnvData[29] = new Array();
+bsEnvData[29]['entity'] = "shy";
+bsEnvData[29]['char'] = "­";
+bsEnvData[29]['desc-en'] = "soft hyphen";
+bsEnvData[30] = new Array();
+bsEnvData[30]['entity'] = "macr";
+bsEnvData[30]['char'] = "¯";
+bsEnvData[30]['desc-en'] = "macron accent";
+bsEnvData[31] = new Array();
+bsEnvData[31]['entity'] = "acute";
+bsEnvData[31]['char'] = "´";
+bsEnvData[31]['desc-en'] = "acute accent";
+bsEnvData[32] = new Array();
+bsEnvData[32]['entity'] = "micro";
+bsEnvData[32]['char'] = "µ";
+bsEnvData[32]['desc-en'] = "micro sign";
+bsEnvData[33] = new Array();
+bsEnvData[33]['entity'] = "cedil";
+bsEnvData[33]['char'] = "¸";
+bsEnvData[33]['desc-en'] = "cedilla";
+bsEnvData[34] = new Array();
+bsEnvData[34]['entity'] = "iquest";
+bsEnvData[34]['char'] = "¿";
+bsEnvData[34]['desc-en'] = "inverted question mark";
+bsEnvData[35] = new Array();
+bsEnvData[35]['entity'] = "Agrave";
+bsEnvData[35]['char'] = "À";
+bsEnvData[35]['desc-en'] = "capital A, grave accent";
+bsEnvData[36] = new Array();
+bsEnvData[36]['entity'] = "Aacute";
+bsEnvData[36]['char'] = "Á";
+bsEnvData[36]['desc-en'] = "capital A, acute accent";
+bsEnvData[37] = new Array();
+bsEnvData[37]['entity'] = "Acirc";
+bsEnvData[37]['char'] = "Â";
+bsEnvData[37]['desc-en'] = "capital A, circumflex accent";
+bsEnvData[38] = new Array();
+bsEnvData[38]['entity'] = "Atilde";
+bsEnvData[38]['char'] = "Ã";
+bsEnvData[38]['desc-en'] = "capital A, tilde";
+bsEnvData[39] = new Array();
+bsEnvData[39]['entity'] = "Auml";
+bsEnvData[39]['char'] = "Ä";
+bsEnvData[39]['desc-en'] = "capital A, dieresis or umlaut mark";
+bsEnvData[40] = new Array();
+bsEnvData[40]['entity'] = "Aring";
+bsEnvData[40]['char'] = "Å";
+bsEnvData[40]['desc-en'] = "capital A, ring";
+bsEnvData[41] = new Array();
+bsEnvData[41]['entity'] = "AElig";
+bsEnvData[41]['char'] = "Æ";
+bsEnvData[41]['desc-en'] = "capital AE diphthong (ligature)";
+bsEnvData[42] = new Array();
+bsEnvData[42]['entity'] = "Ccedil";
+bsEnvData[42]['char'] = "Ç";
+bsEnvData[42]['desc-en'] = "capital C, cedilla";
+bsEnvData[43] = new Array();
+bsEnvData[43]['entity'] = "Egrave";
+bsEnvData[43]['char'] = "È";
+bsEnvData[43]['desc-en'] = "capital E, grave accent";
+bsEnvData[44] = new Array();
+bsEnvData[44]['entity'] = "Eacute";
+bsEnvData[44]['char'] = "É";
+bsEnvData[44]['desc-en'] = "capital E, acute accent";
+bsEnvData[45] = new Array();
+bsEnvData[45]['entity'] = "Ecirc";
+bsEnvData[45]['char'] = "Ê";
+bsEnvData[45]['desc-en'] = "capital E, circumflex accent";
+bsEnvData[46] = new Array();
+bsEnvData[46]['entity'] = "Euml";
+bsEnvData[46]['char'] = "Ë";
+bsEnvData[46]['desc-en'] = "capital E, dieresis or umlaut mark";
+bsEnvData[47] = new Array();
+bsEnvData[47]['entity'] = "Igrave";
+bsEnvData[47]['char'] = "Ì";
+bsEnvData[47]['desc-en'] = "capital I, grave accent";
+bsEnvData[48] = new Array();
+bsEnvData[48]['entity'] = "Iacute";
+bsEnvData[48]['char'] = "Í";
+bsEnvData[48]['desc-en'] = "capital I, acute accent";
+bsEnvData[49] = new Array();
+bsEnvData[49]['entity'] = "Icirc";
+bsEnvData[49]['char'] = "Î";
+bsEnvData[49]['desc-en'] = "capital I, circumflex accent";
+bsEnvData[50] = new Array();
+bsEnvData[50]['entity'] = "Iuml";
+bsEnvData[50]['char'] = "Ï";
+bsEnvData[50]['desc-en'] = "capital I, dieresis or umlaut mark";
+bsEnvData[51] = new Array();
+bsEnvData[51]['entity'] = "ETH";
+bsEnvData[51]['char'] = "Ð";
+bsEnvData[51]['desc-en'] = "capital Eth, Icelandic";
+bsEnvData[52] = new Array();
+bsEnvData[52]['entity'] = "Ntilde";
+bsEnvData[52]['char'] = "Ñ";
+bsEnvData[52]['desc-en'] = "capital N, tilde";
+bsEnvData[53] = new Array();
+bsEnvData[53]['entity'] = "Ograve";
+bsEnvData[53]['char'] = "Ò";
+bsEnvData[53]['desc-en'] = "capital O, grave accent";
+bsEnvData[54] = new Array();
+bsEnvData[54]['entity'] = "Oacute";
+bsEnvData[54]['char'] = "Ó";
+bsEnvData[54]['desc-en'] = "capital O, acute accent";
+bsEnvData[55] = new Array();
+bsEnvData[55]['entity'] = "Ocirc";
+bsEnvData[55]['char'] = "Ô";
+bsEnvData[55]['desc-en'] = "capital O, circumflex accent";
+bsEnvData[56] = new Array();
+bsEnvData[56]['entity'] = "Otilde";
+bsEnvData[56]['char'] = "Õ";
+bsEnvData[56]['desc-en'] = "capital O, tilde";
+bsEnvData[57] = new Array();
+bsEnvData[57]['entity'] = "Ouml";
+bsEnvData[57]['char'] = "Ö";
+bsEnvData[57]['desc-en'] = "capital O, dieresis or umlaut mark";
+bsEnvData[58] = new Array();
+bsEnvData[58]['entity'] = "Oslash";
+bsEnvData[58]['char'] = "Ø";
+bsEnvData[58]['desc-en'] = "capital O, slash";
+bsEnvData[59] = new Array();
+bsEnvData[59]['entity'] = "Ugrave";
+bsEnvData[59]['char'] = "Ù";
+bsEnvData[59]['desc-en'] = "capital U, grave accent";
+bsEnvData[60] = new Array();
+bsEnvData[60]['entity'] = "Uacute";
+bsEnvData[60]['char'] = "Ú";
+bsEnvData[60]['desc-en'] = "capital U, acute accent";
+bsEnvData[61] = new Array();
+bsEnvData[61]['entity'] = "Ucirc";
+bsEnvData[61]['char'] = "Û";
+bsEnvData[61]['desc-en'] = "capital U, circumflex accent";
+bsEnvData[62] = new Array();
+bsEnvData[62]['entity'] = "Uuml";
+bsEnvData[62]['char'] = "Ü";
+bsEnvData[62]['desc-en'] = "capital U, dieresis or umlaut mark";
+bsEnvData[63] = new Array();
+bsEnvData[63]['entity'] = "Yacute";
+bsEnvData[63]['char'] = "Ý";
+bsEnvData[63]['desc-en'] = "capital Y, acute accent";
+bsEnvData[64] = new Array();
+bsEnvData[64]['entity'] = "THORN";
+bsEnvData[64]['char'] = "Þ";
+bsEnvData[64]['desc-en'] = "capital THORN, Icelandic";
+bsEnvData[65] = new Array();
+bsEnvData[65]['entity'] = "szlig";
+bsEnvData[65]['char'] = "ß";
+bsEnvData[65]['desc-en'] = "small sharp s, German (sz ligature)";
+bsEnvData[66] = new Array();
+bsEnvData[66]['entity'] = "agrave";
+bsEnvData[66]['char'] = "à";
+bsEnvData[66]['desc-en'] = "small a, grave accent";
+bsEnvData[67] = new Array();
+bsEnvData[67]['entity'] = "aacute";
+bsEnvData[67]['char'] = "á";
+bsEnvData[67]['desc-en'] = "small a, acute accent";
+bsEnvData[68] = new Array();
+bsEnvData[68]['entity'] = "acirc";
+bsEnvData[68]['char'] = "â";
+bsEnvData[68]['desc-en'] = "small a, circumflex accent";
+bsEnvData[69] = new Array();
+bsEnvData[69]['entity'] = "atilde";
+bsEnvData[69]['char'] = "ã";
+bsEnvData[69]['desc-en'] = "small a, tilde";
+bsEnvData[70] = new Array();
+bsEnvData[70]['entity'] = "auml";
+bsEnvData[70]['char'] = "ä";
+bsEnvData[70]['desc-en'] = "small a, dieresis or umlaut mark";
+bsEnvData[71] = new Array();
+bsEnvData[71]['entity'] = "aring";
+bsEnvData[71]['char'] = "å";
+bsEnvData[71]['desc-en'] = "small a, ring";
+bsEnvData[72] = new Array();
+bsEnvData[72]['entity'] = "aelig";
+bsEnvData[72]['char'] = "æ";
+bsEnvData[72]['desc-en'] = "small ae diphthong (ligature)";
+bsEnvData[73] = new Array();
+bsEnvData[73]['entity'] = "ccedil";
+bsEnvData[73]['char'] = "ç";
+bsEnvData[73]['desc-en'] = "small c, cedilla";
+bsEnvData[74] = new Array();
+bsEnvData[74]['entity'] = "egrave";
+bsEnvData[74]['char'] = "è";
+bsEnvData[74]['desc-en'] = "small e, grave accent";
+bsEnvData[75] = new Array();
+bsEnvData[75]['entity'] = "eacute";
+bsEnvData[75]['char'] = "é";
+bsEnvData[75]['desc-en'] = "small e, acute accent";
+bsEnvData[76] = new Array();
+bsEnvData[76]['entity'] = "ecirc";
+bsEnvData[76]['char'] = "ê";
+bsEnvData[76]['desc-en'] = "small e, circumflex accent";
+bsEnvData[77] = new Array();
+bsEnvData[77]['entity'] = "euml";
+bsEnvData[77]['char'] = "ë";
+bsEnvData[77]['desc-en'] = "small e, dieresis or umlaut mark";
+bsEnvData[78] = new Array();
+bsEnvData[78]['entity'] = "igrave";
+bsEnvData[78]['char'] = "ì";
+bsEnvData[78]['desc-en'] = "small i, grave accent";
+bsEnvData[79] = new Array();
+bsEnvData[79]['entity'] = "iacute";
+bsEnvData[79]['char'] = "í";
+bsEnvData[79]['desc-en'] = "small i, acute accent";
+bsEnvData[80] = new Array();
+bsEnvData[80]['entity'] = "icirc";
+bsEnvData[80]['char'] = "î";
+bsEnvData[80]['desc-en'] = "small i, circumflex accent";
+bsEnvData[81] = new Array();
+bsEnvData[81]['entity'] = "iuml";
+bsEnvData[81]['char'] = "ï";
+bsEnvData[81]['desc-en'] = "small i, dieresis or umlaut mark";
+bsEnvData[82] = new Array();
+bsEnvData[82]['entity'] = "eth";
+bsEnvData[82]['char'] = "ð";
+bsEnvData[82]['desc-en'] = "small eth, Icelandic";
+bsEnvData[83] = new Array();
+bsEnvData[83]['entity'] = "ntilde";
+bsEnvData[83]['char'] = "ñ";
+bsEnvData[83]['desc-en'] = "small n, tilde";
+bsEnvData[84] = new Array();
+bsEnvData[84]['entity'] = "ograve";
+bsEnvData[84]['char'] = "ò";
+bsEnvData[84]['desc-en'] = "small o, grave accent";
+bsEnvData[85] = new Array();
+bsEnvData[85]['entity'] = "oacute";
+bsEnvData[85]['char'] = "ó";
+bsEnvData[85]['desc-en'] = "small o, acute accent";
+bsEnvData[86] = new Array();
+bsEnvData[86]['entity'] = "ocirc";
+bsEnvData[86]['char'] = "ô";
+bsEnvData[86]['desc-en'] = "small o, circumflex accent";
+bsEnvData[87] = new Array();
+bsEnvData[87]['entity'] = "otilde";
+bsEnvData[87]['char'] = "õ";
+bsEnvData[87]['desc-en'] = "small o, tilde";
+bsEnvData[88] = new Array();
+bsEnvData[88]['entity'] = "ouml";
+bsEnvData[88]['char'] = "ö";
+bsEnvData[88]['desc-en'] = "small o, dieresis or umlaut mark";
+bsEnvData[89] = new Array();
+bsEnvData[89]['entity'] = "oslash";
+bsEnvData[89]['char'] = "ø";
+bsEnvData[89]['desc-en'] = "small o, slash";
+bsEnvData[90] = new Array();
+bsEnvData[90]['entity'] = "ugrave";
+bsEnvData[90]['char'] = "ù";
+bsEnvData[90]['desc-en'] = "small u, grave accent";
+bsEnvData[91] = new Array();
+bsEnvData[91]['entity'] = "uacute";
+bsEnvData[91]['char'] = "ú";
+bsEnvData[91]['desc-en'] = "small u, acute accent";
+bsEnvData[92] = new Array();
+bsEnvData[92]['entity'] = "ucirc";
+bsEnvData[92]['char'] = "û";
+bsEnvData[92]['desc-en'] = "small u, circumflex accent";
+bsEnvData[93] = new Array();
+bsEnvData[93]['entity'] = "uuml";
+bsEnvData[93]['char'] = "ü";
+bsEnvData[93]['desc-en'] = "small u, dieresis or umlaut mark";
+bsEnvData[94] = new Array();
+bsEnvData[94]['entity'] = "yacute";
+bsEnvData[94]['char'] = "ý";
+bsEnvData[94]['desc-en'] = "small y, acute accent";
+bsEnvData[95] = new Array();
+bsEnvData[95]['entity'] = "thorn";
+bsEnvData[95]['char'] = "þ";
+bsEnvData[95]['desc-en'] = "small thorn, Icelandic";
+bsEnvData[96] = new Array();
+bsEnvData[96]['entity'] = "yuml";
+bsEnvData[96]['char'] = "ÿ";
+bsEnvData[96]['desc-en'] = "small y, dieresis or umlaut mark";
+</script>
+
+</head>
+
+<body bgcolor="#D6D6CE" onload="init();" leftmargin="10" topmargin="10" style="margin:10px;">
+
+<div id="tabset" style="background-color:menu;">
+	<div id="tabset_tabs"></div>
+	<div id="tabset_content" class="tabsetContentDiv">
+		<div id="Currencies" class="tabContent">
+			<fieldset>
+				<!--<legend>Currencies</legend>-->
+				<script>
+				renderChars(0, 6);
+				</script>
+			<!/fieldset>
+		</div>
+		
+		<div id="Signs" class="tabContent">
+			<fieldset>
+				<!--<legend>Signs</legend>-->
+				<script>
+				renderChars(6, 15);
+				</script>
+				<!--% & @ 171 172 174 175 -->
+			</fieldset>
+		</div>
+		
+		<div id="Numbers" class="tabContent">
+			<fieldset>
+				<!--<legend>Numbers, Math</legend>-->
+				<script>
+				renderChars(15, 27);
+				</script>
+			</fieldset>
+		</div>
+		
+		<div id="Languages" class="tabContent">
+			<fieldset>
+				<!--<legend>Languages</legend>-->
+				<script>
+				renderChars(27, 97);
+				</script>
+				<!--225-->
+			</fieldset>
+		</div>
+	</div>
+</div>
+
+			<br>
+			
+			<nobr>HTML-Code: <div id="charHtmlCode"      style="display:inline; width:60;  border:2px inset; padding:2px;">&nbsp;</div>&nbsp;&nbsp;</nobr>
+			<nobr>Description: <div id="charDescription" style="display:inline; width:208; border:2px inset; padding:2px;">&nbsp;</div></nobr>
+
+</body>
+</html>

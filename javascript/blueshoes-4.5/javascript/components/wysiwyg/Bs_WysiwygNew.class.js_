@@ -1,0 +1,2394 @@
+var bs_move_elm;
+var bs_move_startX;
+var bs_move_startY;
+var bs_move_left;
+var bs_move_top;
+
+function bs_move_moveStart(elmId) {
+	bs_move_elm = document.getElementById(elmId);
+	
+	bs_move_startX = event.clientX;
+	bs_move_startY = event.clientY;
+	bs_move_left   = bs_move_elm.offsetLeft;
+	bs_move_top    = bs_move_elm.offsetTop;
+	
+	document.body.attachEvent('onmousemove', bs_move_move);
+	document.body.attachEvent('onmouseup',   bs_move_moveEnd);
+}
+function bs_move_moveEnd() {
+	document.body.detachEvent('onmousemove', bs_move_move);
+	document.body.detachEvent('onmouseup',   bs_move_moveEnd);
+}
+function bs_move_move() {
+	var diffLeft = event.clientX - bs_move_startX;
+	var diffTop  = event.clientY - bs_move_startY;
+	var newLeft  = bs_move_left  + diffLeft;
+	var newTop   = bs_move_top   + diffTop;
+	
+	bs_move_elm.style.left = newLeft;
+	bs_move_elm.style.top  = newTop;
+}
+
+
+/**
+* resize stuff
+var currentResizeObj;
+var currentResizeElm;
+var currentResizeStartX;
+var currentResizeStartY;
+var currentResizeHeight;
+var currentResizeWidth;
+function resize() {
+	var container = document.getElementById(currentResizeElm.resizeElm);
+	var diffWidth  = event.clientX - currentResizeStartX;
+	var diffHeight = event.clientY - currentResizeStartY;
+	container.style.width  = currentResizeWidth  + diffWidth;
+	container.style.height = currentResizeHeight + diffHeight;
+	container.width  = currentResizeWidth  + diffWidth;
+	container.height = currentResizeHeight + diffHeight;
+	currentResizeObj.resize(diffWidth, diffHeight);
+}
+function resizeEnd() {
+	document.body.detachEvent('onmousemove', resize);
+	document.body.detachEvent('onmouseup', resizeEnd);
+	currentResizeObj.resizeEnd();
+}
+*/
+
+
+//some global arrays we need, hacky things because js is limited.
+if (typeof(bsWysiwygInstances) == 'undefined') {
+  var bsWysiwygInstances = new Object;
+}
+//hash where key is the id of the editable area, value is the wysiwyg instance (ref).
+//needed for the dynamic onBlur and onBeforeDeactivate events if in toolbar mode.
+if (typeof(bsWysiwygDivToInstanceArray) == 'undefined') {
+  var bsWysiwygDivToInstanceArray = new Object;
+}
+
+
+
+
+/**
+* function gets triggered by onBlur event of the editable area if in toolbar mode.
+* it's just some wrapper function.
+* @param  string tagId
+* @return void
+*/
+function bsWysiwygEditorOnBlurWrapper(tagId) {
+  bsWysiwygDivToInstanceArray[tagId].fireOnBlur();
+}
+
+function bsWysiwygEditorOnFocusWrapper(tagId) {
+  bsWysiwygDivToInstanceArray[tagId].fireOnFocus();
+}
+
+/**
+* @param string ev (event)
+* @param string tagId
+*/
+function bsWysiwygEditorEventWrapper(ev, tagId) {
+	switch (ev) {
+		case 'editareaMouseOver':
+		case 'editareaMouseOut':
+			bsWysiwygDivToInstanceArray[tagId].fireEvent(ev);
+			break;
+		case 'editareaPaste':
+			bsWysiwygDivToInstanceArray[tagId]._fireEditareaOnPaste();
+			break;
+	}
+}
+
+
+
+/**
+* similar to bsWysiwygEditorOnBlurWrapper() so look there.
+* 
+* the real function name would be: bsWysiwygEditorOnBeforeDeactivateWrapper
+* but that name is too long and gives a js error.
+*/
+function bsWysiwygEditorObdWrapper(tagId) {
+  bsWysiwygDivToInstanceArray[tagId].saveCursorPos();
+}
+
+
+/**
+* the popup-opened special chars selector window.
+* @var object bsWysiwygSpecialCharsWindow
+*/
+var bsWysiwygSpecialCharsWindow;
+
+function bsSpecialCharsOnloadCallback() {
+  bsWysiwygSpecialCharsOpener.specialCharsOnloadCallback();
+}
+function bsSpecialCharsDoneCallback(code) {
+  bsWysiwygSpecialCharsOpener.specialCharsDoneCallback(code);
+}
+
+
+
+
+
+
+/*******************************************************************************************************
+* Bs_Wysiwyg.class.js - clientside wysiwyg editor.
+*   
+* Dependences: /_bsJavascript/core/form/Bs_FormFieldSelect.class.js, 
+*              /_bsJavascript/core/html/Bs_HtmlUtil.lib.js, 
+*   
+* @Version   4.0 (2003/06/11)
+* @Author    andrej arn <andrej at blueshoes dot org>
+* @copyright blueshoes
+*/
+function Bs_Wysiwyg(objectName) {
+  
+  /**
+  * the name of this object instance that is in the global scope. 
+  * absolutely needed, gets set in the constructor.
+  * @access private
+  * @var    string _objectName
+  */
+  this._objectName;
+  
+  /**
+  * the data type of the data that gets edited.
+  * 
+  * one of: whtml (wysiwyg html, default)
+  *         html  (only html edit is possible, no wysiwyg)
+  *         xhtml
+  *         xml
+  *         text
+  * 
+  * @access public
+  * @param  string dataType
+  */
+  this.dataType = 'whtml';
+  
+	/**
+	* what should be done on a paste operation, what kind of pasts are accepted?
+	* 
+	* a user can really fuck up html code by pasting parts of websites, word documents 
+	* and the like. if your users are not familiar with html, you should not leave the 
+	* default.
+	* 
+	* pasting can be done in different ways, not only with the 
+	*   - paste button, but also
+	*   - ctrl-v
+	*   - shift-insert
+	*   - right mouse, paste (contect menu
+	* 
+	* the options:
+	*   0 = no pasting allowed, just ignore it silently.
+	*   1 = no pasting allowed, alert such a message on paste.
+	*   2 = allow paste of plain text, remove tags silently.
+	*   3 = allow paste of plain text, remove tags, alert such a message.
+	*   4 = if tags are pasted, ask the user if he wants to keep them or have them removed.
+	*   5 = just paste what's pasted, don't do anything, allow everything.
+	*   or alternatively, you can set a function to this var which will then be called, and 
+	*      you can handle it yourself. return a text to paste, or return bool false to paste nothing.
+	*      alert the user yourself if you want.
+	* 
+	* @access public
+	* @var    mixed editareaOnPaste (int or function)
+	* @see   this._fireEditareaOnPaste()
+	* @since bs4.4
+	*/
+	this.editareaOnPaste = 5;
+	
+  /**
+  * how the wysiwyg editor should be displayed.
+  * 
+  * 'inline'   => as fixed field, non-moveable. (default)
+  * 'floating' => as box, moveable
+  * 'toolbar'  => toolbar only, the editable part is directly in the page. toolbar is moveable.
+  * 
+  * @access public
+  * @var    string style
+  */
+  this.style = 'inline';
+  
+  /**
+  * if style is not set to 'toolbar' then our editor area is used for both, wysiwyg and 
+  * html editing. if we're in html mode, we need to do some things differently, so we need 
+  * to know.
+  * you as a coder don't need to do anything with it.
+  * @access private
+  * @var    bool _inHtmlMode
+  */
+  this._inHtmlMode = false;
+  
+  /**
+  * the value, content, however you wanna call it.
+  * @access private
+  * @var    string _value (default is an empty string '')
+  * @see    this.setValue(), this.getValue()
+  */
+  this._value = '';
+  
+  /**
+  * if the style is set to 'inline' or 'floating' (not 'toolbar') then you can 
+  * use a (hidden) form field which will be updated with the editors content 
+  * (whenever the editor loses the focus). if you want that feature, specify 
+  * a field name here. otherwise just leave it unset.
+  * @access public
+  * @var    string formFieldName
+  */
+  this.formFieldName;
+  
+  /**
+  * a reference to the wysiwyg element (div). gets set after the toolbar got loaded.
+  * @access public
+  * @var    object wysiwygElm
+  */
+  this.wysiwygElm;
+	this.wysiwygDoc;
+	
+	this.htmlElm;
+	this.htmlDoc;
+	
+	this.workingElm;
+	this.workingDoc;
+	
+	this.iframeElm;
+  
+	
+	
+	this._currentRegister = '';
+
+	
+	
+  /**
+  * tells if we're already rendered to the browser.
+  * @access public (read only)
+  * @var    bool outrendered
+  */
+  this.outrendered = false;
+  
+  /**
+  * @access private
+  * @var    string _imageSelectorUrl
+  * @see    this.setImageSelector()
+  */
+  this._imageSelectorUrl;
+  
+  /**
+  * @access private
+  * @var    array _codeSnippets
+  * @see    setCodeSnippets()
+  */
+  this._codeSnippets;
+  
+  /**
+  * the saved cursor position of the editor field.
+  * @access private
+  * @var    ? _editorCursorPos
+  * @see    this.saveCursorPos()
+  */
+  this._editorCursorPos;
+  
+	/**
+	* TextRange.
+	* see http://msdn.microsoft.com/workshop/author/dhtml/reference/objects/obj_textrange.asp
+	* see where it's used to understand it.
+	* @access public (used internally, but you can use it too if you want.)
+	* @var    object lastSelection
+	*/
+	this.lastSelection;
+	
+	/**
+	* can be used to stick in any data.
+	* maybe you don't see a reason for it, but i do. 
+	* @access public
+	* @var    mixed dataContainer
+	* @since  bs4.4
+	*/
+	this.dataContainer;	
+	
+	this.imagePath = '/_bsJavascript/components/wysiwyg/img/';
+	
+	/**
+	* array with 3 elements.
+	*   0 = url
+	*   1 = width
+	*   2 = height
+	* @access public
+	* @var    array hrefSelector
+	*/
+	this.hrefSelector = new Array('/_bsJavascript/components/wysiwyg/windowHref.html', 490, 350);
+	
+	/**
+	* array with 4 elements.
+	*   0 = url
+	*   1 = width
+	*   2 = height
+	*   3 = image browser; array with 3 elements: (not set = don't use a server image browser)
+	*         0 = url
+	*         1 = width
+	*         2 = height
+	* 
+	* @access public
+	* @var    array imageSelector
+	*/
+	this.imageSelector = new Array('/_bsJavascript/components/wysiwyg/windowImage.html', 525, 330);
+	
+	/**
+	* array with 3 elements.
+	*   0 = url
+	*   1 = width
+	*   2 = height
+	* @access public
+	* @var    array fgColorSelector
+	*/
+	this.fgColorSelector = new Array('/_bsJavascript/components/wysiwyg/windowColor.html', 500, 600);
+	
+	/**
+	* array with 3 elements.
+	*   0 = url
+	*   1 = width
+	*   2 = height
+	* @access public
+	* @var    array fontSelector
+	*/
+	this.fontSelector = new Array('/_bsJavascript/components/wysiwyg/windowFont.html', 420, 300);
+	
+	/**
+	* array with 3 elements.
+	*   0 = url
+	*   1 = width
+	*   2 = height
+	* @access public
+	* @var    array specialCharSelector
+	*/
+	this.specialCharSelector = new Array('/_bsJavascript/components/wysiwyg/windowSpecialChar.html', 450, 300);
+	
+	/**
+	* cached value of 2nd param in drawAsToolbar().
+	* @access private
+	* @var    bool _toolbarStartActivated
+	*/
+	this._toolbarStartActivated = false;
+	
+	/**
+	* instance of Bs_TabSet. used for the toolbar if there is more than one to choose from.
+	* @access private
+	* @var    object _tabset
+	*/
+	this._tabset;
+	
+	/**
+	* @access public
+	* @var    bool mayResize
+	*/
+	this.mayResize = true;
+	
+	/**
+	* max width of the editor window. not specified = no limit.
+	* @access public
+	* @var    int maxWidth
+	* @see    var this.mayResize
+	*/
+	this.maxWidth;
+	
+	/**
+	* max height of the editor window. not specified = no limit.
+	* @access public
+	* @var    int maxWidth
+	* @see    var this.mayResize
+	*/
+	this.maxHeight;
+	
+	
+	/**
+	* @access public
+	* @var    array buttonsWysiwyg
+	* @see    this.loadButtonsWysiwyg()
+	*/
+	this.buttonsWysiwyg;
+
+	/**
+	* @access public
+	* @var    array buttonsHtml
+	* @see    this.loadButtonsText()
+	*/
+	this.buttonsHtml;
+
+	/**
+	* @access public
+	* @var    array buttonsText
+	* @see    this.loadButtonsText()
+	*/
+	this.buttonsText;
+
+  /**
+  * array holding all the information about attached events. 
+  * the structure can be like these:
+  * 
+  * 1) attach a function directly
+  *    syntax:  _attachedEvents['eventName'] = yourFunctionName;
+  * 2) attach some javascript code
+  *    syntax:  _attachedEvents['eventName'] = "yourCode();";
+  *    example: _attachedEvents['eventName'] = "alert('hi'); callSomething('foo');";
+  *    just keep in mind that you cannot use vars in that code, because when it 
+  *    gets executed that will be another scope (unless the vars are global...)
+  * 3) attach multiple things for the same event
+  *    syntax:  _attachedEvents['eventName']    = new Array;
+  *             _attachedEvents['eventName'][0] = yourFunctionName;
+  *             _attachedEvents['eventName'][1] = "yourCode();";
+  * 
+  * @access private
+  * @var    array _attachedEvents (hash, see above)
+  * @see    this.attachEvent();
+  */
+  this._attachedEvents;
+	
+	
+  /**
+  * attaches an event.
+	* 
+	* editStart
+	* editEnd
+	* editBlur
+	* toolbarClose
+	* editareaMouseOver
+	* editareaMouseOut
+	* 
+  * @access public
+  * @param  string trigger
+  * @param  mixed  yourEvent (string (of code) or function)
+  * @return void
+  * @see    var this._attachedEvents
+  */
+  this.attachEvent = function(trigger, yourEvent) {
+    if (typeof(this._attachedEvents) == 'undefined') {
+      this._attachedEvents = new Array();
+    }
+    
+    if (typeof(this._attachedEvents[trigger]) == 'undefined') {
+      this._attachedEvents[trigger] = new Array(yourEvent);
+    } else {
+      this._attachedEvents[trigger][this._attachedEvents[trigger].length] = yourEvent;
+    }
+  }
+  
+  /**
+  * tells if an event is attached for the trigger specified. 
+  * @access public
+  * @param  string trigger
+  * @return bool
+  */
+  this.hasEventAttached = function(trigger) {
+    return (this._attachedEvents && this._attachedEvents[trigger]);
+  }
+  
+  
+  /**
+  * fires the events for the trigger specified.
+  * @access public (used internally but feel free to trigger events yourself...)
+  * @param  string trigger (for example 'onClickCaption')
+  * @return void
+  */
+  this.fireEvent = function(trigger) {
+    if (this._attachedEvents && this._attachedEvents[trigger]) {
+      var e = this._attachedEvents[trigger];
+      if ((typeof(e) == 'string') || (typeof(e) == 'function')) {
+        e = new Array(e);
+      }
+      for (var i=0; i<e.length; i++) {
+        if (typeof(e[i]) == 'function') {
+          e[i](this);
+        } else if (typeof(e[i]) == 'string') {
+					//alert(e[i]); //4debug
+          eval(e[i]);
+        } //else murphy
+      }
+    }
+  }	
+	
+	
+	/**
+	* toggles the visibility of the toolbar.
+	* access public
+	* @param bool hide
+	* @see   drawAsToolbar()
+	* @return bool (success or not)
+	*/
+	this.toggleToolbar = function(hide) {
+		var toolbarDiv = document.getElementById(this._objectName + '_outerDiv');
+		if (bs_isNull(toolbarDiv)) return false;
+		toolbarDiv.style.display = (hide) ? 'none' : 'block';
+	}
+	
+	/**
+	* 
+	*/
+	this.toolbarButtonUndo = function() {
+		this.toggleToolbar(true);
+	}
+	
+	/**
+	* 
+	*/
+	this.toolbarButtonSave = function() {
+		this.toggleToolbar(true);
+	}
+	
+	/**
+	* 
+	*/
+	this.toolbarButtonClose = function() {
+		this.toggleToolbar(true);
+		document.body.focus();
+		this.fireOnBlur(); //is called automatically, but too late, so i call it by hand too. stupid.
+		this.fireEvent('toolbarButtonClose');
+	}
+	
+	
+  /**
+	* renders the toolbar.
+  * @access public
+  * @param  string editableAreaId
+	* @param  bool   startActivated (if it should be in edit mode after loading. default is false.)
+  * @return bool   true on success, false on failure
+	* @see    toggleToolbar()
+  */
+  this.drawAsToolbar = function(editableAreaId, startActivated) {
+		this.style = 'toolbar';
+		
+    this.wysiwygElm = document.getElementById(editableAreaId);
+		this.workingElm = this.wysiwygElm;
+		this.wysiwygDoc = document;
+    if (this.workingElm == null) return false;
+		
+		if (startActivated) this._toolbarStartActivated = true;
+    
+    //have to fetch the current value:
+    this._value = this.wysiwygElm.innerHTML;
+    
+    bsWysiwygDivToInstanceArray[editableAreaId] = this;
+		
+    this.wysiwygElm.attachEvent('onbeforedeactivate', function() { bsWysiwygEditorObdWrapper(editableAreaId); } );
+    this.wysiwygElm.attachEvent('onblur',             function() { bsWysiwygEditorOnBlurWrapper(editableAreaId); } );
+    this.wysiwygElm.attachEvent('onfocus',            function() { bsWysiwygEditorOnFocusWrapper(editableAreaId); } );
+    this.wysiwygElm.attachEvent('onmouseover',        function() { bsWysiwygEditorEventWrapper('editareaMouseOver', editableAreaId); } );
+    this.wysiwygElm.attachEvent('onmouseout',         function() { bsWysiwygEditorEventWrapper('editareaMouseOut',  editableAreaId); } );
+    this.wysiwygElm.attachEvent('onpaste',            function() { bsWysiwygEditorEventWrapper('editareaPaste',     editableAreaId); } );
+    
+		this.mayResize = false; //no support here yet.
+		
+    var out = new Array;
+		var outerDivId = this._objectName + '_outerDiv'; // '_toolbarDiv'
+    out[out.length] = '<div id="' + outerDivId + '"';
+		out[out.length] = ' style="';
+		//out[out.length] = ' behavior:url(\'/_bsJavascript/lib/winlessmovable.htc\'); cursor:hand;';
+		out[out.length] = ' display:none; position:absolute; left;50; top:50; width:446;';
+		//don't specify the height, let it render by the browser.
+		//  old // out[out.length] = ' height=expression(parseInt(document.getElementById(\'' + this._objectName + '_toolbarIframe\').offsetHeight) + 25 + \'px\');';
+		//out[out.length] = ' height=400;';
+		out[out.length] = ' border:1px solid gray;"';
+		out[out.length] = '>';
+    
+		/*
+    out[out.length] = '<table width="100%" border="0" cellspacing="1" cellpadding="2" bgcolor="blue">';
+    out[out.length] = '  <tr>';
+    out[out.length] = '    <td nowrap><font face="arial" size="2" color="white"><b><nobr>BlueShoes Wysiwyg Toolbar</nobr></b></font></td>';
+		if (this.toolbarShowButtonUndo)  out[out.length] = '    <td align="right" width="16"><img src="/_bsJavascript/components/wysiwyg/buttons/windows_undo.gif"  width="16" height="14" border="0" onClick="' + this._objectName + '.toolbarButtonUndo();"></td>';
+    if (this.toolbarShowButtonSave)  out[out.length] = '    <td align="right" width="16"><img src="/_bsJavascript/components/wysiwyg/buttons/windows_save.gif"  width="16" height="14" border="0" onClick="' + this._objectName + '.toolbarButtonSave();"></td>';
+    if (this.toolbarShowButtonClose) out[out.length] = '    <td align="right" width="16"><img src="/_bsJavascript/components/wysiwyg/buttons/windows_close.gif" width="16" height="14" border="0" onClick="' + this._objectName + '.toolbarButtonClose();"></td>';
+    out[out.length] = '  </tr>';
+    out[out.length] = '</table>';
+		*/
+    out[out.length] = '<div ondragstart="return false;" onmousedown="bs_move_moveStart(\'' + outerDivId + '\');" id="' + this._objectName + '_titleBar" style="width:100%; padding:3px; cursor:default; background-color:#08246B; color:white; font-family:verdana,arial; font-size:12px; font-weight:bold;"><nobr>BlueShoes Wysiwyg Toolbar</nobr></div>';
+		
+    out[out.length] = this._getDrawnFormField();
+		out[out.length] = this._getDrawnButtonBar();
+		out[out.length] = this._getDrawnIframe();
+		out[out.length] = this._drawStatusBar();
+		
+    var body = document.getElementsByTagName('body').item(0);
+    body.insertAdjacentHTML('beforeEnd', out.join(''));
+    
+		this.iframeElm  = document.getElementById(this._objectName + '_iframe');
+		this.htmlDoc = this.iframeElm.contentWindow.document;
+		
+		this._setupIframeDoc();
+		this._setupResizeGrip(outerDivId);
+
+    this.wysiwygElm = document.getElementById(editableAreaId);
+		this.workingElm = this.wysiwygElm;
+		this.wysiwygDoc = document;
+		this.workingDoc = this.wysiwygDoc;
+
+    this.htmlElm = this.htmlDoc.getElementsByTagName('body').item(0);
+		
+		
+		//var bar = document.getElementById(this._objectName + '_titleBar');
+		//bar.attachEvent('mousedown', moveStart);
+		
+		this._afterDrawStuff(true);
+		return true;
+  }
+	
+	
+  /**
+  * draws the editor into the tag specified.
+  * @access public
+  * @var    string tagId
+  * @return bool
+  */
+  this.drawInto = function(tagId) {
+    var out = new Array;
+		var outerDivId = this._objectName + '_outerDiv';
+    if (this.style == 'toolbar') {
+      out[out.length] = '<div id="' + outerDivId + '" style="position:absolute; left;50; top:50; width:442; height:200; border:1px solid gray; background-color:white;">';
+    } else {
+      out[out.length] = '<div id="' + outerDivId + '" style="width:100%; height:100%; border:2px solid outset; background-color:white;">';
+    }
+    out[out.length] = this._getDrawnFormField();
+		out[out.length] = this._getDrawnButtonBar();
+		out[out.length] = this._getDrawnIframe(tagId);
+		out[out.length] = this._drawStatusBar();
+    out[out.length] = '</div>';
+    
+    var tag = document.getElementById(tagId);
+    tag.innerHTML = out.join('');
+    
+		this.iframeElm  = document.getElementById(this._objectName + '_iframe');
+		this.wysiwygDoc = this.iframeElm.contentWindow.document;
+		this.htmlDoc    = this.wysiwygDoc;
+		
+		if (!moz) {
+			this.wysiwygDoc.designMode = "on";
+			//yes, i fucking have to reassign this.wysiwygDoc here in ie6. because of designMode = 'on' above.
+			this.wysiwygDoc = this.iframeElm.contentWindow.document;
+		}
+		
+		this._setupIframeDoc();
+		this._setupResizeGrip(outerDivId);
+		
+		if (moz) {
+			this.wysiwygDoc.designMode = "on";
+		}
+		
+    this.wysiwygElm = this.wysiwygDoc.getElementsByTagName('body').item(0);
+		this.htmlElm    = this.wysiwygElm;
+		this.workingElm = this.wysiwygElm;
+		this.workingDoc = this.wysiwygDoc;
+		
+		this._afterDrawStuff(false);
+		return true;
+	}
+  
+	
+	/**
+	* @access private
+	* @return string
+	*/
+	this._drawStatusBar = function() {
+		var out = new Array;
+		
+		/*
+    out[out.length] = '<table id="' + this._objectName + '_statusbar" width="100%" height="25" cellpadding="0" cellspacing="0" bgcolor="menu"><tr>';
+		out[out.length] = '<td><table><tr>';
+		out[out.length] = '<td class="wysiwygBaseline" style="font-family:arial,helvetica; font-size:11px;" id="toolbarHelptext"></td>';
+		out[out.length] = '</tr></table></td><td width="165"><table><tr>';
+		out[out.length] = '<td width="170" align="right" class="wysiwygBaseline" style="font-family:arial,helvetica; font-size:11px;" nowrap><nobr><a href="http://www.blueshoes.org/en/javascript/wysiwyg/" target="_blank" style="text-decoration:none; color:black;"><img src="/_bsImages/powered/blueshoes/shoe_xxs.gif" border="0"> BlueShoes Wysiwyg Editor</a>&nbsp;&nbsp;&nbsp;&nbsp;</nobr></td>';
+		out[out.length] = '</tr></table></td>';
+		out[out.length] = '</tr></table>';
+		*/
+		
+		out[out.length] = '<div style="height:20px; background-color:menu;">&nbsp;</div>';
+		out[out.length] = '<div id="' + this._objectName + '_statusbar" style="position:absolute; bottom:0px; right:0px; width:100%; height:20px; background-color:menu;">';
+		out[out.length] = '<div unselectable="On" style="z-index:5; position:absolute; display:inline; left:5px; bottom:3px; align:left; border-right:10px solid menu; background-color:menu; font-family:arial,helvetica; font-size:11px;" id="toolbarHelptext"></div>';
+		out[out.length] = '<div unselectable="On" style="z-index:4; position:absolute; display:inline; width:165px; right:10px; bottom:3px; align:right;" class="wysiwygBaseline"><a href="http://www.blueshoes.org/en/javascript/wysiwyg/" target="_blank" style="color:black; text-decoration:none; font-family:arial,helvetica; font-size:11px;"><img src="/_bsImages/powered/blueshoes/shoe_xxs.gif" border="0" align="top"> BlueShoes Wysiwyg Editor</a></div>';
+		out[out.length] = '</div>'
+		
+		return out.join('');
+	}
+	
+	/**
+	* @access private
+	* @param  string tagId
+	* @return string
+	*/
+	this._getDrawnIframe = function(tagId) {
+		if (typeof(tagId) != 'undefined') {
+			var initIframeHeight = document.getElementById(tagId).offsetHeight - 100; //buttonbar 70 and statusbar 30
+		} else {
+			var initIframeHeight = 0; //buttonbar 70 and statusbar 30
+		}
+		return '<iframe align="top" id="' + this._objectName + '_iframe' + '" width="100%" height="' + initIframeHeight + 'px"></iframe>';
+		/*
+		out[out.length] = '<div id="' + this._objectName + '_iframe' + '"';
+    out[out.length] = ' style="background-color:white; border:1px gray solid; overflow:auto; width:100%;';
+    var fullHeight = parseInt(document.getElementById(tagId).clientHeight);
+    //out[out.length] = ' height:expression(' + fullHeight + ' - parseInt(document.getElementById(\'' + this._objectName + '_toolbarIframe' + '\').clientHeight) + \'px\');"';
+		out[out.length] = ' height=400;';
+    out[out.length] = ' onBeforeDeactivate="' + this._objectName + '.saveCursorPos();"';
+    out[out.length] = ' onBlur="'  + this._objectName + '.fireOnBlur();"';
+    out[out.length] = ' onpaste="' + this._objectName + '._fireEditareaOnPaste();"';
+    out[out.length] = '>' + this._value + '</div>';
+		*/
+	}
+	
+	/**
+	* @access private
+	* @return void
+	*/
+	this._setupIframeDoc = function() {
+		var docHead = '';
+		//no, it is not possible to include external files. 
+		//mozilla uses such included scripts. ie uses nothing, but does not complain either.
+		//we're fine this way cause all we have to do is make innerText available in moz. 
+		//docHead += "<script type='text/javascript' src='/_bsJavascript/core/lang/Bs_Misc.lib.js'></script>";
+		if (moz) {
+			docHead += "<script>";
+			docHead += '	function convertTextToHTML(s) {\n';
+			docHead += '		s = s.replace(/\&/g, "&amp;")\n';
+			docHead += '    s = s.replace(/</g, "&lt;")\n';
+			docHead += '    s = s.replace(/>/g, "&gt;")\n';
+			docHead += '    s = s.replace(/\\n/g, "<BR>");\n';  //<= escaped \n here!!!
+			docHead += '		while (/\s\s/.test(s))\n';
+			docHead += '			s = s.replace(/\s\s/, "&nbsp; ");\n';
+			docHead += '		return s.replace(/\s/g, " ");\n';
+			docHead += '	}\n';
+			docHead += '	HTMLElement.prototype.__defineSetter__("innerText", function (sText) {';
+			docHead += '		this.innerHTML = convertTextToHTML(sText);';
+			docHead += '		return sText;		';
+			docHead += '	});';
+			docHead += '	var tmpGet;';
+			docHead += '	HTMLElement.prototype.__defineGetter__("innerText", tmpGet = function () {';
+			docHead += '		var r = this.ownerDocument.createRange();';
+			docHead += '		r.selectNodeContents(this);';
+			docHead += '		return r.toString();';
+			docHead += '	});';
+			docHead += "</script>\n";
+		}
+		
+		//css works for both, lucky me. but moz only likes direct style definitions and freaks out on includes.
+		docHead += "<style>\n";
+		docHead += "body { font-family:arial,helvetica; }\n";
+		docHead += "</style>\n";
+		if (!moz) docHead += '<link rel=stylesheet href="/default.css" type="text/css" />\n';
+		
+		var emptyDoc = '';
+		emptyDoc += '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">';
+		emptyDoc += '<html><head>' + docHead + '</head>';
+		emptyDoc += '<body>';
+		if ((this.dataType == 'whtml') && !this._inHtmlMode) {
+			emptyDoc += this._value;
+		} else {
+			emptyDoc += bs_filterForHtml(this._value);
+		}
+		emptyDoc += '</body></html>';
+		this.htmlDoc.write(emptyDoc);
+	}
+	
+	/**
+	* some stuff that both drawAsToolbar() and drawInto() need, after the 
+	* outrendering has been done.
+	* @access private
+	* @return void
+	*/
+	this._afterDrawStuff = function(isToolbar) {
+		
+		
+		//has to be here, after rendering.
+		switch (this.dataType) {
+			case 'whtml':
+				toolbarWysiwyg.drawInto('registerWysiwygButtons');
+				toolbarHtml.drawInto('registerHtmlButtons');
+				break;
+			case 'html':
+				toolbarHtml.drawInto('registerHtmlButtons');
+				break;
+			case 'xhtml':
+			case 'xml':
+			case 'text':
+				toolbarText.drawInto('registerTextButtons');
+				break;
+		}
+		
+		
+		try {
+			this.wysiwygDoc.execCommand("undo", false, null);
+		} catch (e) {
+			alert("This is not supported on your level of Mozilla. Please update.1");
+		}
+	
+
+		if (this.dataType == 'whtml') {
+			this._tabset = new Bs_TabSet(this._objectName + '._tabset', 'tabset');
+			
+			var tabWysiwygObj = new Object;
+			tabWysiwygObj.caption   = 'Wysiwyg';
+			tabWysiwygObj.container = document.getElementById('registerWysiwygButtons');
+			tabWysiwygObj.onFocus   = this._objectName + '.switchToWysiwygTab();';
+			this._tabset.addTab(tabWysiwygObj);
+			
+			var tabHtmlObj = new Object;
+			tabHtmlObj.caption   = 'HTML';
+			tabHtmlObj.container = document.getElementById('registerHtmlButtons');
+			tabHtmlObj.onFocus   = this._objectName + '.switchToHtmlTab();';
+			this._tabset.addTab(tabHtmlObj);
+			
+			this._tabset.draw();
+		}
+		
+    this._initCodeSnippets();
+		if (!isToolbar) this._updateIframeSize();
+		
+		window.setInterval(this._objectName + "._updateButtons()", 200);
+		
+    this.outrendered = true;
+    return true;
+	
+	}
+	
+  /**
+  * sets the value (content).
+  * @access public
+  * @param  string str
+  * @return bool
+  */
+  this.setValue = function(str) {
+    this._value = str;
+    if (this.outrendered) {
+      //maybe not ready yet, if so we have to use a callback. more work :/
+      if ((this.dataType == 'text') || this._inHtmlMode) {
+        this.wysiwygElm.innerText = str;
+      } else {
+        this.wysiwygElm.innerHTML = str;
+      }
+    }
+    return true;
+  }
+  
+  /**
+  * returns the value (content).
+	* todo: maybe we should re-read it. or add a setting telling if it should be done.
+  * @access public
+  * @return string
+  */
+  this.getValue = function() {
+    //return this.wysiwygElm.innerHTML;
+    return this._value; //really?
+  }
+  
+  /**
+  * if you want to use a file browser to load images from the server, 
+  * set the url here. otherwise all a user can do is type in url's himself.
+  * @access public
+  * @param  string url
+  * @return void
+  this.setImageSelector = function(url) {
+    this._imageSelectorUrl = url;
+  }
+  */
+  
+  /**
+  * opens the image selector (as popup).
+  * only does it if setImageSelector() has been used before.
+  * @access public (well it's used internally.)
+  * @return bool (true if it has been opened, false otherwise)
+  this.openImageSelector = function() {
+    if (typeof(this._imageSelectorUrl) == 'undefined') return false;
+    var url    = this._imageSelectorUrl + '?callbackFunction=' + this._objectName + '.imageSelectorCallback';
+    var params = "dependent=yes,width=500,height=300,location=no,menubar=no,scrollbars=no,status=no,toolbar=no";
+    imgBrowserPopup = window.open(url, "Bs_ImageSelector", params);
+    return true;
+  }
+  */
+  
+  /**
+  * callback function for the image file browser.
+  * @param string url (the image url)
+  this.imageSelectorCallback = function(url) {
+    var img = this.toolbarDoc.document.getElementById('imgSource');
+    if (img) img.value = url;
+  }
+  */
+  
+  /**
+  * sets an array with code snippets.
+  * 
+  * this all only makes sense if the html tab is used.
+  * call it before calling drawInto() or so.
+  * 
+  * the structure of the given array looks like this:
+  *   arr[section][name][property] = value
+  * 
+  * example:
+  * arr = new Array;
+  * arr['site'] = new Array;
+  * arr['site']['webmasterEmail'] = new Array;
+  * arr['site']['webmasterEmail']['value']       = '<a href="webmaster@domain.com">Webmaster</a>';
+  * arr['site']['webmasterEmail']['description'] = 'The main webmaster email address as link.';
+  * arr['site']['webmasterEmail']['lastMod']     = '2002/12/31'; //just a text string, whatever
+  * arr['site']['webmasterEmail']['user']        = 'tom';        //user that last modified the snipped
+  * 
+  * the "value" key is the only really needed one. 
+  * an idea is to groupd snippets into "site", "page" and "user". 
+  * 
+  * if this method is not used, no snippets are available.
+  * 
+  * @access public
+  * @param  array arr (see above)
+  * @return void
+  */
+  this.setCodeSnippets = function(arr) {
+    this._codeSnippets = arr;
+  }
+  
+  /**
+  * inits the code snippets if setCodeSnippets() has been called before.
+  * @access private
+  * @return void
+  */
+  this._initCodeSnippets = function() {
+		return; //deactivated
+		
+    if (this._codeSnippets) {
+      //make snippet button visible:
+      this.toolbarDoc.document.getElementById('btnSnippets').style.display = '';
+      
+      var formFieldSelect = new Bs_FormFieldSelect;
+      var snippetGroupSelect = this.toolbarDoc.document.getElementById('snippetGroupSelect');
+      formFieldSelect.init(snippetGroupSelect);
+      for (var group in this._codeSnippets) {
+        var opt = new Option(group, group, false, false);
+        snippetGroupSelect.options[snippetGroupSelect.length] = opt;
+      }
+      var snippetNameSelect = this.toolbarDoc.document.getElementById('snippetNameSelect');
+      formFieldSelect.init(snippetNameSelect);
+      
+      for (var group in this._codeSnippets) { break; }
+      if (group) {
+        this._snippetUpdateNames(group);
+      }
+    }
+  }
+  
+  /**
+  * 
+  */
+  this._snippetUpdateNames = function(groupName) {
+    var snippetNameSelect = this.toolbarDoc.document.getElementById('snippetNameSelect');
+    snippetNameSelect.prune();
+    for (var myName in this._codeSnippets[groupName]) {
+      var opt = new Option(myName, myName, false, false);
+      snippetNameSelect.options[snippetNameSelect.length] = opt;
+    }
+    
+  }
+  
+  /**
+  * @access public (used internally)
+  * @param  string groupName
+  * @return void
+  */
+  this.snippetSwitchGroup = function(groupName) {
+    this._snippetUpdateNames(groupName);
+    //also clean the code field:
+    var snippetHtmlEditor       = this.toolbarDoc.document.getElementById('snippetHtmlEditor');
+    snippetHtmlEditor.innerText = '';
+  }
+  
+  /**
+  * shows the snippet selector.
+  * @access public (used internally)
+  * @param  string snippetName
+  * @return void
+  */
+  this.snippetShow = function(snippetName) {
+    var groupName              = this.toolbarDoc.document.getElementById('snippetGroupSelect').getValue();
+    var snippetHtmlEditor      = this.toolbarDoc.document.getElementById('snippetHtmlEditor');
+    var snippetPropModified    = this.toolbarDoc.document.getElementById('snippetPropModified');
+    var snippetPropUser        = this.toolbarDoc.document.getElementById('snippetPropUser');
+    var snippetPropDescription = this.toolbarDoc.document.getElementById('snippetPropDescription');
+    var t = this._codeSnippets[groupName][snippetName];
+    var value       = (t['value'])       ? t['value']       : '';
+    var lastMod     = (t['lastMod'])     ? t['lastMod']     : '';
+    var user        = (t['user'])        ? t['user']        : '';
+    var description = (t['description']) ? t['description'] : '';
+    snippetHtmlEditor.innerText      = value;
+    snippetPropModified.innerHTML    = lastMod;
+    snippetPropUser.innerHTML        = user;
+    snippetPropDescription.innerHTML = description;
+  }
+  
+	
+	/**
+	* inserts a special character.
+	* @access public
+	* @param  string code (eg "&euro;")
+	* @return void
+	* @status experimental (may be removed, and you'll have to use insertString() or so.)
+	*/
+	this.insertSpecialChar = function(code) {
+		var r = this.workingDoc.selection.createRange();
+		if (this._inHtmlMode) {
+			//does not help much to use the code. switching to wysiwyg converts it. hrm, should i care?
+			r.text = code;
+		} else {
+			r.pasteHTML(code);
+		}
+	}
+  
+	/**
+	* inserts the string specified at the current cursor position.
+	* @access public
+	* @param  string str
+	* @status experimental
+	* @return void
+	*/
+	this.insertString = function(str) {
+		var r = this.workingDoc.selection.createRange();
+		if (this._inHtmlMode) {
+			r.text = str;
+		} else {
+			r.pasteHTML(str);
+		}
+	}
+	
+	//deprecated. will be removed shortly.
+  this.insertHtml = function(str) {
+    this._editorCursorPos.pasteHTML(str);
+  }
+  /*
+  this.insertText = function(str) {
+    this._editorCursorPos.pasteHTML(bs_filterForHtml(str));
+  }*/
+  
+  /*
+  this.insertText = function(text) {
+    if (this._editorCursorPos) {
+      this._editorCursorPos.pasteHTML(text);
+    } else {
+      this.wysiwygElm.focus();
+      document.execCommand("InsertMarquee", false, 'dummy');
+      //have to use innerHTML, not getValue() here:
+      //var t = this.getValue();
+      if (this._inHtmlMode) {
+        var t = this.wysiwygElm.innerText;
+      } else {
+        var t = this.wysiwygElm.innerHTML;
+      }
+      t = t.replace(/<MARQUEE id=dummy><\/MARQUEE>/, text);
+      this.setValue(t);
+    }
+  }  */
+  
+  /**
+	* !!!!!!! DEPRECATED!!!!!!!!
+	* 
+  * saves the cursor pos of the editable field "onBeforeDeactivate".
+  * this is needed so we can insert things at the right position.
+  * @access public (well it's used internally.)
+  * @return void
+	* @deprecated
+  */
+  this.saveCursorPos = function() {
+    try {
+  		this._editorCursorPos = document.selection.createRange().duplicate();
+    } catch (e) {
+      this._editorCursorPos = null;
+    }
+	}
+  
+  
+  /**
+  * fires when the edit area loses the focus.
+  * we have to update our internal value. and the hidden form field (since bs4.3).
+  * @access public (well it's used internally.)
+  * @return void
+  */
+  this.fireOnBlur = function() {
+		//alert('here in fireOnBlur()');
+    if (this.wysiwygElm) { //only if ready!
+      if (this._inHtmlMode) {
+        this._value = this.wysiwygElm.innerText;
+      } else {
+        this._value = this.wysiwygElm.innerHTML;
+      }
+	    if (typeof(this.formFieldName) != 'undefined') {
+				var fld = document.getElementById(this.formFieldName);
+				if (typeof(fld) != 'unknown') fld.value = this._value;
+			}
+			/*
+			if (this.style == 'toolbar') {
+				this.toggleToolbar(true);
+			}
+			*/
+    }
+		this.fireEvent('editEnd');
+  }
+	
+	
+	/**
+	* 
+	*/
+	this.fireOnFocus = function() {
+		if (this.style == 'toolbar') {
+			this.toggleToolbar(false);
+		}
+		this.fireEvent('editStart');
+	}
+	
+	/**
+	* fires onPaste on the contentEditable area.
+	* @access private
+	* @return void
+	* @since  bs4.4
+	*/
+	this._fireEditareaOnPaste = function() {
+	//*   2 = allow paste of plain text, remove tags silently.
+	//*   3 = allow paste of plain text, remove tags, alert such a message.
+	//*   4 = if tags are pasted, ask the user if he wants to keep them or have them removed.
+		
+		if (typeof(this.editareaOnPaste) == 'function') {
+			var status = this.editareaOnPaste();
+			if (typeof(status) == 'string') {
+				window.clipboardData.setData("Text", status);
+				event.returnValue = true;
+			} else {
+				event.returnValue = false;
+			}
+			return;
+		} else {
+			switch (this.editareaOnPaste) {
+				case 1:
+					alert('Sorry, no pasting allowed.');
+					//don't break!
+				case 0:
+					event.returnValue = false;
+					return;
+					break;
+				case 5:
+					event.returnValue = true;
+					return;
+					break;
+				default: 
+					//need to check if there are tags or not.
+					//try {
+					var clipValOrig  = window.clipboardData.getData("Text");
+					var clipValStrip = bs_stripTags(clipValOrig);
+					if ((clipValOrig == clipValStrip) || (this.editareaOnPaste == 2)) {
+						//well no tags. or silent insert. that's easy.
+						event.returnValue = true;
+						return;
+					} else {
+						switch (this.editareaOnPaste) {
+							case 3: //alert that tags are stripped
+								alert("Formatting tags have been removed from the clipboard.");
+								window.clipboardData.setData("Text", clipValStrip);
+								event.returnValue = true;
+								break;
+							case 4: //ask what he wants:
+								var status = confirm("The pasted content includes formatting tags. Click OK to paste your content with them. Click cancel to have them removed.");
+								if (!status) window.clipboardData.setData("Text", clipValStrip);
+								event.returnValue = true;
+								break;
+						}
+						//now set the orig value back into the clipboard, the user may want to use it 
+						//somewhere else. me, i'd get angry if my clipboard got overwritten.
+						//window.clipboardData.setData("Text", clipValOrig);
+					}
+			}
+		}
+	}
+	
+	
+	/**
+	* creates/updates the link at the current position/for the current selection..
+	* 
+	* param paramObj: array or object that can have the fields 
+	*   'href', 'target', 'name', 'title', 'id', 'class', 'style'
+	* 
+	* if 'href' is empty then no link will be added, and an existing link will be dropped.
+	* 
+	* @access public
+	* @param  obj paramObj (see above)
+	*/
+	this.createLink = function(paramObj) {
+		var propArr   = new Array('href', 'target', 'name', 'title', 'id', 'class', 'style');
+		var tempRange = this.workingDoc.selection.createRange();
+		
+		if ((this.dataType == 'whtml') && !this._inHtmlMode) {
+			if (bs_isEmpty(paramObj.href)) {
+				tempRange.execCommand('UnLink', false, null);
+				return;
+			}
+			
+			var tempElm = findWrappingElement('A', tempRange);
+			
+			if (tempElm == false) {
+				if (bs_isEmpty(paramObj['value'])) { //got no value from the user.
+					if (tempRange.htmlText == '') {
+						tempRange.expand('word'); //expand it
+					}
+					//if the last selected char is a space, we remove it from the selection.
+					//because expand() likes to select the space after a word too. very stupid.
+					var htmlText = tempRange.htmlText;
+					if (typeof(htmlText) == 'string') { //could be an object.
+						if (htmlText.substr(htmlText.length -1) == ' ') {
+							tempRange.moveEnd('character', -1)
+						}
+					}
+					paramObj['value'] = tempRange.htmlText;
+				}
+				
+				tempRange.execCommand('CreateLink', false, paramObj.href); 
+				tempElm = findWrappingElement('A', tempRange);
+			}
+			
+			if (tempElm == false) {
+				if (bs_isEmpty(paramObj['value'])) { //got no value from the user.
+					if (tempRange.htmlText == '') {
+						tempRange.expand('word'); //expand it
+					}
+					//if the last selected char is a space, we remove it from the selection.
+					//because expand() likes to select the space after a word too. very stupid.
+					var htmlText = tempRange.htmlText;
+					if (typeof(htmlText) == 'string') { //could be an object.
+						if (htmlText.substr(htmlText.length -1) == ' ') {
+							tempRange.moveEnd('character', -1)
+						}
+					}
+					paramObj['value'] = tempRange.htmlText;
+				}
+				
+				var code = '<a';
+				for (var i=0; i<propArr.length; i++) {
+					if (!bs_isEmpty(paramObj[propArr[i]])) code += ' ' + propArr[i] + '="' + paramObj[propArr[i]] + '"';
+				}
+				code += '>' + paramObj['value'] + '</a>';
+				tempRange.pasteHTML(code);
+				tempRange.select(); //does not work somehow.
+			} else {
+				for (var i=0; i<propArr.length; i++) {
+					if (!bs_isEmpty(paramObj[propArr[i]])) tempElm.setAttribute(propArr[i], paramObj[propArr[i]]);
+				}
+				if (!bs_isEmpty(paramObj['value'])) tempElm.innerHTML = paramObj['value'];
+			}
+		} else {
+			var r2 = expandSelectionToSimpleTag(tempRange, 'a');
+			if (r2.text != tempRange.text) tempRange = r2;
+			
+			if (bs_isEmpty(paramObj.href)) {
+				var code = ''; //remove link.
+			} else {
+				var code = '<a';
+				for (var i=0; i<propArr.length; i++) {
+					if (!bs_isEmpty(paramObj[propArr[i]])) code += ' ' + propArr[i] + '="' + paramObj[propArr[i]] + '"';
+				}
+				code += '>';
+			}
+			tempRange.text = code;
+			tempRange.select(); //does not work somehow.
+		}
+	}
+	
+	
+	/**
+	* inserts an image, or, if an image is currently selected, updates it.
+	* 
+	* param paramObj can have the keys:
+	*   'src', 'alt', 'width', 'height', 'hspace', 'vspace', 'border', 'align', 
+	*   'name', 'title', 'id', 'class', 'style'
+	* 
+	* @access public
+	* @param  object paramObj
+	* @return void
+	*/
+	this.createImage = function(paramObj) {
+		var propArr   = new Array('src', 'alt', 'width', 'height', 'hspace', 'vspace', 'border', 'align', 'name', 'title', 'id', 'class', 'style');
+		var tempRange = this.workingDoc.selection.createRange();
+		
+		if ((this.dataType == 'whtml') && !this._inHtmlMode) {
+			if (this.workingDoc.selection.type == "Control") {
+		  } else {
+				tempRange.execCommand('InsertImage', false, paramObj.src);
+				var tempRange = this.workingDoc.selection.createRange();
+			}
+			
+			tempElm = tempRange(0);
+			
+			if (tempElm != false) {
+				for (var i=0; i<propArr.length; i++) {
+					if (!bs_isEmpty(paramObj[propArr[i]])) tempElm.setAttribute(propArr[i], paramObj[propArr[i]]);
+				}
+			}
+		} else {
+			var r2 = expandSelectionToSimpleTag(tempRange, 'img');
+			if (r2.text != tempRange.text) tempRange = r2;
+			
+			var code = '<img';
+			for (var i=0; i<propArr.length; i++) {
+				if (!bs_isEmpty(paramObj[propArr[i]])) code += ' ' + propArr[i] + '="' + paramObj[propArr[i]] + '"';
+			}
+			code += '>';
+			tempRange.text = code;
+			tempRange.select(); //does not work somehow.
+		}
+	}
+	
+	/**
+	* @access public
+	* @param  string hexCode (6 digit hex code)
+	* @return void
+	*/
+	this.setFgColor = function(hexCode) {
+		this.workingDoc.execCommand('ForeColor', false, hexCode);
+	}
+	
+	
+	/**
+	* 
+	* param option: these are allowed
+	*   'Underline'
+	*   'StrikeThrough'
+	*   'SuperScript'
+	*   'SubScript'
+	* 
+	* @access public
+	* @param  string option (see above)
+	* @param  bool b
+	* @return void
+	*/
+	this.setFontOption = function(option, b) {
+		var current = this.workingDoc.queryCommandValue(option);
+		if (current && !b) {
+			this.workingDoc.execCommand(option, false, false);
+		} else if (!current && b) {
+			this.workingDoc.execCommand(option, false, true);
+		}
+	}
+	
+	/**
+	* @access public
+	* @param  object paramObj
+	* @return void
+	*/
+	this.setFont = function(paramObj) {
+		if (!bs_isEmpty(paramObj.fontFace)) this.workingDoc.execCommand('FontName', false, paramObj.fontFace);
+		if (!bs_isEmpty(paramObj.fontSize)) this.workingDoc.execCommand('FontSize', false, paramObj.fontSize);
+		this.setFontOption('Bold',          (paramObj.fontStyle.indexOf('Bold')   != -1));
+		this.setFontOption('Italic',        (paramObj.fontStyle.indexOf('Italic') != -1));
+		this.setFontOption('Underline',     paramObj.underline);
+		this.setFontOption('StrikeThrough', paramObj.strikeThrough);
+		this.setFontOption('SuperScript',   paramObj.superScript);
+		this.setFontOption('SubScript',     paramObj.subScript);
+		//paramObj.upperCase;
+	}
+	
+	/**
+	* called from the windowHref, telling us that it's loaded.
+	* @access public (you don't need that)
+	* @return void
+	*/
+	this.callbackWindowHref = function() {
+		var paramObj  = new Object;
+		var tempRange = this.workingDoc.selection.createRange();
+		if ((this.dataType == 'html') || this._inHtmlMode) {
+			var r2 = expandSelectionToSimpleTag(tempRange, 'a');
+			if ((r2.text != tempRange.text) && !bs_isEmpty(r2.text)) {
+				r2.select();
+				paramObj = bs_parseSimpleTagProps(r2.text);
+				paramObj['value'] = 'ggg';
+			}
+		} else {
+			var tempElm = findWrappingElement('A', tempRange);
+			if (tempElm != false) {
+				paramObj.href     = (!bs_isEmpty(tempElm.getAttribute('href')))   ? tempElm.getAttribute('href')   : '';
+				paramObj.target   = (!bs_isEmpty(tempElm.getAttribute('target'))) ? tempElm.getAttribute('target') : '';
+				paramObj.name     = (!bs_isEmpty(tempElm.getAttribute('name')))   ? tempElm.getAttribute('name')   : '';
+				paramObj.title    = (!bs_isEmpty(tempElm.getAttribute('title')))  ? tempElm.getAttribute('title')  : '';
+				paramObj.id       = (!bs_isEmpty(tempElm.getAttribute('id')))     ? tempElm.getAttribute('id')     : '';
+				paramObj['class'] = (!bs_isEmpty(tempElm.getAttribute('class')))  ? tempElm.getAttribute('class')  : '';
+				paramObj.style    = (!bs_isEmpty(tempElm.getAttribute('style')))  ? tempElm.getAttribute('style')  : '';
+				paramObj['value'] = tempElm.innerHTML;
+			} else {
+				if (typeof(tempRange.text) == 'undefined') { //control range
+					paramObj['value'] = tempRange.item(0).outerHTML;
+				} else { //text range
+					paramObj['value'] = tempRange.text;
+				}
+			}
+		}
+		return paramObj;
+	}
+	
+	/**
+	* called from the windowImage, telling us that it's loaded.
+	* @access public (you don't need that)
+	* @return void
+	*/
+	this.callbackWindowImage = function() {
+		var paramObj = new Object;
+		
+		//try {
+			var tempRange = this.workingDoc.selection.createRange();
+			if (typeof(tempRange.text) == 'undefined') { //control range
+				var tempElm = tempRange(0);
+				if (tempElm != false) {
+					paramObj.src      = (!bs_isEmpty(tempElm.getAttribute('src')))       ? tempElm.getAttribute('src')    : '';
+					paramObj.alt      = (!bs_isEmpty(tempElm.getAttribute('alt')))       ? tempElm.getAttribute('alt')    : '';
+					paramObj.width    = (!bs_isEmpty(tempElm.getAttribute('width')))     ? tempElm.getAttribute('width')  : '';
+					paramObj.height   = (!bs_isEmpty(tempElm.getAttribute('height')))    ? tempElm.getAttribute('height') : '';
+					paramObj.hspace   = (!bs_isEmpty(tempElm.getAttribute('hspace')))    ? tempElm.getAttribute('hspace') : '';
+					paramObj.vspace   = (!bs_isEmpty(tempElm.getAttribute('vspace')))    ? tempElm.getAttribute('vspace') : '';
+					paramObj.border   = (!bs_isEmpty(tempElm.getAttribute('border')))    ? tempElm.getAttribute('border') : '';
+					paramObj.align    = (!bs_isEmpty(tempElm.getAttribute('align')))     ? tempElm.getAttribute('align')  : '';
+					paramObj.name     = (!bs_isEmpty(tempElm.getAttribute('name')))      ? tempElm.getAttribute('name')   : '';
+					paramObj.title    = (!bs_isEmpty(tempElm.getAttribute('title')))     ? tempElm.getAttribute('title')  : '';
+					paramObj.id       = (!bs_isEmpty(tempElm.getAttribute('id')))        ? tempElm.getAttribute('id')     : '';
+					paramObj['class'] = (!bs_isEmpty(tempElm.getAttribute('class')))     ? tempElm.getAttribute('class')  : '';
+					paramObj.style    = (!bs_isEmpty(tempElm.getAttribute('style')))     ? tempElm.getAttribute('style')  : '';
+					//style_Str
+				}
+			} else { //text range
+				if ((this.dataType == 'html') || this._inHtmlMode) {
+					var r2 = expandSelectionToSimpleTag(tempRange, 'img');
+					if ((r2.text != tempRange.text) && !bs_isEmpty(r2.text)) {
+						paramObj = bs_parseSimpleTagProps(r2.text);
+						r2.select();
+					}
+				}
+			}
+		//} catch (e) {
+		//}
+		
+		if (typeof(this.imageSelector[3]) != 'undefined') {
+			paramObj.imageBrowser = this.imageSelector[3];
+		}
+		
+		return paramObj;
+	}
+	
+	/**
+	* called from the windowColor, telling us that it's loaded.
+	* @access public (you don't need that)
+	* @return void
+	*/
+	this.callbackWindowColor = function() {
+		var currentColor = this.workingDoc.queryCommandValue('ForeColor');
+		//leading zeros are missing.
+		currentColor = currentColor.toString(16);
+		for (var i=6-currentColor.length; i>0; i--) {
+			currentColor = '0' + '' + currentColor;
+		}
+		var paramObj = new Object;
+		paramObj.color = currentColor;
+		return paramObj;
+	}
+	
+	/**
+	* called from the windowFont, telling us that it's loaded.
+	* @access public (you don't need that)
+	* @return void
+	*/
+	this.callbackWindowFont = function() {
+		var paramObj = new Object;
+		paramObj.fontFace      = this.workingDoc.queryCommandValue('FontName');
+		var fontStyle = new Array;
+		if (this.workingDoc.queryCommandValue('Bold'))   fontStyle[fontStyle.length] = 'Bold';
+		if (this.workingDoc.queryCommandValue('Italic')) fontStyle[fontStyle.length] = 'Italic';
+		paramObj.fontStyle     = fontStyle.join(' ');
+		paramObj.fontSize      = this.workingDoc.queryCommandValue('FontSize');
+		paramObj.underline     = this.workingDoc.queryCommandValue('Underline');
+		paramObj.strikeThrough = this.workingDoc.queryCommandValue('StrikeThrough');
+		paramObj.superScript   = this.workingDoc.queryCommandValue('Superscript');
+		paramObj.subScript     = this.workingDoc.queryCommandValue('Subscript');
+		//paramObj.upperCase     = document.myForm.elements['upperCase'].checked;
+		
+		try {
+			if (this.lastSelection.text == '') {
+				this.lastSelection.expand('word'); //if the user did not select a range, only has the cursor somewhere, we expand it.
+			}
+			paramObj.previewText = this.lastSelection.text;
+		} catch (e) {
+			//doesn't matter. just nice to have.
+		}
+		
+		return paramObj;
+	}
+	
+	/**
+	* @access public (you don't need that)
+	* @param  obj btnObj (an instance of Bs_Button)
+	* @return void
+	*/
+	this.toolbarButtonClicked = function(btnObj) {
+		try {
+			if (moz) {
+				this.workingElm.contentWindow.focus();
+			} else {
+				this.workingElm.focus();
+			}
+		} catch (e) {
+			//ugh.
+		}
+		
+		
+		switch (btnObj.action) {
+      case 'Bold':
+      case 'Italic':
+      case 'Underline':
+      case 'Undo':
+      case 'Redo':
+      case 'Cut':
+      case 'Copy':
+      case 'Paste':
+      case 'JustifyLeft':
+      case 'JustifyCenter':
+      case 'JustifyRight':
+      case 'InsertOrderedList':
+      case 'InsertUnorderedList':
+      case 'Outdent':
+      case 'Indent':
+			case 'UnLink':
+				try {
+	        this.workingDoc.execCommand(btnObj.action, false, null);
+				} catch (e) {
+					//ugh.
+				}
+				break;
+			case 'CreateLink':
+				//we use our own window, that is way better.
+        //this.workingDoc.execCommand(btnObj.action, true, null);
+				var url = this.hrefSelector[0] + '?objectName=' + this._objectName;
+				url += '&callbackLoad=callbackWindowHref&callbackSave=createLink';
+				if (moz) {
+					window.open(url, "HrefSelector", "width=" + this.hrefSelector[1] + ",height=" + this.hrefSelector[2] + ",left=0,top=0,scrollbars=no,status=no,toolbar=no,resizable=no,location=no,hotkeys=no,dependent=yes");
+				} else {
+					var ret = window.showModalDialog(url, this.callbackWindowHref(), "dialogWidth:"  + this.hrefSelector[1] + "px; dialogHeight:" + this.hrefSelector[2] + "px;");
+					if (ret) this.createLink(ret);
+				}
+				break;
+			case 'InsertImage':
+				//we use our own window, that is way better.
+        //this.workingDoc.execCommand('InsertImage', true, null);
+				var url = this.imageSelector[0] + '?objectName=' + this._objectName;
+				url += '&callbackLoad=callbackWindowImage&callbackSave=createImage';
+				if (moz) {
+					window.open(url, "ImageSelector", "width=" + this.imageSelector[1] + ",height=" + this.imageSelector[2] + ",left=0,top=0,scrollbars=no,status=no,toolbar=no,resizable=no,location=no,hotkeys=no,dependent=yes");
+				} else {
+					var ret = window.showModalDialog(url, this.callbackWindowImage(), "dialogWidth:"  + this.imageSelector[1] + "px; dialogHeight:" + this.imageSelector[2] + "px;");
+					if (ret) this.createImage(ret);
+				}
+				break;
+			case 'ForeColor':
+				var url = this.fgColorSelector[0] + '?objectName=' + this._objectName;
+				url += '&callbackLoad=callbackWindowColor&callbackSave=setFgColor';
+				if (moz) {
+					window.open(url, "FgColorSelector", "width=" + this.fgColorSelector[1] + ",height=" + this.fgColorSelector[2] + ",left=0,top=0,scrollbars=no,status=no,toolbar=no,resizable=no,location=no,hotkeys=no,dependent=yes");
+				} else {
+					var ret = window.showModalDialog(url, this.callbackWindowColor(), "dialogWidth:"  + this.fgColorSelector[1] + "px; dialogHeight:" + this.fgColorSelector[2] + "px;");
+					if (ret) this.setFgColor(ret);
+				}
+				break;
+			case 'Color':
+				var url = this.fgColorSelector[0] + '?objectName=' + this._objectName;
+				url += '&callbackLoad=false&callbackSave=insertString';
+				if (moz) {
+					window.open(url, "ColorSelector", "width=" + this.fgColorSelector[1] + ",height=" + this.fgColorSelector[2] + ",left=0,top=0,scrollbars=no,status=no,toolbar=no,resizable=no,location=no,hotkeys=no,dependent=yes");
+				} else {
+					var ret = window.showModalDialog(url, this.callbackWindowColor(), "dialogWidth:"  + this.fgColorSelector[1] + "px; dialogHeight:" + this.fgColorSelector[2] + "px;");
+					if (ret) this.insertString(ret);
+				}
+				break;
+			case 'Font':
+				this.lastSelection = this.workingDoc.selection.createRange(); //have to remember it here, cause later this window has no focus.
+				var url = this.fontSelector[0] + '?objectName=' + this._objectName;
+				url += '&callbackLoad=callbackWindowFont&callbackSave=setFont';
+				if (moz) {
+					window.open(url, "fontSelector", "width=" + this.fontSelector[1] + ",height=" + this.fontSelector[2] + ",left=0,top=0,scrollbars=no,status=no,toolbar=no,resizable=no,location=no,hotkeys=no,dependent=yes");
+				} else {
+					var ret = window.showModalDialog(url, this.callbackWindowFont(), "dialogWidth:"  + this.fontSelector[1] + "px; dialogHeight:" + this.fontSelector[2] + "px;");
+					if (ret) this.setFont(ret);
+				}
+				break;
+			case 'SpecialChars':
+				var url = this.specialCharSelector[0] + '?objectName=' + this._objectName;
+				url += '&callbackLoad=callbackWindowSpecialChars&callbackSave=insertSpecialChar';
+				if (moz) {
+					window.open(url, "specialCharSelector", "width=" + this.specialCharSelector[1] + ",height=" + this.specialCharSelector[2] + ",left=0,top=0,scrollbars=no,status=no,toolbar=no,resizable=no,location=no,hotkeys=no,dependent=yes");
+				} else {
+					var ret = window.showModalDialog(url, true, "dialogWidth:"  + this.specialCharSelector[1] + "px; dialogHeight:" + this.specialCharSelector[2] + "px;");
+					if (ret) this.insertSpecialChar(ret);
+				}
+				break;
+			/*
+			case 'InsertTable':
+				break;*/
+			case 'x':
+				//this is only a testing case. 
+				
+				this.workingDoc.execCommand('FontName', true, 'arial');
+		    //workingDoc.execCommand("FontName", false, fontFace); 
+				/*
+				tempRange = this.workingDoc.selection.createRange();
+				tempRange.expand('word');
+				tempRange.select();
+				*/
+				break;
+				
+				/*
+				var r = document.body.createRange();
+				var r = document.getElementById(this._objectName + '_iframe').contentWindow.document.body.createRange();
+				//var r = this.workingDoc.body.createRange();
+				r.selectNodeContents(this);
+				alert(r.toString());
+				*/
+		}
+	}
+	
+	
+	/**
+	* loads the buttons for the text bar.
+	* @access public
+	* @return void
+	* @see    var this.buttonsText
+	*/
+	this.loadButtonsText = function() {
+		var buttons = new Array();
+		this.buttonsText = buttons;
+		
+		buttons['cut'] = new Array();
+		buttons['cut'].action   = 'Cut';
+		buttons['cut'].imgName  = 'bs_cut';
+		
+		buttons['copy'] = new Array();
+		buttons['copy'].action   = 'Copy';
+		buttons['copy'].imgName  = 'bs_copy';
+		
+		buttons['paste'] = new Array();
+		buttons['paste'].action   = 'Paste';
+		buttons['paste'].imgName  = 'bs_paste';
+		
+		var i = buttons.length;
+		buttons[i] = '__SEPARATOR__';
+		
+		buttons['undo'] = new Array();
+		buttons['undo'].action   = 'Undo';
+		buttons['undo'].imgName  = 'bs_undo';
+		
+		buttons['redo'] = new Array();
+		buttons['redo'].action   = 'Redo';
+		buttons['redo'].imgName  = 'bs_redo';
+		
+		var i = buttons.length;
+		buttons[i] = '__SEPARATOR__';
+	}
+	
+	/**
+	* @access private
+	* @return void
+	*/
+	this._drawButtonBarText = function() {
+		toolbarText = new Bs_ButtonBar();
+		toolbarText.useHelpBar = 'toolbarHelptext';
+		if (typeof(this.buttonsText) == 'undefined') this.loadButtonsText();
+		this._drawButtonBarHelper(this.buttonsText, 'toolbarText', 'text');
+	}
+	
+	
+	/**
+	* loads the buttons for the wysiwyg bar.
+	* @access public
+	* @return void
+	* @see    var this.buttonsWysiwyg
+	*/
+	this.loadButtonsWysiwyg = function() {
+		var buttons = new Array();
+		this.buttonsWysiwyg = buttons;
+		
+		buttons['cut'] = new Array();
+		buttons['cut'].action   = 'Cut';
+		buttons['cut'].imgName  = 'bs_cut';
+		
+		buttons['copy'] = new Array();
+		buttons['copy'].action   = 'Copy';
+		buttons['copy'].imgName  = 'bs_copy';
+		
+		buttons['paste'] = new Array();
+		buttons['paste'].action   = 'Paste';
+		buttons['paste'].imgName  = 'bs_paste';
+		
+		var i = buttons.length;
+		buttons[i] = '__SEPARATOR__';
+		
+		buttons['undo'] = new Array();
+		buttons['undo'].action   = 'Undo';
+		buttons['undo'].imgName  = 'bs_undo';
+		
+		buttons['redo'] = new Array();
+		buttons['redo'].action   = 'Redo';
+		buttons['redo'].imgName  = 'bs_redo';
+		
+		var i = buttons.length;
+		buttons[i] = '__SEPARATOR__';
+		
+		buttons['bold'] = new Array();
+		buttons['bold'].action   = 'Bold';
+		
+		buttons['italic'] = new Array();
+		buttons['italic'].action   = 'Italic';
+		
+		buttons['underline'] = new Array();
+		buttons['underline'].action   = 'Underline';
+		buttons['underline'].imgName  = 'bs_formatUnderline';
+		
+		var i = buttons.length;
+		buttons[i] = '__SEPARATOR__';
+		
+		buttons['font'] = new Array();
+		buttons['font'].action   = 'Font';
+		buttons['font'].imgName  = 'bs_font';
+		
+		buttons['forecolor'] = new Array();
+		buttons['forecolor'].action   = 'ForeColor';
+		buttons['forecolor'].imgName  = 'bs_fgColor';
+		
+		var i = buttons.length;
+		buttons[i] = '__SEPARATOR__';
+		
+		buttons['justifyleft'] = new Array();
+		buttons['justifyleft'].action   = 'JustifyLeft';
+		buttons['justifyleft'].imgName  = 'bs_alignLeft';
+		
+		buttons['justifycenter'] = new Array();
+		buttons['justifycenter'].action   = 'JustifyCenter';
+		buttons['justifycenter'].imgName  = 'bs_alignCenter';
+		
+		buttons['justifyright'] = new Array();
+		buttons['justifyright'].action   = 'JustifyRight';
+		buttons['justifyright'].imgName  = 'bs_alignRight';
+		
+		var i = buttons.length;
+		buttons[i] = '__SEPARATOR__';
+		
+		buttons['insertorderedlist'] = new Array();
+		buttons['insertorderedlist'].action   = 'InsertOrderedList';
+		buttons['insertorderedlist'].imgName  = 'bs_ol';
+		
+		buttons['insertunorderedlist'] = new Array();
+		buttons['insertunorderedlist'].action   = 'InsertUnorderedList';
+		buttons['insertunorderedlist'].imgName  = 'bs_ul';
+		
+		var i = buttons.length;
+		buttons[i] = '__SEPARATOR__';
+		
+		buttons['outdent'] = new Array();
+		buttons['outdent'].action   = 'Outdent';
+		buttons['outdent'].imgName  = 'bs_outdent';
+		
+		buttons['indent'] = new Array();
+		buttons['indent'].action   = 'Indent';
+		buttons['indent'].imgName  = 'bs_indent';
+		
+		var i = buttons.length;
+		buttons[i] = '__SEPARATOR__';
+		
+		buttons['createlink'] = new Array();
+		buttons['createlink'].action   = 'CreateLink';
+		buttons['createlink'].imgName  = 'bs_createLink';
+		
+		buttons['unlink'] = new Array();
+		buttons['unlink'].action   = 'UnLink';
+		buttons['unlink'].imgName  = 'bs_unLink';
+
+		var i = buttons.length;
+		buttons[i] = '__SEPARATOR__';
+		
+		buttons['insertimage'] = new Array();
+		buttons['insertimage'].action   = 'InsertImage';
+		buttons['insertimage'].imgName  = 'bs_image';
+		
+		buttons['specialchars'] = new Array();
+		buttons['specialchars'].action   = 'SpecialChars';
+		buttons['specialchars'].imgName  = 'bs_specialChars';
+		
+		var i = buttons.length;
+		buttons[i] = '__SEPARATOR__';
+		
+		/*
+		var i = buttons.length;
+		buttons[i] = '__SEPARATOR__';
+		
+		buttons['inserttable'] = new Array();
+		buttons['inserttable'].action   = 'InsertTable';
+		buttons['inserttable'].imgName  = 'bs_table';
+		buttons['inserttable'].group    = 'insertTable';
+		*/
+		
+		/*
+		buttons['x'] = new Array();
+		buttons['x'].action   = 'x';
+		buttons['x'].title    = 'CreateLink';
+		buttons['x'].imgName  = 'bs_createLink';
+		buttons['x'].helpText = 'CreateLink';
+		*/
+				
+	}
+	
+	/**
+	* @access private
+	* @return void
+	*/
+	this._drawButtonBarWysiwyg = function() {
+		toolbarWysiwyg = new Bs_ButtonBar();
+		toolbarWysiwyg.useHelpBar = 'toolbarHelptext';
+		if (typeof(this.buttonsWysiwyg) == 'undefined') this.loadButtonsWysiwyg();
+		this._drawButtonBarHelper(this.buttonsWysiwyg, 'toolbarWysiwyg', 'wysiwyg');
+	}
+	
+	
+	/**
+	* loads the buttons for the html bar.
+	* @access public
+	* @return void
+	* @see    var this.buttonsHtml
+	*/
+	this.loadButtonsHtml = function() {
+		var buttons = new Array();
+		this.buttonsHtml = buttons;
+		
+		buttons['cut'] = new Array();
+		buttons['cut'].action   = 'Cut';
+		buttons['cut'].imgName  = 'bs_cut';
+		
+		buttons['copy'] = new Array();
+		buttons['copy'].action   = 'Copy';
+		buttons['copy'].imgName  = 'bs_copy';
+		
+		buttons['paste'] = new Array();
+		buttons['paste'].action   = 'Paste';
+		buttons['paste'].imgName  = 'bs_paste';
+		
+		var i = buttons.length;
+		buttons[i] = '__SEPARATOR__';
+		
+		buttons['undo'] = new Array();
+		buttons['undo'].action   = 'Undo';
+		buttons['undo'].imgName  = 'bs_undo';
+		
+		buttons['redo'] = new Array();
+		buttons['redo'].action   = 'Redo';
+		buttons['redo'].imgName  = 'bs_redo';
+		
+		var i = buttons.length;
+		buttons[i] = '__SEPARATOR__';
+		
+		buttons['createlink'] = new Array();
+		buttons['createlink'].action   = 'CreateLink';
+		buttons['createlink'].imgName  = 'bs_createLink';
+		
+		buttons['insertimage'] = new Array();
+		buttons['insertimage'].action   = 'InsertImage';
+		buttons['insertimage'].imgName  = 'bs_image';
+		
+		buttons['specialchars'] = new Array();
+		buttons['specialchars'].action   = 'SpecialChars';
+		buttons['specialchars'].imgName  = 'bs_specialChars';
+		
+		buttons['color'] = new Array();
+		buttons['color'].action   = 'Color';
+		buttons['color'].imgName  = 'bs_bgColor';
+	}
+	
+	/**
+	* @access private
+	* @return void
+	*/
+	this._drawButtonBarHtml = function() {
+		toolbarHtml = new Bs_ButtonBar();
+		toolbarHtml.useHelpBar = 'toolbarHelptext';
+		if (typeof(this.buttonsHtml) == 'undefined') this.loadButtonsHtml();
+		this._drawButtonBarHelper(this.buttonsHtml, 'toolbarHtml', 'html');
+	}
+	
+	
+	/**
+	* @access private
+	* @param  array buttonArr
+	* @param  string toolbarName
+	* @param  string buttonNamePrefix
+	* @return void
+	*/
+	this._drawButtonBarHelper = function(buttonArr, toolbarName, buttonNamePrefix) {
+		var lastWasSeparator = true; //never render 2 separaters next to each other. never start with a separator.
+		
+		for (var i in buttonArr) {
+			if (bs_isNull(buttonArr[i])) {
+				continue;
+			} else if (buttonArr[i] == '__SEPARATOR__') {
+				if (lastWasSeparator) continue;
+				eval(toolbarName + ".newGroup();");
+				lastWasSeparator = true;
+			} else {
+				lastWasSeparator = false;
+				if (typeof(buttonArr[i]['title']) == 'undefined') {
+					if (!bs_isEmpty(bsWyLa['btn'][i + '_title'])) buttonArr[i]['title'] = bsWyLa['btn'][i + '_title'];
+				}
+				if (typeof(buttonArr[i]['helpText']) == 'undefined') {
+					if (!bs_isEmpty(bsWyLa['btn'][i + '_helpText'])) buttonArr[i]['helpText'] = bsWyLa['btn'][i + '_helpText'];
+				}
+				if (typeof(buttonArr[i]['imgName']) == 'undefined') {
+					if (!bs_isEmpty(bsWyLa['btn'][i + '_imgName'])) buttonArr[i]['imgName'] = bsWyLa['btn'][i + '_imgName'];
+				}
+				
+				var varName = buttonNamePrefix + 'Button' + i;
+				var tempButton = new Bs_Button();
+				tempButton.objectName = varName;
+				tempButton.action  = buttonArr[i]['action'];
+				tempButton.title   = buttonArr[i]['title'];
+				tempButton.imgName = buttonArr[i]['imgName'];
+				if (typeof(buttonArr[i]['group']) != 'undefined') {
+					tempButton.group = buttonArr[i]['group'];
+				}
+				tempButton.attachEvent(this._objectName + ".toolbarButtonClicked(this);");
+				eval(varName + ' = tempButton;');
+				eval(toolbarName + ".addButton(" + varName + ", \"" + buttonArr[i]['helpText'] + "\");");
+			}
+		}
+	}
+  
+	/**
+	* @access private
+	* @return string
+	*/
+	this._getDrawnButtonBar = function() {
+		var out = new Array();
+		
+    out[out.length] = '<div id="' + this._objectName + '_buttonbar" style="background-color:menu; padding:3px;">';
+    out[out.length] = '<!form name="navbarForm">';
+		
+		
+		if (this.dataType == 'whtml') {
+	    out[out.length] = '<div id="tabset" style="background-color:menu;">';		
+	    out[out.length] = '	<div id="tabset_tabs"></div>';		
+	    out[out.length] = '	<div id="tabset_content" class="tabsetContentDiv">';		
+		}
+		
+		/*
+		if (this.dataType == 'whtml') {
+	    out[out.length] = '<table BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%" bgcolor="menu">';
+	    out[out.length] = '  <tr>';
+	    out[out.length] = '    <td id="btnRegisterWysiwyg"    width="78" height="23" align="center" background="' + this.imagePath + 'register_off.gif" style="cursor: default; display: block;" onClick="' + this._objectName + '._switchToRegister(\'registerWysiwyg\');">Wysiwyg</td>';
+	    out[out.length] = '    <td id="btnRegisterHtml"       width="78" height="23" align="center" background="' + this.imagePath + 'register_off.gif" style="cursor: default; display: block;" onClick="' + this._objectName + '._switchToRegister(\'registerHtml\');">HTML</td>';
+	    out[out.length] = '    <td>&nbsp;</td>';
+	    out[out.length] = '  </tr>';
+	    //out[out.length] = '  <tr><td colspan="100%"><img src="' + this.imagePath + 'buttons_lane.gif" height="2" width="100%"></td></tr>';
+	    out[out.length] = '</table>';
+		}
+		*/
+		
+		switch (this.dataType) {
+			case 'whtml':
+				/*
+		    out[out.length] = '<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%" ID="registerWysiwyg" style="DISPLAY:none;">';
+		    out[out.length] = '	<tr><td width="100%" id="registerWysiwygButtons">';
+		    out[out.length] = '  </td></tr>';
+		    out[out.length] = '</table>';
+		    out[out.length] = '<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%" ID="registerHtml" style="DISPLAY:none;">';
+		    out[out.length] = '	<tr><td width="100%" id="registerHtmlButtons">';
+		    out[out.length] = '  </td></tr>';
+		    out[out.length] = '</table>';
+				*/
+				out[out.length] = '<div id="registerWysiwygButtons"></div>';
+				out[out.length] = '<div id="registerHtmlButtons"></div>';
+				this._drawButtonBarWysiwyg();
+				this._drawButtonBarHtml();
+				break;
+			case 'html':
+				out[out.length] = '<div id="registerHtmlButtons"></div>';
+				this._drawButtonBarHtml();
+				break;
+			case 'xhtml':
+			case 'xml':
+			case 'text':
+				/*
+		    out[out.length] = '<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 width="100%" ID="registerText" style="DISPLAY:none;">';
+		    out[out.length] = '	<tr><td width="100%" id="registerTextButtons">';
+		    out[out.length] = '  </td></tr>';
+		    out[out.length] = '</table>';
+				*/
+				out[out.length] = '<div id="registerTextButtons"></div>';
+				this._drawButtonBarText();
+				break;
+		}
+		
+		if (this.dataType == 'whtml') {
+	    out[out.length] = '	</div>';		
+	    out[out.length] = '</div>';		
+		}
+		
+    out[out.length] = '<!/form>';
+    out[out.length] = '</div>';
+		return out.join('');
+	}
+	
+	
+	
+  /**
+  * creates a string with the form field and returns it.
+  * @access private
+  * @return string (empty string if no form field is used.)
+  */
+  this._getDrawnFormField = function() {
+    if (typeof(this.formFieldName) == 'undefined') return '';
+    return '<input type="hidden" name="' + this.formFieldName + '" id="' + this.formFieldName + '" value="' + bs_filterForHtml(this._value) + '">';
+  }
+  
+	/**
+	* fires onkeyup
+	* @access private (used internally only)
+	* @return void
+	*/
+	this._updateButtons = function() {
+		if (moz) return; //not supported
+		
+		if ((this.dataType == 'text') || (this.dataType == 'xhtml') || (this.dataType == 'xml')) {
+		} else if ((this.dataType == 'html') || this._inHtmlMode) {
+		} else {
+			this._updateButtonsHelper('wysiwygButton', 'bold');
+			this._updateButtonsHelper('wysiwygButton', 'italic');
+			this._updateButtonsHelper('wysiwygButton', 'underline');
+			this._updateButtonsHelper('wysiwygButton', 'justifyleft');
+			this._updateButtonsHelper('wysiwygButton', 'justifycenter');
+			this._updateButtonsHelper('wysiwygButton', 'justifyright');
+			this._updateButtonsHelper('wysiwygButton', 'insertorderedlist');
+			this._updateButtonsHelper('wysiwygButton', 'insertunorderedlist');
+			//alert(w.wysiwygDoc.queryCommandValue('createlink'));
+			
+			//update the unlink button:
+			try {
+				var tempRange = this.workingDoc.selection.createRange().duplicate();
+				var tempElm   = findWrappingElement('A', tempRange);		
+				wysiwygButtonunlink.setStatus((tempElm == false) ? 0 : 1);
+				
+				eval('wysiwygButton' + 'font'                + '.setStatus(1);');
+				eval('wysiwygButton' + 'specialchars'        + '.setStatus(1);');
+				eval('wysiwygButton' + 'forecolor'           + '.setStatus(1);');
+			} catch (e) {
+				//fails for example when an image is selected.
+				eval('wysiwygButton' + 'bold'                + '.setStatus(0);');
+				eval('wysiwygButton' + 'italic'              + '.setStatus(0);');
+				eval('wysiwygButton' + 'underline'           + '.setStatus(0);');
+				eval('wysiwygButton' + 'insertorderedlist'   + '.setStatus(0);');
+				eval('wysiwygButton' + 'insertunorderedlist' + '.setStatus(0);');
+				eval('wysiwygButton' + 'font'                + '.setStatus(0);');
+				eval('wysiwygButton' + 'specialchars'        + '.setStatus(0);');
+				eval('wysiwygButton' + 'forecolor'           + '.setStatus(0);');
+			}
+		}
+	}
+	
+	/**
+	* @access private
+	* @param  string cat (category, eg 'wysiwygButton')
+	* @param  string what (eg 'bold')
+	* @return void
+	*/
+	this._updateButtonsHelper = function(cat, what) {
+		eval(cat + what + '.setStatus(' + this._objectName + '.wysiwygDoc.queryCommandValue("' + what + '") ? 2 : 1);');
+	}
+	
+	
+	this.switchToWysiwygTab = function() {
+    if (!this._inHtmlMode) return; //already here
+		this._inHtmlMode          = false;
+		this._value               = this.htmlElm.innerText;
+		this.wysiwygElm.innerHTML = this._value; //filterForHtml(this._value);
+		
+		this.workingDoc = this.wysiwygDoc;
+		this.workingElm = this.wysiwygElm;
+		
+		if (this.style == 'toolbar') {
+			this.htmlElm.contentEditable = false;
+			this.iframeElm.height = 0;
+			this.wysiwygElm.contentEditable = true;
+			//document.body.focus();
+			this.wysiwygElm.focus();
+		}
+		
+		/*
+		if (this.style == 'toolbar') {
+      document.all.htmlEditor.innerHTML = filterForHtml(this._value);
+      this.wysiwygElm.contentEditable = false;
+      document.all.htmlEditor.focus();
+    } else {
+      this._inHtmlMode          = true;
+      this.wysiwygElm.innerHTML = filterForHtml(this._value);
+ 	    //this.wysiwygElm.focus(); //ie would support that too.
+			this.iframeElm.contentWindow.focus();
+    }
+		*/
+	}
+	
+	this.switchToHtmlTab = function() {
+    if (this._inHtmlMode) return; //already here
+		this._inHtmlMode       = true;
+		this._value            = this.wysiwygElm.innerHTML;
+		this.htmlElm.innerText = this._value; //filterForHtml(this._value);
+		
+		this.workingDoc = this.htmlDoc;
+		this.workingElm = this.htmlElm;
+		
+		if (this.style == 'toolbar') {
+			this.wysiwygElm.contentEditable = false;
+			this.iframeElm.height = 200;
+			this.htmlElm.contentEditable = true;
+			this.iframeElm.contentWindow.focus();
+		}
+		
+		/*
+		if (this.style == 'toolbar') {
+			this.wysiwygElm.contentEditable = true;
+		}
+		this.wysiwygElm.innerHTML = this._value;
+		if (!noActivation) {
+			//this.wysiwygElm.focus(); //ie would support that too.
+			this.iframeElm.contentWindow.focus();
+		}*/
+	}
+	
+	
+	/**
+	* @access private
+	* @return void
+	*/
+	this._setupResizeGrip = function(outerDivId) {
+		if (this.mayResize) {
+			var resizeGripObjName = this._objectName + '_rg';
+			var rg = new Bs_ResizeGrip(resizeGripObjName, outerDivId);
+			rg.minWidth  = 200;
+			rg.minHeight = 200;
+			if (typeof(this.maxWidth)  != 'undefined') rg.maxWidth  = this.maxWidth;
+			if (typeof(this.maxHeight) != 'undefined') rg.maxHeight = this.maxHeight;
+			rg.onBeforeResizeStart = this._objectName + '.resizeWindowStart();';
+			rg.onAfterResizeEnd    = this._objectName + '.resizeEnd();';
+			eval(resizeGripObjName + ' = rg;');
+			rg.draw();
+		}
+	}
+	
+	
+	
+	/**
+	* fires when resizing of the editor window/toolbar starts.
+	* @access public (used internally, you don't need that.)
+	* @param  element elm
+	* @return void
+	*/
+	this.resizeWindowStart = function(elm) {
+		this.iframeElm.width  = 0;
+		this.iframeElm.height = 0;
+		//this.iframeElm.border = 0;
+		this.iframeElm.style.display  = 'none';
+	}
+	
+	this.resizeEnd = function() {
+		this._updateIframeSize();
+		this.iframeElm.style.display  = 'block';
+		this.iframeElm.width          = '100%';
+	}
+	
+	
+	this._updateIframeSize = function() {
+		var totalHeight  = document.getElementById(this._objectName + '_outerDiv').offsetHeight;
+		var statusHeight = document.getElementById(this._objectName + '_statusbar').offsetHeight;
+		var buttonHeight = document.getElementById(this._objectName + '_buttonbar').offsetHeight;
+		this.iframeElm.style.height = totalHeight - statusHeight - buttonHeight + 'px';
+		this.iframeElm.height       = totalHeight - statusHeight - buttonHeight;
+	}
+	
+  
+  //like a constructor.
+  this._objectName = objectName;
+  bsWysiwygInstances[this._objectName] = this;
+  
+}
+
+
+
+
+
+
+	
+		
+	
+	/**
+	* acts when a button got pushed.
+	* @param  mixed obj (object or string)
+	* @return void
+	*/
+  function buttonAct(obj) {
+    //wysiwygObj.wysiwygElm.focus(); //fucks up btnPin and pasteHTML in some circumstances :/
+    
+    /*
+    2do:
+    OverWrite (true = overwrite mode, false = insert mode) Toggles the text-entry mode between insert and overwrite.
+    RemoveFormat //Removes the formatting tags from the current selection.
+    SaveAs, true (with gui) Saves the current Web page to a file.
+document.execCommand("LiveResize", true, true);
+document.execCommand("2D-Position", true, true);
+document.execCommand("MultipleSelection", true, true);
+see http://msdn.microsoft.com/library/default.asp?url=/workshop/author/dhtml/reference/commandids.asp
+
+FontName
+Sets or retrieves the font for the current selection.
+
+FontSize
+Sets or retrieves the font size for the current selection.
+
+ForeColor
+Sets or retrieves the foreground (text) color of the current selection.
+
+OverWrite
+Toggles the text-entry mode between insert and overwrite.
+
+    */
+		
+		if (typeof(obj) == 'string') {
+			var buttonId = obj;
+		} else {
+			var buttonId = obj.id;
+		}
+		
+    switch (buttonId) {
+      case "btnCut":
+        workingDoc.execCommand('Cut'); 
+        break;
+      case "btnCopy":
+        workingDoc.execCommand('Copy');
+        break;
+      case "btnPaste":
+        workingDoc.execCommand('Paste');
+        break;
+      case "btnUndo":
+        workingDoc.execCommand('Undo');
+        break;
+      case "btnRedo":
+        workingDoc.execCommand('Redo');
+        break;
+      case "btnLeft":
+        workingDoc.execCommand('JustifyLeft');
+        break;
+      case "btnCenter":
+        workingDoc.execCommand('JustifyCenter');
+        break;
+      case "btnRight":
+        workingDoc.execCommand('JustifyRight');
+        break;
+      case "btnOl":
+        workingDoc.execCommand('InsertOrderedList');
+        break;
+      case "btnUl":
+        workingDoc.execCommand('InsertUnorderedList');
+        break;
+      case "btnParagraph": //no such button yet. not really needed, you can still hit return on your keyboard.
+        workingDoc.execCommand('InsertParagraph');
+        break;
+      case "btnOutdent":
+        workingDoc.execCommand('Outdent');
+        break;
+      case "btnIndent":
+        workingDoc.execCommand('Indent');
+        break;
+      case "btnBold":
+        workingDoc.execCommand('Bold');
+        //var x = "hi";
+        //alert(x);
+        //document.body.
+        //x = workingDoc.execCommand('IDM_BOLD', true);
+        //workingDoc.body.execCommand('IDM_BOLD', true);
+
+        //var y;
+        //y = workingDoc.createRange();
+        //y.execCommand('Bold');
+        //alert(x);
+        break;
+      case "btnItalic":
+        workingDoc.execCommand('Italic');
+        break;
+      case "btnUnderline":
+        workingDoc.execCommand('Underline');
+        break;
+      case "btnStrikethrough":
+        workingDoc.execCommand('StrikeThrough');
+        break;
+      case "btnSuperscript":
+        workingDoc.execCommand('Superscript');
+        break;
+      case "btnSubscript":
+        workingDoc.execCommand('Subscript');
+        break;
+      case "btnImage":
+			  //workingDoc.execCommand("InsertImage", true, "");
+			  workingDoc.execCommand("InsertTable", true, "");
+        break;
+      case "btnLink":
+			  workingDoc.execCommand("CreateLink", true, "");
+        break;
+      case "btnUnLink": //Removes any hyperlink from the current selection.
+			  workingDoc.execCommand("Unlink");
+        break;
+      case "btnPrint": //show print dialog
+			  workingDoc.execCommand("Print", true);
+        break;
+      /*
+      case "btn":
+			  workingDoc.execCommand("InsertMarquee", false, 'dummy');
+        break;
+      */
+      case "btnOk":
+        wysiwygObj.wysiwygElm.focus();
+        workingDoc.execCommand("ForeColor", false, document.all.customColor.value); 
+        break;
+      case "btnSave":
+        wysiwygObj.wysiwygElm.innerHTML = filterForHtml2(document.all.htmlEditor.innerHTML);
+        break;
+      case "btnNosave":
+        document.all.htmlEditor.innerHTML = filterForHtml(wysiwygObj.wysiwygElm.innerHTML);
+        break;
+      /*
+      case "btnPreview":
+        alert("preview not implemented yet.");
+        break;
+      */
+      case "btnPin":
+        if (useInternalHtmlElement && wysiwygObj._editorCursorPos) {
+          //can only use smarter way if we have a saved cursor pos.
+          wysiwygObj._editorCursorPos.pasteHTML(filterForHtml(snippetHtmlEditor.innerText));
+        } else {
+          //hacked like insertText()
+          if (useInternalHtmlElement) {
+            var editor = htmlEditor;
+          } else {
+            var editor = wysiwygObj.wysiwygElm;
+          }
+          editor.focus();
+          if (useInternalHtmlElement) {
+            document.execCommand("InsertMarquee", false, 'dummy');
+          } else {
+            workingDoc.execCommand("InsertMarquee", false, 'dummy');
+          }
+          var t = editor.innerHTML;
+          t = t.replace(/<MARQUEE id=dummy><\/MARQUEE>/, filterForHtml(snippetHtmlEditor.innerText));
+          editor.innerHTML = t;
+        }
+        break;
+      case "btnImageSelector":
+        if (!wysiwygObj.openImageSelector()) {
+          alert("sorry, no image browser has been attached.");
+        }
+        break;
+      case "btnSpecialChars":
+        wysiwygObj.specialCharsSelectorShow();
+        break;
+      default:
+        alert("not handled in buttonAct: " + obj.id);
+    }
+  }

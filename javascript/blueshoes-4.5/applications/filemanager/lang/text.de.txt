@@ -1,0 +1,106 @@
+[misc]
+name                  = Name
+fileName              = Dateiname
+inFolder              = Im Verzeichnis
+size                  = Grösse
+fileSizeBytes         = Dateigrösse in Bytes
+type                  = Typ
+fileType              = Dateityp
+modified              = Modifiziert
+lastModDatetime       = Zuletzt modifiziert (Zeitstempel)
+read                  = Read
+fileReadableByProcess = ist Datei lesbar vom Webserver Prozess
+diskFreeSpace         = Freier Festplattenspeicher
+desiredPath           = Gewünschter Pfad
+askFolderName         = Wie soll der neue Ordner heissen?
+newFolder             = Neuer Ordner
+askFileName           = Wie soll die neue Datei heissen?
+newfiletxt            = neuedatei.txt
+virtualRoot           = Virtual Root
+directory             = Verzeichnis
+unknown               = unbekannt
+object-s              = Objekt(e)
+path                  = Pfad
+
+
+[edit]
+savedSuccessfully = Erfolgreich gespeichert.
+errorSaving       = Fehler beim Speichern der Datei aufgetreten.
+fileNotReadable   = Die Datei ist nicht lesbar. Bitte Berechtigungen überprüfen.
+fileNotWritable   = Die Datei ist nicht schreibbar. Bitte Berechtigungen überprüfen.
+noDir             = Dies ist ein Verzeichnis. Verzeichnisse können nicht editiert werden.
+editFile          = Datei bearbeiten
+
+
+[search]
+named       = Suche nach Datein und Ordnern namens
+containing  = die den Text beinhalten
+lookIn      = Suche in
+subfolders  = Unterverzeichnisse durchsuchen
+searchNow   = Jetzt Suchen
+newSearch   = Neue Suche
+title       = Suche nach Dateien und Ordnern
+
+
+[error]
+notAllowed         = Nicht erlaubt!
+couldNotDelete     = Konnte nicht gelöscht werden!
+pathAlreadyExists  = Pfad existiert bereits!
+fileAlreadyExists  = Datei existiert bereits!
+createDir          = Verzeichnis konnte nicht erstellt werden!
+createFile         = Datei konnte nicht erstellt werden!
+couldNot           = Konnte nicht %s Dateien/Ordner!
+overwrite          = Das Zielverzeichnis bzw. die Zieldatei existiert bereits. Möchten Sie es überschreiben?
+cheat              = Don't cheat! your attempt has been logged.
+undefinedError     = Wie Sie sehen können ist ein Fehler aufgetreten.
+uploadFailedTmp    = Die Datei, welche Sie heraufladen wollten, besteht bereits. Ich habe versucht diese im tmp Verzeichnis temporär abzulegen, aber das ist fehlgeschlagen. Das tmp Verzeichnis wäre gewesen
+pathNotAllowed     = Keine berechtigung oder Pfad besteht nicht.
+tooManyFiles       = Es gibt %s Dateien und Verzeichnisse. Das ist zu viel für diese Technologie.
+limitOfFiles       = Das Limit ist auf %s gesetzt.
+
+
+[overwrite]
+alreadyExists = Diese Datei besteht bereits, was möchten Sie tun?
+cancel        = abbrechen
+overwrite     = überschreiben
+renameOld     = alte Datei umbenennen zu
+renameNew     = neue Datei umbenennen zu
+
+
+[actions]
+view        = Anzeigen
+edit        = Bearbeiten
+download    = Herunterladen
+delete      = Löschen
+rename      = Umbenennen
+cut         = Ausschneiden
+copy        = Kopieren
+
+
+[buttons]
+homeTitle      = Home
+homeDesc       = Zurück zum Start-Verzeichnis.
+refreshTitle   = Aktualisieren
+refreshDesc    = Den gesamten Dateimanager aktualisieren (neu laden).
+goDirUpTitle   = Rauf
+goDirUpDesc    = Ein Verzeichnis raufgehen.
+foldersTitle   = Ordner
+foldersDesc    = Die Ordner-Ansicht zeigen.
+searchTitle    = Suche
+searchDesc     = Die Suche-Ansicht zeigen.
+deleteTitle    = Löschen
+deleteDesc     = Die gewählten Dateien/Ordner löschen.
+cutTitle       = Ausschneiden
+cutDesc        = Die gewählten Dateien/Ordner in die Zwischenablage ausschneiden.
+copyTitle      = Kopieren
+copyDesc       = Die gewählten Dateien/Ordner in die Zwischenablage kopieren.
+pasteTitle     = Einfügen
+pasteDesc      = Die Dateien/Ordner aus der Zwischenablage einfügen.
+newFolderTitle = Neuer Ordner
+newFolderDesc  = Einen neuen Ordner erstellen.
+newFileTitle   = Neue Datei
+newFileDesc    = Eine neue Datei erstellen.
+editTitle      = Bearbeiten
+editDesc       = Die ausgewählte Datei bearbeiten.
+
+

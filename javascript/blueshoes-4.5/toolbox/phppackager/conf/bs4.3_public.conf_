@@ -1,0 +1,24 @@
+array (
+  '_fld_packageName' => 'bs4.3_public',
+  '_fld_targetDir' => '/tmp/bs4.3_public/',
+  '_fld_baseDir' => '/usr/local/lib/php/',
+  '_fld_subDirs' => '/blueshoes-4.3/',
+  '_fld_mainFilter' => '- |/CVS/|
+- |/cms/|
+- |/lib/JpGraph/|
+- |\\.#|',
+  '_fld_noChangeFilter' => '+ ~/howtos/~
++ ~/examples?/~
++ ~/skin/~
++ ~/lib/~
++ ~[^\\.php|\\.js]$~
++ |\\.css|
++ |\\.txt|
++ |\\.ht|
++ |^blueshoes.ini.php$|
+
+',
+  '_fld_unCommentFilter' => '+ |\\.js|
++ |Bs_Wse_Searcher|',
+  '_fld_obfuseFilter' => '',
+)

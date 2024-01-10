@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="notes" value="This process will allow manager to re-assign queued entries.&#xD;1. The selection process will be limited to defined criteria&#xD;2. All unassigned entries will remain unassigned.&#xD;3. A summary will be displayed for each queue." />
+</info>

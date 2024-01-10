@@ -1,0 +1,45 @@
+<html>
+   <head>
+      <title>Test Page For EditLive! HTML String Editing</title>
+    
+      <style TYPE="text/css">
+      		td { font-family: arial, helvetica; font-size: 10pt; color: #000000; }
+      		td.bar { font-family: arial, helvetica; font-size: 2pt; color: #000000; }
+      </style>
+
+      <SCRIPT src="/bs/editlive/editlive2.js" type="text/javascript"></SCRIPT>
+      <SCRIPT language="VBScript" src="/bs/editlive/editlive2.vbs"></SCRIPT>
+
+   </head>
+
+   <body leftmargin="2" topmargin="2" LANGUAGE="javascript" onload="return window_onload()" BGCOLOR="silver" TEXT="#000000" ALINK="#003399" LINK="#003399" VLINK="#003333">
+      
+   <SCRIPT type="text/javascript">
+<!--	
+
+//Important: set the directory where EditLive! download files can be found
+EditLiveGlobal.setDownloadDirectory("/bs/editlive/");
+
+//Instatiate the EditLiveObject
+var editLive1 = new EditLive("Plugin1", 600, 300);
+
+//Assign a window onload function
+editLive1.onload = EditLive1_onload;
+
+//Use this function for initalizing and customizing EditLive!
+function EditLive1_onload()
+{
+   editLive1.setEditLiveMode('HTMLString');
+   editLive1.setWebRoot('http://www.ephox.com/global/include');
+   editLive1.setStylesOnlyMode(true);
+   editLive1.setAllowStyleSheetFormattingOnly(true);
+   editLive1.setSource(' ');
+   editLive1.loadStyleSheet('ephox.css');
+      
+}
+
+//-->
+</SCRIPT>
+
+   </body>
+</html>

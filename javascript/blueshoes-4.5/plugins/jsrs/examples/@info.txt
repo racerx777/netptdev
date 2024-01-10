@@ -1,0 +1,17 @@
+
+
+--- Quick start: Select chatboxClient.html in your browser. ---
+
+
+
+This is a very simple demo to give you the idea on how it works.
+
+The files: 
+
+- chatboxClient.html      : Is the client.
+
+- ChatboxServer.class.php : Is the server.
+
+- chatBuffer.txt          : Is a temp-file used by the ChatboxServer.
+
+                            It holds the last few lines of the chat.

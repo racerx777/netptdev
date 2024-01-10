@@ -1,0 +1,8 @@
+[default]
+#we put everything into the [default] section for this file. that is hardcoded. if you need more sections, recode.
+seconds         = Sekunden
+contactForm     = Kontaktformular
+no              = nein
+errorsOccured   = Fehler aufgetreten
+
+[fields]

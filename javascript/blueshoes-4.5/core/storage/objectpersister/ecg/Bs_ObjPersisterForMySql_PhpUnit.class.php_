@@ -1,0 +1,188 @@
+<?php
+//$GLOBALS[strToLower('Bs_ObjPersisterForMySql_PhpUnit')] = 'object';
+
+
+
+echo "<font color='red'><b>these tests fail. but i won't dig into the problems since the class is deprecated anyway. the class itself still works where it's used.</b></font><hr>";
+
+
+
+//dependencies
+require_once($APP['path']['core'] . 'storage/objectpersister/Bs_ObjPersisterForMySql.class.php');
+
+/**
+* @package    core_storage
+* @subpackage objectpersister_phpunit
+*/
+class Bs_ObjPersisterForMySql_PhpUnit extends Bs_TestCase {
+  
+  function Bs_ObjPersister_PhpUnit($name) {
+    $this->Bs_TestCase($name);
+  }
+  
+  
+  /**
+  * 
+  */
+  function __Bs_ObjPersisterForMySql_test1() {
+    $someObject =& new Bs_SomeObjectToPersistUsingMySql;
+    
+    // Stuff to persist for 1 record:
+    $someObject->aInt_p    = 10;
+    $someObject->bInt_s    = 20;
+    $someObject->cInt_s    = 30; //will be removed, not persisted
+    $someObject->aBool_p   = TRUE;
+    $someObject->bBool     = FALSE; //will be set as a 'hint'
+    $someObject->aString   = 'This is a string!'; //will be set as a 'hint'
+    $someObject->bString_p = 'This is the 2nd string.';
+    $someObject->aArray    = array('a'=>'Apple', 'b'=>'Banana'); //will be set as a 'hint'
+    $someObject->aObj      = new Bs_Object(); //will be set as a 'hint'
+    $someObject->bObj_p    = new Bs_Object();
+    $someObject->someShit  = "I don't want to have this one persisted.";
+    $someObject->unknown_p = NULL;
+    
+    $status = $someObject->_persister->persist();
+    if (isEx($status)) {
+      $status->stackDump('echo', __FILE__, __LINE__);
+    }
+    
+    unset($someObject->aInt_p);
+    unset($someObject->bInt_s);
+    unset($someObject->cInt_s);
+    unset($someObject->aString);
+    unset($someObject->bString_p);
+    unset($someObject->aArray);
+    unset($someObject->aObj);
+    unset($someObject->bObj_p);
+    unset($someObject->someShit);
+    unset($someObject->unknown_p);
+    
+    $status = $someObject->_persister->unpersist();
+    if (isEx($status)) {
+      $status->stackDump('echo', __FILE__, __LINE__);
+    } elseif ($status === FALSE) {
+      $status =& new Bs_Exception("was not able to unPersist().", __FILE__, __LINE__, '', 'fatal');
+      $status->stackDump('echo', __FILE__, __LINE__);
+    }
+    
+    $expected = 10;
+    $actual = $someObject->aInt_p;
+    $this->assertEquals($expected, $actual, 'var aInt_p in __Bs_ObjPersisterForMySql_test1()');
+    
+    $expected = 20;
+    $actual = $someObject->bInt_s;
+    $this->assertEquals($expected, $actual, 'var bInt_s in __Bs_ObjPersisterForMySql_test1()');
+    
+    $expected = NULL;
+    $actual = @$someObject->cInt_s; // Ignor waring. As cInt_s is not defined.
+    $this->assertEquals($expected, $actual, 'var cInt_s in __Bs_ObjPersisterForMySql_test1()');
+    
+    $expected = TRUE;
+    $actual = $someObject->aBool_p;
+    $this->assertEquals($expected, $actual, 'var aBool_p in __Bs_ObjPersisterForMySql_test1()');
+    
+    $expected = FALSE;
+    $actual = $someObject->bBool;
+    $this->assertEquals($expected, $actual, 'var bBool in __Bs_ObjPersisterForMySql_test1()');
+    
+    $expected = 'This is a string!';
+    $actual = $someObject->aString;
+    $this->assertEquals($expected, $actual, 'var aString in __Bs_ObjPersisterForMySql_test1()');
+    
+    $expected = 'This is the 2nd string.';
+    $actual = $someObject->bString_p;
+    $this->assertEquals($expected, $actual, 'var bString_p in __Bs_ObjPersisterForMySql_test1()');
+    
+    $expected = array('a'=>'Apple', 'b'=>'Banana');
+    $actual = $someObject->aArray;
+    $this->assertEquals($expected, $actual, 'var aArray in __Bs_ObjPersisterForMySql_test1()');
+    
+    $expected = 'object';
+    $actual = $someObject->aObj;
+    $this->assertEqualsType($expected, $actual, 'var aObj in __Bs_ObjPersisterForMySql_test1()');
+    
+    $expected = 'bs_object';
+    $actual = $someObject->aObj;
+    $this->assertInstanceOf($expected, $actual, 'var aObj in __Bs_ObjPersisterForMySql_test1()');
+    
+    $expected = 'object';
+    $actual = $someObject->bObj_p;
+    $this->assertEqualsType($expected, $actual, 'var bObj_p in __Bs_ObjPersisterForMySql_test1()');
+    
+    $expected = 'bs_object';
+    $actual = $someObject->bObj_p;
+    $this->assertInstanceOf($expected, $actual, 'var bObj_p in __Bs_ObjPersisterForMySql_test1()');
+    
+    $expected = NULL;
+    $actual = @$someObject->someShit; // Ignor waring. As someShit is not defined.
+    $this->assertEquals($expected, $actual, 'var someShit in __Bs_ObjPersisterForMySql_test1()');
+    
+    $expected = NULL;
+    $actual = $someObject->unknown_p;
+    $this->assertEquals($expected, $actual, 'var unknown_p in __Bs_ObjPersisterForMySql_test1()');
+  }
+  
+  
+}
+
+
+class Bs_SomeObjectToPersistUsingMySql extends Bs_Object {
+  
+  // Stuff to persist:
+  // _s => push in hash, serialize and then persist
+  // _p perisit directly in a separate field
+  var $aInt_p;
+  var $bInt_s;
+  var $cInt_s;
+  var $aBool_p;
+  var $bBool;
+  var $aString;
+  var $bString_p;
+  var $aArray;
+  var $aObj;
+  var $bObj_p;
+  var $unknown_p;
+  
+  var $persisterVarSettings_1 = array('aInt_p'    => array('mode'=>'lonely',        'metaType'=>'integer',     'index'=>TRUE), 
+                                      'bInt_s'    => array('mode'=>'stream'), 
+                                      'cInt_s'    => array('mode'=>'no'), 
+                                      'bBool'     => array('mode'=>'lonely',        'metaType'=>'boolean',     'index'=>FALSE), 
+                                      'aString'   => array('mode'=>'lonely',        'metaType'=>'string',      'index'=>TRUE), 
+                                      'aArray'    => array('mode'=>'stream'), 
+                                      'aObj'      => array('mode'=>'stream'), 
+                                    );
+  var $_persister = NULL;
+  
+  
+  function Bs_SomeObjectToPersistUsingMySql() {
+    $bsDb =& new Bs_MySql();
+		
+		if (!isSet($GLOBALS['APP']['db']['ecg'])) {
+			$GLOBALS['APP']['db']['ecg'] = array();
+		  $GLOBALS['APP']['db']['ecg']['name']      = 'bs_ecg';
+		  $GLOBALS['APP']['db']['ecg']['host']      = 'localhost';
+		  $GLOBALS['APP']['db']['ecg']['port']      = '3306';
+		  $GLOBALS['APP']['db']['ecg']['user']      = 'root';
+		  $GLOBALS['APP']['db']['ecg']['pass']      = '';
+		  $GLOBALS['APP']['db']['ecg']['socket']    = '';
+		  $GLOBALS['APP']['db']['ecg']['syntax']    = 'mysql';
+		  $GLOBALS['APP']['db']['ecg']['type']      = 'mysql';
+		}
+    $this->_dsn      = $GLOBALS['APP']['db']['ecg'];
+    $connId = $bsDb->connect($GLOBALS['APP']['db']['ecg']);
+		if (isEx($connId)) {
+			echo '<hr><font color="red"><b>';
+			echo "we need a connection to the db to test a few things. <br>";
+			echo "the global.conf.php-dist has a definition \$APP['db']['ecg'] for that. if you have removed it in your conf file, re-add it. the user needs the permission to create databases and tables.<br>";
+			echo "when there is no such definition, the user 'root' with empty password is tried.<br>";
+			echo 'the stackdump follows:';
+			echo '</b></font><hr>';
+			$connId->stackDump('die');
+		}
+		
+    $this->_persister =& new Bs_ObjPersisterForMySql($this, &$this->persisterVarSettings_1, &$bsDb);
+  }
+  
+}
+
+?>

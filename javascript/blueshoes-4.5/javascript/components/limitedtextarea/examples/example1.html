@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>BlueShoes Limited Textarea Example 1</title>
+	<script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Misc.lib.js"></script>
+	<script type="text/javascript" src="/_bsJavascript/components/limitedtextarea/Bs_LimitedTextarea.class.js"></script>
+	<script>
+	function init() {
+		myLimitedTextarea = new Bs_LimitedTextarea('foo', 50);
+		myLimitedTextarea.infolineCssStyle = "font-family:arial; font-size:11px; color:gray;";
+		myLimitedTextarea.draw();
+		
+		myLimitedTextarea2 = new Bs_LimitedTextarea('bar', 400);
+		myLimitedTextarea2.infolineText     = 'Verbleibende Anzahl Zeichen:';
+		myLimitedTextarea2.infolineCssStyle = "font-family:arial; font-size:11px; color:gray;";
+		myLimitedTextarea2.numberCssStyle   = "border:2px inset; width:40px; text-align:right;";
+		myLimitedTextarea2.useProgressBar   = true;
+		myLimitedTextarea2.draw();
+	}
+	</script>
+</head>
+
+<body onload="init();">
+
+<h1>BlueShoes Limited Textarea Example 1</h1>
+
+This is an example of the <a href="http://www.blueshoes.org/en/javascript/limitedtextarea/">Limited Textarea</a> component.
+<br><br>
+
+<table border="0" cellspacing="10" cellpadding="10">
+	<tr>
+		<td valign="top">
+			some text BEFORE the element<br><br>
+			<textarea name="foo" id="foo" cols="20" rows="3"></textarea>
+			<br><br>some text AFTER the element
+		</td>
+		<td width="20">&nbsp;</td>
+		<td valign="top">
+			some text BEFORE the element<br><br>
+			<textarea name="bar" id="bar" cols="30" rows="7" style="background-color:#DEFEDE;">Have a look at the progress bar. Not much space wasted yet.</textarea>
+			<br><br>some text AFTER the element
+		</td>
+	</tr>
+</table>
+
+
+</body>
+</html>

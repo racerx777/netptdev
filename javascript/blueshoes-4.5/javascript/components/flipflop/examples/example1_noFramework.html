@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>BlueShoes JavaScript FlipFlop Example 1</title>
+<script type="text/javascript" src="../../../core/lang/Bs_Misc.lib.js"></script>
+<script type="text/javascript" src="../../../core/form/Bs_FormFieldSelect.class.js"></script>
+<script type="text/javascript" src="../../../components/flipflop/Bs_FlipFlop.class.js"></script>
+<script type="text/javascript" src="../../../components/toolbar/Bs_Button.class.js"></script>
+<script>
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='../../../components/toolbar/win2k_ie.css'>");
+}
+
+function init() {
+	myFlipFlop = new Bs_FlipFlop();
+	myFlipFlop.fieldAvailableCssClass = 'flipFlopField';
+	myFlipFlop.fieldSelectedCssClass  = 'flipFlopField';
+	myFlipFlop.showCaptionLine        = true;
+	
+  myFlipFlop.buttonSelect.imgPath      = '../../../../images/buttons/';
+	myFlipFlop.buttonSelectAll.imgPath   = '../../../../images/buttons/';
+	myFlipFlop.buttonDeselect.imgPath    = '../../../../images/buttons/';
+  myFlipFlop.buttonDeselectAll.imgPath = '../../../../images/buttons/';
+	
+	myFlipFlop.convertField('mySelect');
+}
+</script>
+<style>
+.flipFlopField {
+  font-family:arial,helvetica;
+	font-size:11px;
+	width:100px;
+}
+body {
+  font-family:arial,helvetica;
+	font-size:11px;
+}
+td {
+  font-family:arial,helvetica;
+	font-size:11px;
+}
+</style>
+</head>
+
+<body onload="init();">
+
+<h1>BlueShoes JavaScript FlipFlop Example 1</h1>
+
+<ul>
+	<li>FlipFlop init by convertField(): an existing select field is converted on the fly.</li>
+	<li>
+		Long text entries like "Comparison and Review" don't fit entirely into the select fields. In this example, 
+		we've turned the 'showCaptionLine' feature on. If you click on an option, the full caption displays 
+		below the select fields.
+	</li>
+	<li>Isn't that easier to select all the languages you know, compared to a standard select field?</li>
+	<li>The language list comes from dmoz.org.</li>
+</ul>
+
+<form name="myForm" action="/postDump.php" method="post">
+
+<table border="0" cellspacing="5" cellpadding="2">
+	<tr>
+		<td valign="top"><b>Languages:</b></td>
+		<td valign="top">
+			<select name="mySelect[]" id="mySelect" size="7" multiple>
+			<option>ABC </option>
+			<option>ABEL </option>
+			<option selected>Ada </option>
+			<option>ADL </option>
+			<option>Aleph </option>
+			<option>Algol 60 </option>
+			<option>Algol 68 </option>
+			<option>APL </option>
+			<option>AppleScript </option>
+			<option>ASP </option>
+			<option>Assembly </option>
+			<option>Awk </option>
+			<option>BASIC </option>
+			<option>Befunge </option>
+			<option>BETA </option>
+			<option>Bigwig </option>
+			<option>Bistro </option>
+			<option>Blue </option>
+			<option>Brainfuck </option>
+			<option>C </option>
+			<option>C++ </option>
+			<option>C-sharp </option>
+			<option>Caml </option>
+			<option>Cecil </option>
+			<option>CHILL </option>
+			<option>Clarion </option>
+			<option>Clean </option>
+			<option>Clipper </option>
+			<option>CLU </option>
+			<option>Cobol </option>
+			<option>CobolScript </option>
+			<option>Cocoa </option>
+			<option>Comparison and Review </option>
+			<option>Compiled </option>
+			<option>Component Pascal </option>
+			<option>Concurrent </option>
+			<option>Constraint </option>
+			<option>Curl </option>
+			<option>D </option>
+			<option>Database </option>
+			<option>Dataflow </option>
+			<option>Declarative </option>
+			<option>Delphi </option>
+			<option>Directories </option>
+			<option>DOS Batch </option>
+			<option>Dylan </option>
+			<option>E </option>
+			<option>Eiffel </option>
+			<option>ElastiC </option>
+			<option>Erlang </option>
+			<option>Euphoria </option>
+			<option>Forth </option>
+			<option>Fortran </option>
+			<option>FP </option>
+			<option>Frontier </option>
+			<option>Functional </option>
+			<option>Garbage Collected </option>
+			<option>Goedel </option>
+			<option>Hardware Description </option>
+			<option>Haskell </option>
+			<option>History </option>
+			<option>HTML </option>
+			<option>HTMLScript </option>
+			<option>HyperCard </option>
+			<option>ICI </option>
+			<option>Icon </option>
+			<option>IDL </option>
+			<option>Imperative </option>
+			<option>Intercal </option>
+			<option>Interface </option>
+			<option>Interpreted </option>
+			<option selected>Java </option>
+			<option>JavaScript </option>
+			<option>LabVIEW </option>
+			<option>Lagoona </option>
+			<option>Language-OS Hybrids </option>
+			<option>Leda </option>
+			<option>Limbo </option>
+			<option>Lisp </option>
+			<option>Logic-based </option>
+			<option>Logo </option>
+			<option>Lua </option>
+			<option>m4 </option>
+			<option>Markup </option>
+			<option>MATLAB </option>
+			<option>Mercury </option>
+			<option>Miranda </option>
+			<option>Miva </option>
+			<option>ML </option>
+			<option>Modula-2 </option>
+			<option>Modula-3 </option>
+			<option>Moto </option>
+			<option>Multiparadigm </option>
+			<option>Mumps </option>
+			<option>NET </option>
+			<option>Oberon </option>
+			<option>Obfuscated </option>
+			<option>Object-Oriented </option>
+			<option>Objective-C </option>
+			<option>Objective Caml </option>
+			<option>Obliq </option>
+			<option>Occam </option>
+			<option>Open Source </option>
+			<option>Oz </option>
+			<option>Parallel </option>
+			<option>Pascal </option>
+			<option>Perl </option>
+			<option selected>PHP </option>
+			<option>Pike </option>
+			<option>PL </option>
+			<option>PL-SQL </option>
+			<option>Pliant </option>
+			<option>POP-11 </option>
+			<option>Postscript </option>
+			<option>PowerBuilder </option>
+			<option>Procedural </option>
+			<option>Prograph </option>
+			<option>Prolog </option>
+			<option>Proteus </option>
+			<option>Prototype-based </option>
+			<option>Python </option>
+			<option>REBOL </option>
+			<option>Reflective </option>
+			<option>Regular Expressions </option>
+			<option>Rexx </option>
+			<option>Rigal </option>
+			<option>RPG </option>
+			<option>Ruby </option>
+			<option>S-Lang </option>
+			<option>SAS </option>
+			<option>Sather </option>
+			<option>Scheme </option>
+			<option>Scripting </option>
+			<option>Self </option>
+			<option>SETL </option>
+			<option>SGML </option>
+			<option>Simula </option>
+			<option>Sisal </option>
+			<option selected>Smalltalk </option>
+			<option>Snobol </option>
+			<option>Specification </option>
+			<option>SQL </option>
+			<option>Squeak </option>
+			<option>T3X </option>
+			<option>Tcl-Tk </option>
+			<option>Tempo </option>
+			<option>TOM </option>
+			<option>TRAC </option>
+			<option>Turing </option>
+			<option>UML </option>
+			<option>VBA </option>
+			<option selected>VBScript </option>
+			<option>Verilog </option>
+			<option>VHDL </option>
+			<option>Visual </option>
+			<option>Visual Basic </option>
+			<option>Visual DialogScript </option>
+			<option>Visual FoxPro </option>
+			<option>Water </option>
+			<option>Wirth </option>
+			<option>XML </option>
+			<option>XOTcl </option>
+			<option>YAFL </option>
+			<option>Yorick </option>
+			<option>Z </option>
+			</select>
+		</td>
+	</tr>
+</table>
+
+<input type="submit" name="send" value="submit">
+</form>
+
+</body>
+</html>

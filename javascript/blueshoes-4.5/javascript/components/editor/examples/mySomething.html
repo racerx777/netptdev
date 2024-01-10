@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>My Something</title>
+
+<script type="text/javascript" src='/_bsJavascript/core/lang/Bs_Misc.lib.js'></script>
+<script type="text/javascript">
+
+/**
+* the caller object, instance of Bs_Wysiwyg.
+* @var object wysiwygObj
+*/
+var wysiwygObj;
+
+/**
+* name of the callback function in the wysiwygObj that we need to call 
+* once this page has loaded (onload).
+* @var string callbackLoad
+*/
+var callbackLoad;
+
+/**
+* name of the callback function in the wysiwygObj that we need to call 
+* to save our value back.
+* @var string callbackSave
+*/
+var callbackSave;
+
+
+function init() {
+	if (window.dialogArguments) {
+		setDefaultValues(window.dialogArguments);
+	} else { //popup
+		var qsArr      = queryStringToHash(window.location.search);
+		wysiwygObjName = qsArr['objectName'];
+		callbackLoad   = qsArr['callbackLoad'];
+		callbackSave   = qsArr['callbackSave'];
+		var parentOpener = (opener) ? opener : parent;
+		eval('wysiwygObj = parentOpener.' + wysiwygObjName + ';');
+		setDefaultValues(wysiwygObj[callbackLoad]()); //tell that i'm ready
+	}
+}
+
+/**
+* @param object paramObj
+*/
+function setDefaultValues(paramObj) {
+	document.myForm.elements['fldMyValue'].value = paramObj.value;
+}
+
+function setBack() {
+	var ret = new Object;
+	ret['value'] = document.myForm.elements['fldMyValue'].value;
+	
+	if (window.dialogArguments) {
+		window.returnValue = ret;
+	} else {
+		wysiwygObj[callbackSave](ret);
+	}
+}
+</script>
+
+<style>
+body {
+	font-family: arial,verdana,sans-serif,helvetica;
+	font-size:11px;
+}
+td {
+	font-size:11px;
+}
+.tabContent {
+	height:500px;
+}
+input.inputText {
+	width: 40px;
+}
+input.inputButton {
+	width:100px; 
+	height:20px; 
+	font-size:12px;
+}
+</style>
+</head>
+
+<body bgcolor="#D6D6CE" onload="init();" leftmargin=0 topmargin=0 style="margin:10px;">
+		
+<form name="myForm">
+	
+	Value:<br>
+	<textarea cols="40" rows="5" name="fldMyValue" id="fldMyValue" style="width:420px; height:100px;"></textarea><br><br>
+	
+	<input type="button" name="cancel" value="OK"     onclick="setBack(); window.close();" class="inputButton" style="margin-bottom:3px;"><br>
+	<input type="button" name="cancel" value="Cancel" onclick="window.close();" class="inputButton">
+
+</form>
+
+
+</body>
+</html>

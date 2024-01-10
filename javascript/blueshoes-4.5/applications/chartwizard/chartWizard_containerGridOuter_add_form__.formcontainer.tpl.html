@@ -1,0 +1,33 @@
+<fieldset><legend><bs_input name="containerGridOuter" type="caption"/></legend>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td valign="top">
+      <bs_input name="containerGridInner" type="element"/>
+    </td>
+		<td><img src="/_bsImages/spacer.gif" width="1" height="200" /></td>
+    <td valign="top" width="200">
+			<img src="/_bsImages/spacer.gif" width="200" height="1" />
+			<div style="position:relative;">
+				<div style="position:absolute;"><img src="/_bsImages/applications/chartwizard/chart_body.gif" border="0" /></div>
+				<div style="position:absolute; display:none;" id="grid_x_helper"><img src="/_bsImages/applications/chartwizard/grid_x_helper.gif" border="0" /></div>
+				<div style="position:absolute; display:none;" id="grid_x_main"><img src="/_bsImages/applications/chartwizard/grid_x_main.gif" border="0" /></div>
+				<div style="position:absolute; display:none;" id="grid_y_helper"><img src="/_bsImages/applications/chartwizard/grid_y_helper.gif" border="0" /></div>
+				<div style="position:absolute; display:none;" id="grid_y_main"><img src="/_bsImages/applications/chartwizard/grid_y_main.gif" border="0" /></div>
+			</div>
+    </td>
+  </tr>
+</table>
+</fieldset>
+<script>
+function chartWizard_setGrid(xy, mainHelper, checked) {
+	var elm = document.getElementById('grid_' + xy + '_' + mainHelper);
+	if (elm == null) return;
+	elm.style.display = (checked) ? 'block' : 'none';
+}
+function chartWizard_updateGridOnLoad() {
+	chartWizard_setGrid('x', 'main',   gridMainX);
+	chartWizard_setGrid('x', 'helper', gridHelperX);
+	chartWizard_setGrid('y', 'main',   gridMainY);
+	chartWizard_setGrid('y', 'helper', gridHelperY);
+}
+</script>

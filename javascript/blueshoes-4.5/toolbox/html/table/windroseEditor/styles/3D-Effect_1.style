@@ -1,0 +1,40 @@
+  //////////////////////////////////////////////////////////////////////////////
+  // Bs_HtmlTableWindrose.class.php ini-file
+  // =======================================
+  // o) The Relative Position mnomics ID's (or keys)
+  //    - ALL
+  //      All cells
+  //    - Borders And Corners 
+  //      Defined by the wind rose mnomics. E.g. NW is top/left cell and N is top row
+  //                 N                +----+---+----+
+  //            NW   ¦   NE           ¦ NW ¦ N ¦ NE ¦
+  //               \ ¦ /              +----+---+----+
+  //          W ---- C ---- E         ¦ W  ¦ C ¦  E ¦
+  //               / ¦ \              +----+---+----+
+  //            SW   ¦   SE           ¦ SW ¦ S ¦ SE ¦
+  //                 S                +----+---+----+
+  //    - C (Center)
+  //       C (the center cells)
+  //    - DD (Diogonal Down) and DU (Diogonal Up)
+  //    - ZR_0/ZR_1 and ZC_0/ZC_1 (Zebra Row and Zebra Col)
+  //
+  // o) See sample below for setup. 
+  //    - NOTE: %TRANSPARENT% is default.
+  // E.g.
+  //  [style]
+  //      N = color:black; background-color:white; font-size:20px;
+  //      NE= %OPAQUE% color:#0066CC; font-size:12px; font-family:Verdana,Arial; font-weight:bold;
+  //  [attr]
+  //      W = %TRANSPARENT% aline="center"
+  //      E = aline="left"
+  //////////////////////////////////////////////////////////////////////////////
+[style]
+    ALL = font-family:Verdana,Arial; background-color:lightgrey;  
+    ZR_0 = border-top:thin solid gray; border-bottom:thin solid white;  
+    W = font-weight:bold; border-top:thin solid lightgrey; border-bottom:thin solid lightgrey; border-right:thin solid gray;  
+    ZR_1 = border-right:thin solid lightgrey;  
+    E = text-align:right;  
+    N = color:white; background-color:#66aacc; border-right:thin solid #66aacc; border-top:thin solid black; border-bottom:thin solid black;  
+    S = border-top:thin solid black; border-bottom:solid black;  
+
+[attr]

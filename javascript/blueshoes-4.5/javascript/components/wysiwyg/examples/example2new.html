@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+<head>
+	<title>BS Wysiwyg Example 2</title>
+
+<script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Misc.lib.js"></script>
+<script type="text/javascript" src="/_bsJavascript/core/html/Bs_HtmlUtil.lib.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/tabset/Bs_TabSet.class.js"></script>
+<link rel='stylesheet' href='/_bsJavascript/components/tabset/default.css'>
+
+<script type="text/javascript" src="/_bsJavascript/components/wysiwyg/Bs_WysiwygNew.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/wysiwyg/lang/en.js"></script>
+
+<link rel='stylesheet' href='/_bsJavascript/components/wysiwyg/styles.css'>
+<script type="text/javascript" src="/_bsJavascript/core/form/Bs_FormFieldSelect.class.js"></script>
+
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_ButtonBar.class.js"></script>
+<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_Button.class.js"></script>
+
+<script>
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_ie.css'>");
+}
+
+function init() {
+	w = new Bs_Wysiwyg('w'); //global
+	//w.setValue('blah <a href="http://www.bar.com/">foo</a> <font color="#008200"><b>bold</b></font> <img id="xxx" src="http://homepage.swissonline.ch/blueshoes/img/javaScript/wysiwyg/screenshot1.gif" alt="alt foo" width="200"> <i>italic</i><br><br><table><tr><td>td</td></tr></table><form name="f"></form>');
+	//w.mayResize = false;
+  w.style = 'toolbar';
+	w.imageSelector[3] = new Array('/_bsApplications/filebrowser/examples/example1.php', 500, 300);
+  var status = w.drawAsToolbar('editableArea', true);
+  if (!status) alert('failed loading toolbar!');
+}
+</script>
+
+</head>
+
+<body onLoad="init()">
+
+<a href="javascript:void(0);" onclick="alert(w.getValue()); return false;">alert the current value</a>
+<br><br>
+
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<div id="editableArea" style="background-color:antiquewhite; border:1px solid gray;" contenteditable>this is the content that gets edited.</div>
+
+</body>
+</html>

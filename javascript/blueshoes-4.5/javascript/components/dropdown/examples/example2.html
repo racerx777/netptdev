@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title>JavaScript Bs_Dropdown example 2</title>
+  <script type="text/javascript" src='/_bsJavascript/core/lang/Bs_Misc.lib.js'></script>
+  <script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Array.class.js"></script>
+  <script type="text/javascript" src="/_bsJavascript/core/form/Bs_FormUtil.lib.js"></script>
+  <script type="text/javascript" src="/_bsJavascript/core/form/Bs_FormFieldSelect.class.js"></script>
+  <script type="text/javascript" src="/_bsJavascript/components/dropdown/Bs_Dropdown.class.js"></script>
+
+<script type="text/javascript">
+function init() {
+  myDropdown = new Bs_Dropdown();
+  myDropdown.addOption('http://www.php.net/');
+  myDropdown.addOption('http://www.apache.org/');
+  myDropdown.convertField('myField');
+}
+</script>
+</head>
+
+<body onLoad="init();">
+
+<h1>JavaScript Bs_Dropdown example 2</h1>
+
+<ul>
+  <li>Using an existing text field for the dropdown by using convertField().</li>
+	<li>This makes it fully backward compatible (old browsers, non-js browsers).</li>
+	<li>The field name, default value, size and maxlength attributes of the text field are read in, and used.</li>
+</ul>
+<hr>
+<br>
+
+
+<form  name="test" id="test" action="http://www.blueshoes.org/postDump.php" method="post">
+
+	Converted Field: <input type="text" name="myField" id="myField" value="http://www.blueshoes.org/" size="40" maxlength="100"><br><br>
+	Non-Converted Field: <input type="text" name="otherField" id="otherField" value="http://www.blueshoes.org/" size="40" maxlength="100"><br><br>
+
+	<input type="submit" value="submit">
+
+</form>
+
+</body>
+</html>

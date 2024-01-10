@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title>JavaScript Bs_Dropdown example 1</title>
+	<script type="text/javascript" src="../../../core/lang/Bs_Misc.lib.js"></script>
+  <script type="text/javascript" src="../../../core/lang/Bs_Array.class.js"></script>
+  <script type="text/javascript" src="../../../core/form/Bs_FormUtil.lib.js"></script>
+  <script type="text/javascript" src="../../../core/form/Bs_FormFieldSelect.class.js"></script>
+  <script type="text/javascript" src="../../../components/dropdown/Bs_Dropdown.class.js"></script>
+
+<script type="text/javascript">
+function init() {
+  myDropdown = new Bs_Dropdown();
+	myDropdown.imgDir = '../../../components/dropdown/img/win2k/';
+  myDropdown.setValue('http://www.blueshoes.org/');
+  myDropdown.addOption('http://www.php.net/');
+  myDropdown.addOption('http://www.apache.org/');
+  myDropdown.addOption('http://www.zend.com/');
+  myDropdown.addOption('http://www.mysql.com/');
+  myDropdown.addOption('http://www.redhat.com/');
+  myDropdown.addOption('http://www.linux.org/');
+  myDropdown.addOption('http://www.yahoo.com/');
+  myDropdown.classInput  = 'dropdownInput';
+  myDropdown.classSelect = 'dropdownSelect';
+  myDropdown.drawInto('myDropdownDiv');
+}
+</script>
+
+<style>
+  .dropdownInput {
+    width:500;
+  }
+  .dropdownSelect {
+    width:520;
+  }
+</style>
+</head>
+
+<body onLoad="init();">
+
+<h1>JavaScript Bs_Dropdown example 1</h1>
+
+<ul>
+  <li>customized width of the control (larger). that's achieved with styles (css).</li>
+  <li>new entries (by typing) get automatically added to the list. (default behavior)</li>
+</ul>
+<hr>
+<br>
+
+<form  name="test" id="test" action="http://www.blueshoes.org/postDump.php" method="post">
+  <div id="myDropdownDiv"></div>
+</form>
+
+
+</body>
+</html>

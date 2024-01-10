@@ -1,0 +1,71 @@
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td valign="top">
+      <bs_input name="containerLegendLocationInner" type="element"/>
+    </td>
+    <td valign="top" width="200">
+			<img src="/_bsImages/spacer.gif" width="200" height="1" />
+			<div style="position:relative;">
+				<div style="position:absolute;"><img src="/_bsImages/applications/chartwizard/chart_body.gif" border="0" /></div>
+				<div style="position:absolute; left:50px; top:10px;" id="legendLayer"><img id="legendImage" src="/_bsImages/applications/chartwizard/legend_vertical.gif" border="0" /></div>
+			</div>
+    </td>
+  </tr>
+</table>
+<script>
+var legendLayerLocation = new Array();
+legendLayerLocation['hor'] = new Array();
+legendLayerLocation['hor']['x'] = new Array();
+legendLayerLocation['hor']['x']['left']   = 10;
+legendLayerLocation['hor']['x']['center'] = 20;
+legendLayerLocation['hor']['x']['right']  = 30;
+legendLayerLocation['hor']['y'] = new Array();
+legendLayerLocation['hor']['y']['top']    = 15;
+legendLayerLocation['hor']['y']['center'] = 55;
+legendLayerLocation['hor']['y']['bottom'] = 100;
+legendLayerLocation['vert'] = new Array();
+legendLayerLocation['vert']['x'] = new Array();
+legendLayerLocation['vert']['x']['left']   = 10;
+legendLayerLocation['vert']['x']['center'] = 70;
+legendLayerLocation['vert']['x']['right']  = 115;
+legendLayerLocation['vert']['y'] = new Array();
+legendLayerLocation['vert']['y']['top']    = 15;
+legendLayerLocation['vert']['y']['center'] = 45;
+legendLayerLocation['vert']['y']['bottom'] = 100;
+
+function setLegendLocationX(radioObj) {
+	var val = (radioObj == null) ? legendLocationX : radioObj.value;
+	var elm = document.getElementById('legendLayer');
+	if (elm == null) return;
+	elm.style.left = legendLayerLocation[legendAlignment]['x'][val] + 'px';
+	if (radioObj != null) legendLocationX = radioObj.value;
+}
+function setLegendLocationY(radioObj) {
+	var val = (radioObj == null) ? legendLocationY : radioObj.value;
+	var elm = document.getElementById('legendLayer');
+	if (elm == null) return;
+	elm.style.top = legendLayerLocation[legendAlignment]['y'][val] + 'px';
+	if (radioObj != null) legendLocationY = radioObj.value;
+}
+function setLegendAlignment(radioObj) {
+	var val = (radioObj == null) ? legendAlignment : radioObj.value;
+	var elm = document.getElementById('legendImage');
+	if (elm == null) return;
+	switch (val) {
+		case 'hor':
+			elm.src = '/_bsImages/applications/chartwizard/legend_horizontal.gif';
+			break;
+		case 'vert':
+			elm.src = '/_bsImages/applications/chartwizard/legend_vertical.gif';
+			break;
+	}
+	if (radioObj != null) legendAlignment = radioObj.value;
+	setLegendLocationX();
+	setLegendLocationY();
+}
+function updateLegendOnLoad() {
+	setLegendAlignment();
+	setLegendLocationX();
+	setLegendLocationY();
+}
+</script>

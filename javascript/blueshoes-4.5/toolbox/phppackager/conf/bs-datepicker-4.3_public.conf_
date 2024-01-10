@@ -1,0 +1,23 @@
+array (
+  '_fld_packageName' => 'bs-datepicker-4.3_public',
+  '_fld_targetDir' => '/tmp/bs-datepicker-4.3_public/',
+  '_fld_baseDir' => '/usr/local/lib/php/',
+  '_fld_subDirs' => '/blueshoes-4.3/javascript/components/datepicker/
+/blueshoes-4.3/javascript/core/form/',
+  '_fld_mainFilter' => '- |/CVS/|
+- |\\.#|
+- |.php$|
+',
+  '_fld_noChangeFilter' => '+ ~/howtos/~
++ ~/examples?/~
++ ~/skin/~
++ ~[^\\.php|\\.js]$~
++ |\\.css|
++ |\\.txt|
++ |\\.ht|
+
+',
+  '_fld_unCommentFilter' => '+ |\\.js|
+',
+  '_fld_obfuseFilter' => '',
+)

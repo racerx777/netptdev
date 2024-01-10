@@ -1,0 +1,70 @@
+most of this is rather a wishlist than a todo.
+
+
+todo:
+document dependencies (mysql table, browser)
+search files (look in folder, search subfolders) => kick out or implement, or already done?
+document sorting functionality
+email file to...
+renaming a folder: treeview needs to be updated as well.
+after a click on the home button the treeview needs to be updated as well.
+when using another language than english the right-mouse-menu may need to be wider. make its size dynamic.
+
+
+TODO
+path field full-size (always)
+path field initiated right after start
+path field relative (if relative)
+path field using backslash on win
+fix upload (is that still the case?)
+upload: file exists? ask what to do (overwrite, [rename], cancel)
+fix right-mouse click problem (is that still the case?)
+don't allow edit for non-ascii files
+make fulltext search for search
+allow keys like del, enter (really?), cursors, tab (what about ctrl-x etc?)
+add cug with options from above
+file details in extra frame à la newer windows
+multi-select for files (ctrl, shift)
+select all/select none
+tree nachladen bei bedarf und nicht bei init
+file order: nach file und dir trennen (dir first) (possible hack: add 000 in front of all dirs ...)
+fix wrong warnings for 'don't cheat!' (is that still the case?)
+make dropdown entries unique
+logfile?
+
+
+check the php version (4.3 > or so)
+check the browser
+check if uploading is disabled, then display a notice instead of the upload form.
+
+
+
+NOTES FOR THE RIGHTS MANAGEMENT
+===============================
+
+disabled
+pathRelative (to homedir)
+hide hidden files
+idleTimeout
+
+FILES
+read
+write
+append
+delete
+execute
+
+DIRECTORIES
+list
+make
+remove
+
+(sub-dirs inherit that from it's parent)
+
+disk quota
+
+ip access 
+allow
+deny
+
+

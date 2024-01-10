@@ -1,0 +1,277 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>BlueShoes Color Picker &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </title>
+
+<script type="text/javascript" src="../../core/lang/Bs_Misc.lib.js"></script>
+<script type="text/javascript" src="../../components/toolbar/Bs_Button.class.js"></script>
+<script type="text/javascript" src="../../components/numberfield/Bs_NumberField.class.js"></script>
+<script type="text/javascript" src="../../core/gfx/Bs_ColorUtil.lib.js"></script>
+<script type="text/javascript" src="../../core/util/Bs_TitleToTooltip.lib.js"></script>
+<script type="text/javascript" src="../../components/tabset/Bs_TabSet.class.js"></script>
+<link rel="stylesheet" href="../../components/tabset/default.css">
+
+<script type="text/javascript">
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='../../components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='../../components/toolbar/win2k_ie.css'>");
+}
+
+
+/**
+* copied from Bs_Misc.lib.js
+*/
+function bs_isNull(theVar) {
+  if (typeof(theVar) == 'undefined') return true;
+  if (theVar == null) return true;
+  return false;
+}
+/**
+* copied from Bs_Misc.lib.js
+*/
+function bs_isEmpty(theVar) {
+	if (bs_isNull(theVar)) return true;
+	if (theVar == '') return true;
+	return false;
+}
+/**
+* copied from Bs_Misc.lib.js
+*/
+function queryStringToHash(queryString) {
+	if (typeof(queryString) == 'undefined') {
+		var queryString = window.location.search;
+	}
+	var ret = new Array;
+	if (bs_isEmpty(queryString)) return ret;
+	queryString = queryString.substr(1);
+	if (bs_isEmpty(queryString)) return ret;
+	var junks = queryString.split('&');
+	for (var i=0; i<junks.length; i++) {
+		var x = junks[i].split('=');
+		if (x.length == 2) {
+			ret[x[0]] = x[1];
+		} else {
+			ret[x[0]] = '';
+		}
+	}
+	return ret;
+}
+
+/*
+if (window.dialogArguments) {
+	var bsImgDir = window.dialogArguments.bsImgDir;
+} else {
+	//var qsArr     = queryStringToHash();
+	//var bsImgDir = qsArr['bsImgDir'];
+	var bsImgDir = '/_bsImages/';
+}
+*/
+var bsImgDir = '../../../images/';
+</script>
+
+<script type="text/javascript" src="./Bs_ColorPicker.lib.js"></script>
+
+<style>
+body {
+	font-family: arial,verdana,sans-serif,helvetica;
+	font-size:11px;
+}
+td {
+	font-size:11px;
+}
+.tabContent {
+	height:   480px;
+	overflow: auto;
+}
+input.inputText {
+	width: 40px;
+}
+input.inputButton {
+	width:100px; 
+	height:20px; 
+	font-size:12px;
+}
+.matrixLine {
+	WIDTH:  1px; 
+	HEIGHT: 255px;		
+}
+</style>
+</head>
+
+<body bgcolor="#D6D6CE" onload="init();">
+
+<table><tr><td valign="top" width="340">
+<br>
+<div id="tabset" style="background-color:menu;">
+	<div id="tabset_tabs"></div>
+	<div id="tabset_content" class="tabsetContentDiv">
+		<div id="ps" class="tabContent">
+<table><tr><td valign="top">
+
+<div id="psColorSelector" style="width:260; height:260; border:2px inset;" onmousedown="updateColorByPsSelector();" ondragstart="return false;">
+<div style="position:absolute;" id="psColorSelector_1">
+<script type="text/javascript">
+/*
+for (var j=15; j>=0; j--) {
+	color2nd = dechex(j);
+	color2nd2 = color2nd + '' + color2nd;
+	document.write('<div>');
+	for (var i=255; i>=0; i--) {
+		color = dechex(i) + '' + color2nd2;
+		document.write('<span style="width:1px; height:1px; background-color:#' + color + '"><img src="" width="1" height="1"></span>');
+		//alert(color);
+		//if (i < 250) break;
+	}
+	document.write('</div>');
+}
+*/
+if (ie) {
+	for (var j=255; j>=0; j--) {
+		hex   = dechex(j);
+		color = 'ff' + hex + '' + hex;
+		document.write('<SPAN onmousedown="updateColorByPsSelector(\'' + color + '\');" style="FILTER:progid:DXImageTransform.Microsoft.Gradient(gradientType=0,startColorStr=#' + color + ',endColorStr=#000000); WIDTH: 1px; HEIGHT: 255px;"></SPAN>');
+	}
+} else {
+	document.getElementById('psColorSelector').style.display = 'none';
+}
+</script>
+</div>
+</div>
+<br>
+
+<form name="myForm">
+<table>
+	<tr>
+		<td>Red:</td>
+		<td><input type="text" id="rgb_r" name="rgb_r" value="255" maxlength="3" size="3" class="inputText" tabindex="1" onblur="setColorByFormRgb();" title="The amount of red color, 0 to 255."></td>
+		<td width="50" rowspan="5">&nbsp;</td>
+		<td>Hue:</td>
+		<td><input type="text" id="hsb_h" name="hsb_h" value="360" maxlength="3" size="3" class="inputText" tabindex="5" onblur="setColorByFormHsb();" title="The hue in degrees, 0 to 360.">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;°</td>
+	</tr>
+	<tr>
+		<td>Green:</td>
+		<td><input type="text" id="rgb_g" name="rgb_g" value="255" maxlength="3" size="3" class="inputText" tabindex="2" onblur="setColorByFormRgb();" title="The amount of green color, 0 to 255."></td>
+		<td>Sat.:</td>
+		<td><input type="text" id="hsb_s" name="hsb_s" value="100" maxlength="3" size="3" class="inputText" tabindex="6" onblur="setColorByFormHsb();" title="The saturation in percent, 0 to 100.">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%</td>
+	</tr>
+	<tr>
+		<td>Blue:</td>
+		<td><input type="text" id="rgb_b" name="rgb_b" value="255" maxlength="3" size="3" class="inputText" tabindex="3" onblur="setColorByFormRgb();" title="The amount of blue color, 0 to 255."></td>
+		<td>Bright.:</td>
+		<td><input type="text" id="hsb_b" name="hsb_b" value="100" maxlength="3" size="3" class="inputText" tabindex="7" onblur="setColorByFormHsb();" title="The brightness in percent, 0 to 100.">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%</td>
+	</tr>
+	<tr>
+		<td colspan="2"><input type="button" name="btnUpdateByRgb" value="Update" onclick="setColorByFormRgb();" class="inputButton" tabindex="4"></td>
+		<td colspan="2"><input type="button" name="btnUpdateByHsb" value="Update" onclick="setColorByFormHsb();" class="inputButton" tabindex="8"></td>
+	</tr>
+	<tr>
+		<td colspan="4">Hex Code <br>#<input type="text" name="hex" value="" maxlength="6" size="6" class="inputText" style="width:100px;" onblur="setColorByFormHex();" tabindex="9" title="The hex code aka HTML code."> <br><input type="button" name="btnUpdateByHex" value="Update" onclick="setColorByFormHex();" class="inputButton" tabindex="10"></td>
+	</tr>
+</table>
+</form>
+
+</td><td width="20">&nbsp;</td><td valign="top">
+
+<div style="border:2px inset" id="psColorBar">
+<script type="text/javascript">
+if (ie) {
+	for (var i=360; i>=0; i--) {
+		rgb = HSBtoRGB((i / 360), 1, 1);
+		color = rgb[0] + '' + rgb[1] + '' + rgb[2];
+		//if ((i < 240) && (i > 200)) alert(color);
+		document.write('<div id="colorBar_' + i + '" style="background-color:#' + color + '; WIDTH: 17px; HEIGHT: 1px;" onmousedown="um(this);"><img src="" width="1" height="1"></div>');
+	}
+} else {
+	document.getElementById('psColorBar').style.display = 'none';
+}
+</script>
+</div>
+
+</td></tr></table>		
+		</div>
+		<div id="webSafe" class="tabContent">
+		<br>This is the palette of the 216 "web safe" colors. <br><br>
+		<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr><td valign="top">
+		<table width="48%" border="0" cellspacing="0" cellpadding="0">
+		<script type="text/javascript">
+		document.writeln('<tr>');
+		for (var i=6; i>0; i--) {
+			var ii = i * 3 -3;
+			var hex1 = ii.toString(16);
+			
+			if (i == 3) {
+				document.writeln('</table></td>');
+				document.writeln('<td width="4%">&nbsp;</td>');
+				document.writeln('<td valign="top"><table width="48%" border="0" cellspacing="0" cellpadding="0">');
+			}
+
+			document.writeln('<tr>');
+			for (var j=6; j>0; j--) {
+				var jj = j * 3 -3;
+				var hex2 = jj.toString(16);
+				document.writeln('<td>');
+				for (var k=6; k>0; k--) {
+					var kk = k * 3 -3;
+					var hex3 = kk.toString(16);
+					var color = hex1 + '' + hex1 + '' + hex2 + '' + hex2 + '' + hex3 + '' + hex3;
+					document.writeln('<div style="background-color:#' + color + '; width:20px; height:20px; border:2px inset; margin:2px;" onclick="selectWebColor(this, \'' + color + '\');" title="#' + color + '">&nbsp;</div>');
+				}
+				document.writeln('</td>');
+			}
+			document.writeln('<tr>');
+		}
+		</script>
+		</table>
+		</td></tr></table>
+		</div>
+		<div id="tabMyColors" class="tabContent">
+		</div>
+		<!--
+		<div id="tabDefinedColors" class="tabContent">
+		We could use defined colors, and even restrict the user to only choose from these.
+		</div>
+		-->
+	</div>
+</div>
+
+</td>
+<td width="20">&nbsp;</td>
+<td valign="top">
+<br><br>
+<div style="font-size:10px;">
+<div id="colorPreview" style="width:100px; height:100px; border:2px inset;"></div>
+<table width="100" border="0" cellspacing="0" cellpadding="0">
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td>Red:</td><td align="right"><span id="colorPreviewRgbR"></span></td></tr>
+	<tr><td>Green:</td><td align="right"><span id="colorPreviewRgbG"></span></td></tr>
+	<tr><td>Blue:</td><td align="right"><span id="colorPreviewRgbB"></span></td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td>Hex:</td><td align="right">#<span id="colorPreviewHex"></span></td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<input type="button" name="btnStoreColor" value="Add To My Colors" onclick="saveToMyColor(); updateMyColors();" class="inputButton">
+
+<div style="height:220px;"></div>
+
+<input type="button" name="btnOk"     value="OK"     onclick="setBack(); window.close();" class="inputButton" style="margin-bottom:5px;"><br>
+<input type="button" name="btnCancel" value="Cancel" onclick="window.close();" class="inputButton">
+</div>
+</td>
+</tr></table>
+
+
+
+<div id="doubleArrow" style="position:absolute;"><img src="../../components/editor/img/doubleArrow.gif"></div>
+<div id="circle" style="position:absolute;"><img id="circleImage" src="../../components/editor/img/circleDark.gif"></div>
+
+<script type="text/javascript">
+if (!ie) {
+	document.getElementById('doubleArrow').style.display = 'none';
+	document.getElementById('circle').style.display = 'none';
+}
+</script>
+
+</body>
+</html>

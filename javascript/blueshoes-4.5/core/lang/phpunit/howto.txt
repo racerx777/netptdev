@@ -1,0 +1,2 @@
+ecg: a graphical record of the cardiac cycle produced by an electrocardiograph.
+

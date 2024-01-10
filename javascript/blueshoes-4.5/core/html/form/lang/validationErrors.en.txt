@@ -1,0 +1,47 @@
+[default]
+# the default error messages for each field are here. other field types may 
+# overwrite some or all error messages. 
+must                       = You have to fill in this field.
+mustIf                     = This time this field has to be filled in.
+mustOneOf                  = This field or another field has to be filled in.
+mustOneOfIf                = In this case this field or another field has to be filled in.
+onlyOneOf                  = Only one of the fields %s may be filled in.
+onlyIf                     = This field may not be filled in.
+minLength                  = The minimal length of this field is %s characters, but you have only used %s.
+maxLength                  = The maximal length of this field is %s characters, but you have used %s.
+mustStartWith              = The field value must start with one of these values: %s.
+notStartWith               = The field value may not start with '%s'.
+mustEndWith                = The field value must end with one of these values: %s.
+notEndWith                 = The field value may not end with '%s'.
+mustContain                = The field value must contain one of these values: %s.
+notContain                 = The field value may not contain '%s'.
+equalTo                    = The field must be equal to the field %s.
+notEqualTo                 = The field may not be equal to the field %s.
+dataType                   = The datatype is wrong.
+dataType_text2             = You may only use a-z, A-Z and 0-9.
+dataType_text3             = You may only use a-z and A-Z.
+dataType_text4             = You may only use: 
+dataType_number_nan        = The given value is not a number.
+dataType_number_range      = The given number is not in the allowed range.
+dataType_number_high       = The given number is too large.
+dataType_number_low        = The given number is too small.
+dataType_email_unknown     = Invalid Email address.
+dataType_email_syntax      = Invalid Email address (syntax).
+dataType_email_host        = Invalid Email address (host).
+dataType_email_account     = Invalid Email address (account).
+dataType_email_newAddress  = The email address has changed. The new address is %s.
+dataType_date_invalid      = The given date is not valid or the syntax is wrong.
+dataType_ip_invalid        = The given IP is not valid or the syntax is wrong.
+dataType_url_invalid       = The URL syntax is wrong. Note that the URL must beginn with a scheme (eg http://).
+regularExpression          = The field value was not accepted.
+additionalCheck            = The field did not pass a check.
+mustBeUnique               = '%s' already exists, please choose something else.
+
+[select]
+must                       = Make your choice.
+minLength                  = The minimal number of elements is %s but you have only selected %s.
+maxLength                  = The maximal number of elements is %s but you have selected %s.
+
+[checkbox]
+must                       = You have to click this checkbox.
+

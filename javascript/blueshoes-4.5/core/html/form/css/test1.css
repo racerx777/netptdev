@@ -1,0 +1,22 @@
+input {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 12px;
+	font-style : normal;
+	font-variant : normal;
+}
+.enabled {
+	background-color : Yellow;
+	border : 1px solid Blue;
+}
+
+.disabled {
+	background-color : Olive;
+	border : 1px solid Black;
+}
+
+select {
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 12px;
+	font-style : normal;
+	font-variant : normal;
+}

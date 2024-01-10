@@ -1,0 +1,22 @@
+* Our php framework is based on the one from fred yankowski OntoSys.com, which itself is based 
+* on the design of JUnit.
+* 
+* ///////////////////////////////////////////////////////////
+* // Written by Fred Yankowski <fred@ontosys.com>
+* //            OntoSys, Inc  <http://www.OntoSys.com>
+* // phpunit.php,v 1.1 2000/11/29 20:30:03 fredy
+* // Copyright (c) 2000 Fred Yankowski
+* // Permission is hereby granted, free of charge, to any person
+* // obtaining a copy of this software and associated documentation
+* // files (the "Software"), to deal in the Software without
+* // restriction, including without limitation the rights to use, copy,
+* // modify, merge, publish, distribute, sublicense, and/or sell copies
+* // of the Software, and to permit persons to whom the Software is
+* // furnished to do so, subject to the following conditions:
+* // The above copyright notice and this permission notice shall be
+* // included in all copies or substantial portions of the Software.
+* ///////////////////////////////////////////////////////////
+* 
+* the code still looks a lot like the one from fred yankowski, but has 
+* some bugfixes, has documentation which was missing completly, 
+* and is stamped for bs now. early 2001 --andrej

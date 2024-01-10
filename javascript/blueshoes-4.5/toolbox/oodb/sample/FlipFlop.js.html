@@ -1,0 +1,629 @@
+<!-- Begin
+// *************************************************************************************** 
+//  Class FlipFlop
+// *************************************************************************************** 
+/*************************************************************************************** 
+ Use Sample
+ o Prepare Master Data:
+      Master = new Array();
+      Master[1] = "Ausstellungen";
+      Master[3] = "Bühne";
+
+ o Prepare Pre Marked Data:
+      MasterMarkedList = new Array (1,3);
+ 
+ o If Slave is used prepare Slave Data
+      Slave = new Array();
+      Slave[1] = new Array();    
+      Slave[1][1] = "Kunstmuseen";
+      Slave[1][5] = "Kulturgeschichte";
+  
+      Slave[3] = new Array();
+      Slave[3][7] = "Schauspeil";
+      Slave[3][9] = "Musik";
+
+ o Prepare Pre Marked Data:
+      SlaveMarkedList = new Array (1,5,7); 
+      
+ o Intanciate a FlipFlop and start to fill it with data
+     myFlipFlop = new FlipFlop();
+     myFlipFlop.setMasterData(Master);
+     myFlipFlop.setSlaveData(Slave);                     // Only if slave is used
+     myFlipFlop.setPreMark("master", MasterMarkedList); 
+     myFlipFlop.setPreMark("slave", SlaveMarkedList);    // Only if slave is used
+     
+ o IMPORTENT ! 
+   Now end the javascript-block and start with the HTML form. 
+   At the end of the HTML form start a new javascript-block 
+   
+   //------------------ SAMPLE FORM ----------------------------
+        <center>
+        <form name="MyForm" method=post>
+          <table>
+          <tr>
+            <td width="74">Available</td>
+            <td> </td>
+            <td width="69">Selected</td>
+          </tr><tr>
+            <td width="85">
+              <select size="6" name="Master_L" multiple>
+              </select>
+            </td>
+            <td width="74" align="center">
+              <input type="button" value=" >> " onClick="myFlipFlop.moveSelect2Select('masterFlip', 'masterFlop');">
+              <br><br>
+              <input type="button" value=" << " onclick="myFlipFlop.moveSelect2Select('masterFlop', 'masterFlip');">
+            </td>
+            <td width="69">
+              <select size="6" name="Master_R" multiple>
+              </select>
+            </td>
+          </tr><tr>
+            <td align="center">
+            <input type="button" value=" V " onclick="javascript:myFlipFlop.copySelect2Text('masterFlip', flipIn);">
+            </td>  
+          </tr><tr>
+            <td colspan=3>
+            <input type='text' name='flipIn'  size='15' maxlength='15'>
+            <input type="button" value="Mod" onClick = "javascript:myFlipFlop.modSelectByText('masterFlip', flipIn)">
+            <input type="button" value="New" onClick = "javascript:myFlipFlop.newText2Select(flipIn, 'masterFlip')">
+            <input type="button" value="Del" onClick = "javascript:myFlipFlop.delMarked('masterFlip')">
+            </td>
+            <td align="center"> 
+            </td>
+          </tr>
+          </table>
+        
+          <table border=1>
+          <tr>
+            <td>
+              <select size=5 name='Slave_L' multiple>
+              </select>
+            </td>
+            <td width="74" align="center">
+              <input type="button" value=" >> " onClick="javascript:myFlipFlop.moveSelect2Select('slaveFlip', 'slaveFlop');">
+              <br><br>
+              <input type="button" value=" << " onclick="javascript:myFlipFlop.moveSelect2Select('slaveFlop', 'slaveFlip');">
+            </td>
+            <td width="69">
+              <select size="6" name="Slave_R" multiple>
+              </select>
+            </td>
+          </tr>
+          </table>
+        </form>
+        </center>   
+   //-------------------------------------------------------   
+   
+ o In the new block with the HTML-from select objects
+     myFlipFlop.setSelectObj("master", <select object>, <select object>);  // e.g. myFlipFlop.setSelectObj("master", self.document.forms['myForm'].masterFlip, self.document.forms['myForm'].masterFlop);
+     myFlipFlop.setSelectObj("slave", <select object>, <select object>);   // If slave is used
+
+ o (OPTIONAL) For convinience a HTML (hidden) text field can be defined to hold a CSV-list of ID's of the Flop items.  
+     myFlipFlop.setResultTextObj("master", <text object>); 
+     myFlipFlop.setResultTextObj("slave", <text object>); 
+     
+ o Finaly call setup
+     myFlipFlop.setup();
+ ***************************************************************************************/ 
+
+
+/*************************************************************************************** 
+ For Netscape Browsers
+ Do a resize window, so that changes on the forms are shown. (NS needs this only)
+***************************************************************************************/ 
+var isIE = "";
+function redrawWindow () { 
+  if (isIE=="") { // Detect browser 
+    isIE = (navigator.appName.indexOf("Microsoft") >= 0) ? true : false;
+ }
+  if (!isIE) {
+    //alert("go"); 
+    this.window.resizeTo(this.window.innerWidth+1, this.window.innerHeight);
+    this.window.resizeTo(this.window.innerWidth-1, this.window.innerHeight);          
+  }
+}
+
+function FlipFlop () {
+  //alert("Begin");
+  this.masterFlip = null;
+  this.masterFlop = null;
+  this.slaveFlip = null;
+  this.slaveFlop = null;
+
+  this.masterDataMap = null; // The full master Data
+  this.slaveDataMap = null;  // The full slave Data
+  
+  this.masterResultTextObj = null; // To store the CSV data of the items in the master Flop (ID's only) 
+  this.slaveResultTextObj = null;  // To store the CSV data of the items in the slave Flop  (ID's only) 
+  
+  this.masterPreMarkedList = new Array();
+  this.slavePreMarkedList = new Array();
+}
+
+
+  /*************************************************************************************** 
+  Call setup AFTER all parameters have been set. If no Slave is used you may skip the 
+  slave init functions
+  CALL AFTER YOU HAVE
+  o  setMasterData / setSlaveData
+  o  setPreMark (optional)
+  o  setSelectObj
+  Parameter: 2 ways to premark the flop the data. 
+    1) A filled Array called this.masterPreMarkedList / this.slavePreMarkedList. (see FlipFlop.prototype.setPreMark) filled by the db
+    2) A CSV filled Text Obj. usually filled by the form when looping in edit mode.
+  ***************************************************************************************/ 
+  FlipFlop.prototype.setup = function (thePremarkedSource) {
+   //alert("Hallo");
+    emptyArr = new Array();
+    emptyArr[0] = "";
+        
+    if (this.masterFlop == null) { // If there is no Flop do a different init
+       this.addArray2Select (emptyArr, "masterFlip");
+    }
+
+    this.addArray2Select(this.masterDataMap, "masterFlip");
+    //alert(this.masterPreMarkedList);
+    if (this.masterPreMarkedList.length <= 0) { // Use masterResultTextObj (usually set by a previous call) instaed of .
+      // alert(this.masterResultTextObj=="[object]");
+      if (this.masterResultTextObj != null) { 
+        if (this.masterResultTextObj == "[object]") { // a Obj or just a text?
+          this.masterPreMarkedList = this.masterResultTextObj.value.split(",");
+        } else { 
+          this.masterPreMarkedList = this.masterResultTextObj.split(",");
+        }
+      }
+    }
+
+    this.markByArray("masterFlip", this.masterPreMarkedList);
+    this.moveSelect2Select("masterFlip", "masterFlop");
+    if (this.slavePreMarkedList.length <= 0) { // Use slaveResultTextObj (usually set by a previous call).
+      //alert(this.slaveResultTextObj.value);
+      if (this.slaveResultTextObj != null) {
+        if (this.slaveResultTextObj == "[object]") { // a Obj or just a text?
+          this.slavePreMarkedList = this.slaveResultTextObj.value.split(",");
+        } else {
+          this.slavePreMarkedList = this.slaveResultTextObj.split(",");
+        }
+      }
+    }
+    this.markByArray("slaveFlip", this.slavePreMarkedList);
+    this.moveSelect2Select("slaveFlip", "slaveFlop");
+  
+    // Now get the Netscape Browsers to update the Data  	  
+    redrawWindow();
+  }
+  
+  /*************************************************************************************** 
+   An 1D Array set together by [master-ID] => master-caption
+   Sample:
+    Master = new Array();
+    Master[1] = "Ausstellungen";
+    Master[8] = "Bühne";
+  ***************************************************************************************/ 
+  FlipFlop.prototype.setMasterData = function (a_2D_Array) {
+    this.masterDataMap = a_2D_Array;
+  }
+  
+  /*************************************************************************************** 
+   An 2D Array set together by [master-ID][slave-ID] => slave-caption
+   Sample:
+    Master = new Array();
+    Master[1] = "Ausstellungen";
+    Master[8] = "Bühne";
+
+    Slave = new Array();
+    Slave[1] = new Array();    
+    Slave[1][1] = "Kunstmuseen";
+    Slave[1][5] = "Kulturgeschichte";
+
+    Slave[8] = new Array();
+    Slave[8][7] = "Schauspeil";
+    Slave[8][9] = "Musik";
+  ***************************************************************************************/       
+  FlipFlop.prototype.setSlaveData = function (a_2D_Array) {
+    this.slaveDataMap = a_2D_Array;
+  }
+    
+  /*************************************************************************************** 
+   setMaster / setSlave pre marked data
+   Expecting a siple 1D Array with a list of the already selected master-IDs / slave-IDs
+  ***************************************************************************************/ 
+  FlipFlop.prototype.setPreMark = function (who, aArray) {
+     // alert("setPreMark (" + who +", " + aArray +" )")
+     switch (who) {
+      case "master": 
+        this.masterPreMarkedList = aArray;
+        // alert(this.masterPreMarkedList);
+        break
+      case "slave": 
+        this.slavePreMarkedList = aArray;
+        break
+      default:
+        alert ("Err in 'FlipFlop.setPreMark. Wrong param: '" + who + "'. Use [ master | slave ].");
+    }    
+  }
+  
+  /*************************************************************************************** 
+   setMaster / setSlave Select-Objects
+   Expecting 2 HTML Select Objects   
+  ***************************************************************************************/ 
+  FlipFlop.prototype.setSelectObj = function (who, aSelectObjFlip, aSelectObjFlop) {
+    switch (who) {
+      case "master": 
+        this.masterFlip = aSelectObjFlip;
+        this.masterFlop = aSelectObjFlop;
+        break;
+      case "slave": 
+        this.slaveFlip = aSelectObjFlip;
+        this.slaveFlop = aSelectObjFlop;
+        break;
+      default:
+        alert ("Err in 'FlipFlop.setSelects'. Wrong param: '" + who + "'. Use [ master | slave ].");
+    }    
+  }
+    
+  /*************************************************************************************** 
+   setMaster / setSlave result in (hidden) text-Objects as CSV list (ID's only)
+   Expecting 1 HTML Text Objects   
+  ***************************************************************************************/ 
+  FlipFlop.prototype.setResultTextObj = function (who, aTextObj) {
+    switch (who) {
+      case "master": 
+        this.masterResultTextObj = aTextObj;
+        break;
+      case "slave": 
+        this.slaveResultTextObj = aTextObj;
+        break;
+      default:
+        alert ("Err in 'FlipFlop.setResultTextObj. Wrong param: '" + who + "'. Use [ master | slave ].");
+    }    
+  }
+
+  // privte function
+  // Copies the ID's of all items found in the select-Obj as CSV to the text-Obj. 
+  FlipFlop.prototype.storeResult = function (whichSelect) {
+    var aSelectObj = this.determinSelectObj (whichSelect, "storeResult");
+    if (aSelectObj==null) return true; 
+    
+    var aTextObj=null;
+    if ("masterFlop" == whichSelect) aTextObj = this.masterResultTextObj;
+    if ("slaveFlop"  == whichSelect) aTextObj = this.slaveResultTextObj;    
+
+    //alert(whichSelect +" "+ aTextObj);
+    if (aTextObj==null) return true; 
+    var out = "";
+    var len = aSelectObj.options.length;
+
+    firstLoop = true;
+    for(var i=0; i<len; i++) {
+      if ((aSelectObj.options[i] != null)) {
+        if (firstLoop) firstLoop = false; else out += ",";
+        out += aSelectObj.options[i].value;
+      }
+    }
+    aTextObj.value = out;
+    //alert(aTextObj.value);
+  }
+
+  //  
+  FlipFlop.prototype.emptyText = function (aTextObj) {
+    aTextObj.key = "";
+    aTextObj.value = "";
+  }
+  
+ 
+  // Empty a select-Obj.  
+  FlipFlop.prototype.emptySelect = function (whichSelect) {
+    var aSelectObj = this.determinSelectObj (whichSelect, "emptySelect");
+    
+    if (aSelectObj != null) {
+      for(var count = aSelectObj.options.length - 1; count >= 0; count--) {
+        aSelectObj.options[count] = null;
+      }
+    }
+    this.storeResult(whichSelect);
+    return true;
+  }
+
+  // Marks all the items as selected for the submit button.  
+  FlipFlop.prototype.markAll = function (whichSelect) {
+    var aSelectObj = this.determinSelectObj (whichSelect, "markAll");
+    if (aSelectObj == null) return ture;  
+    
+    for(var i = 0; i < aSelectObj.options.length; i++) {
+      if (aSelectObj.options[i] != null)
+        aSelectObj.options[i].selected = true;
+    }
+    return true;
+  }
+
+  // Marks all the items as selected that have the same id as in the array
+  FlipFlop.prototype.markByArray = function (whichSelect, markList) {
+    //alert("markByArray (" + whichSelect +", " + markList +" )")
+    var aSelectObj = this.determinSelectObj (whichSelect, "markByArray");
+    if (aSelectObj == null) return true;
+    
+    var selectLen = aSelectObj.options.length;
+    var listLen = markList.length;
+
+    for(var i = 0; i < listLen; i++) {
+      //Check if this value already exist in the targetSelectObj or not
+      //if not then add it otherwise do not add it.
+      for(var count = 0; count < selectLen; count++) {
+        if (aSelectObj.options[count] != null) {
+          if (markList[i] == aSelectObj.options[count].value) {
+            //alert(aSelectObj.options[count].selected);
+            aSelectObj.options[count].selected = true;
+            break;
+          }
+        }
+      }
+    }
+    return true;
+  }
+  
+  // Deletes the selected items of supplied select-Obj. 
+  FlipFlop.prototype.delMarked = function (whichSelect) {
+    var aSelectObj = this.determinSelectObj (whichSelect, "delMarked");
+    if (aSelectObj == null) return true;
+    
+    var maxCnt = aSelectObj.options.length;
+    for(var i = maxCnt - 1; i >= 0; i--) {
+      if ((aSelectObj.options[i] != null) && (aSelectObj.options[i].selected == true)) {
+        aSelectObj.options[i] = null;
+      }
+    }
+    this.storeResult(whichSelect);
+    return true;
+  }
+  
+  // Deletes the items of supplied select-Obj. if also found in the supplied array.
+  FlipFlop.prototype.delSelectByArray = function (whichSelect, dataArray) {
+    var aSelectObj = this.determinSelectObj (whichSelect, "delSelectByArray");
+    if (aSelectObj == null) return true;
+
+    var id; 
+    var len = aSelectObj.options.length;
+    for (id in dataArray) {
+      //Check if this value already exist in the targetSelectObj or not
+      //if not then add it otherwise do not add it.
+      for(var count = 0; count < len; count++) {
+        if (aSelectObj.options[count] != null) {
+          if (id == aSelectObj.options[count].value) {
+            aSelectObj.options[count] = null;
+            break;
+          }
+        }
+      }
+    }
+    this.storeResult(whichSelect);
+    return true;
+  }
+    
+  // Copies the first selected found in the select-Obj to the text-Obj. 
+  FlipFlop.prototype.copySelect2Text = function (whichSelect, aTextObj) {
+    var aSelectObj = this.determinSelectObj (whichSelect, "copySelect2Text");
+    if (aSelectObj == null) return false;
+      
+    for(var i=0; i<aSelectObj.options.length; i++) {
+      if ((aSelectObj.options[i] != null) && (aSelectObj.options[i].selected)) {
+        aTextObj.value = aSelectObj.options[i].text;
+        aTextObj.key = aSelectObj.options[i].value;
+        break;
+      }
+    }
+    return true;
+  }
+
+  // Adds the list of selected items selected in the child
+  // window to its list. It is called by child window to do so.  
+  FlipFlop.prototype.copySelect2Select = function (whichSelectSource, whichSelectTarget) {
+    var sourceSelectObj = this.determinSelectObj (whichSelectSource, "copySelect2Select #1");
+    var targetSelectObj = this.determinSelectObj (whichSelectTarget, "copySelect2Select #2");
+
+    if ((sourceSelectObj==null) || (targetSelectObj==null)) return true; 
+       
+    this.emptySelect(targetSelectObj);
+    for(var i=0; i<sourceSelectObj.options.length; i++) {
+      if (sourceSelectObj.options[i] != null)
+        targetSelectObj.options[i] = new Option(sourceSelectObj.options[i].text, sourceSelectObj.options[i].value);
+    }
+    this.storeResult(whichSelectTarget);
+    return true;
+  }
+
+  // Adds the text-Obj as new item to the select-Obj.
+  // If already inserted it will take the new value 
+  FlipFlop.prototype.addText2Select = function (aTextObj, whichSelect)  {
+    var aSelectObj = this.determinSelectObj (whichSelect, "addText2Select");
+    if (aSelectObj == null) return false;
+
+    if ((aTextObj==null) || (aTextObj.value=="")) return;
+    var len = aSelectObj.options.length;
+    var found = false;
+    for(var count = 0; count < len; count++) {
+      if (aSelectObj.options[count] != null) {
+        if (aTextObj.key == aSelectObj.options[count].value) {
+          aSelectObj.options[count].text = aTextObj.value;
+          found = true;
+          break;
+        }
+      }
+    }
+    if (!found) {
+      if (aTextObj.key == "") {
+        aTextObj.key = "new_"+len;
+      }
+      // alert (id);
+      aSelectObj.options[len] = new Option(aTextObj.value, aTextObj.key); 
+    }
+    this.storeResult(whichSelect);
+    return true;
+  }
+  
+ 
+  // Modify a item in the select-Obj. If not found it will be added
+  FlipFlop.prototype.modSelectByText = function (whichSelect, aTextObj) {
+    this.addText2Select(aTextObj, whichSelect); 
+    return true;
+  }
+
+  // Add the text-Obj as new item to the select-Obj.
+  FlipFlop.prototype.newText2Select = function (aTextObj, whichSelect)  {
+    aTextObj.key = "";
+    this.addText2Select(aTextObj, whichSelect);     
+    return true;
+  }
+
+
+  // Empties the select-Obj and then fills it with the data of the supplied array.
+  FlipFlop.prototype.initSelectByArray = function (whichSelect, dataArray) {
+    var aSelectObj = this.determinSelectObj (whichSelect, "initSelectByArray");
+    if (aSelectObj == null) return true;
+
+    this.emptySelect(whichSelect);
+
+    var id; 
+    var i = 0;
+    for (id in dataArray) {
+      aSelectObj.options[i] = new Option(dataArray[id], id);
+      i++;
+    }
+    this.storeResult(whichSelect);    
+    return true;
+  }
+
+  
+  // Fills the select-Obj  with the data of the supplied array.
+  FlipFlop.prototype.addArray2Select = function (dataArray, whichSelect) {
+    var aSelectObj = this.determinSelectObj (whichSelect, "addArray2Select");
+    if (aSelectObj == null) return false;
+    if (dataArray == null) return false;
+
+    var id; 
+    var i = 0;
+    var len = aSelectObj.options.length;
+    for (id in dataArray) {
+      //Check if this value already exist in the targetSelectObj or not
+      //if not then add it otherwise do not add it.
+      var found = false;
+      for(var count = 0; count < len; count++) {
+        if (aSelectObj.options[count] != null) {
+          if (id == aSelectObj.options[count].value) {
+            found = true;
+            break;
+          }
+        }
+      }
+      if (!found) {
+        //alert(dataArray[id] + id);
+        aSelectObj.options[len] = new Option(dataArray[id], id); 
+        len++;
+      }
+    }
+    this.storeResult(whichSelect);    
+    return true;
+  }
+
+
+  // Add the selected items from the source to target select-Obj.
+  FlipFlop.prototype.addSelect2Select = function (whichSelectSource, whichSelectTarget) {
+    var sourceSelectObj = this.determinSelectObj (whichSelectSource, "addSelect2Select #1");
+    var targetSelectObj = this.determinSelectObj (whichSelectTarget, "addSelect2Select #2");
+ 
+    if ((sourceSelectObj==null) || (targetSelectObj==null)) return false; 
+ 
+    var len = targetSelectObj.options.length;
+
+    for(var i=0; i < sourceSelectObj.length; i++) {
+      if ((sourceSelectObj.options[i] != null) && (sourceSelectObj.options[i].selected)) {
+        //Check if this value already exist in the targetSelectObj or not
+        //if not then add it otherwise do not add it.
+        var found = false;
+        for(var count = 0; count < len; count++) {
+          if (targetSelectObj.options[count] != null) {
+            if (sourceSelectObj.options[i].value == targetSelectObj.options[count].value) {
+              found = true;
+              break;
+            }
+          }
+        }
+        if ((!found) && (sourceSelectObj.options[i].value != 0)) {
+          targetSelectObj.options[len] = new Option(sourceSelectObj.options[i].text, sourceSelectObj.options[i].value); 
+          len++;
+        }
+      }
+    }
+    this.storeResult(whichSelectTarget);        
+    return true;
+  }
+
+  // Move the selected items from the source to target select-Obj.
+  FlipFlop.prototype.moveSelect2Select = function (whichSelectSource, whichSelectTarget) {
+      switch (whichSelectSource) {
+      case "masterFlip": 
+        sourceSelectObj = this.masterFlip;
+        var len = sourceSelectObj.options.length;
+        //alert(this.slaveDataMap);
+        if (this.masterFlop == null) {
+          // If there is no masterFlop, empty slaveFlip on every occation and add an empty item.
+          this.emptySelect("slaveFlip");
+          emptyArr = new Array();
+          emptyArr[0] = "";
+          this.addArray2Select (emptyArr, "slaveFlip");
+        }
+        if (this.slaveDataMap != null) {
+          for(var i=0; i<len; i++) {  
+            if ((sourceSelectObj.options[i] != null) && (sourceSelectObj.options[i].selected)) {
+              this.addArray2Select(this.slaveDataMap[sourceSelectObj.options[i].value], "slaveFlip");
+            }
+          }
+        }        
+        break;
+      case "masterFlop": 
+        var sourceSelectObj = this.masterFlop;
+        var len = sourceSelectObj.options.length; 
+        // alert(len);
+        //alert(this.slaveDataMap);          
+        if (this.slaveDataMap != null) {
+          for(var i=0; i<len; i++) {
+            // alert(i + "  " + ((sourceSelectObj.options[i] != null) && (sourceSelectObj.options[i].selected)));          
+            if ((sourceSelectObj.options[i] != null) && (sourceSelectObj.options[i].selected)) {
+              this.delSelectByArray("slaveFlip", this.slaveDataMap[sourceSelectObj.options[i].value]);
+              this.delSelectByArray("slaveFlop", this.slaveDataMap[sourceSelectObj.options[i].value]);
+            }
+          }
+        }
+        // alert(i + " end len:"+len);
+        break;
+      case "slaveFlip" : 
+      case "slaveFlop" : 
+        break;
+      default : alert("ERR in " + err + ". Wrong param :(" + which + ")");
+    } 
+    if (this.addSelect2Select(whichSelectSource, whichSelectTarget)) { 
+      // only del if addSelect2Select was successfull
+      this.delMarked(whichSelectSource);
+    }
+    redrawWindow();
+  }
+  
+  /*************************************************************************************** 
+   Private function    
+  ***************************************************************************************/ 
+  FlipFlop.prototype.determinSelectObj = function (which, err) {
+    var aSelectObj = null;
+    //alert("Debuging FlipFlop." + err );
+
+    switch (which) {
+      case "masterFlip": aSelectObj = this.masterFlip; break;
+      case "masterFlop": aSelectObj = this.masterFlop; break;
+      case "slaveFlip" : aSelectObj = this.slaveFlip;  break;
+      case "slaveFlop" : aSelectObj = this.slaveFlop;  break;
+      default : alert("ERR in 'FlipFlop." + err + "'. Wrong param: '" + which + "'. Use [ masterFlip | masterFlop | slaveFlip | slaveFlop ]");
+    } 
+    return aSelectObj;
+  }
+  
+//  End -->

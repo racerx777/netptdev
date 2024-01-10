@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title>JavaScript Bs_DatePicker example 3</title>
+	<script type="text/javascript" src="/_bsJavascript/core/lang/Bs_Misc.lib.js"></script>
+	<script type="text/javascript" src="/_bsJavascript/components/toolbar/Bs_Button.class.js"></script>
+	<script type="text/javascript" src="/_bsJavascript/components/numberfield/Bs_NumberField.class.js"></script>
+  <script type="text/javascript" src="/_bsJavascript/components/datepicker/Bs_DatePicker.class.js"></script>
+  <script type="text/javascript" src="/_bsJavascript/core/form/Bs_FormFieldSelect.class.js"></script>
+<script type="text/javascript">
+if (moz) {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_mz.css'>");
+} else {
+  document.writeln("<link rel='stylesheet' href='/_bsJavascript/components/toolbar/win2k_ie.css'>");
+}
+
+function init() {
+  myDatePicker = new Bs_DatePicker();
+	myDatePicker.dateFormat = 'eu';
+  myDatePicker.convertField('myDatePickerFld');
+}
+</script>
+
+</head>
+
+<body onLoad="init();">
+
+<h1>JavaScript Bs_DatePicker example 3</h1>
+
+<ul>
+  <li>Like example 1, but uses convertField().</li>
+</ul>
+<hr>
+<br>
+
+<form  name="test" id="test" action="http://www.blueshoes.org/postDump.php" method="post">
+  <input type="text" name="myDatePickerFld" id="myDatePickerFld" value="2003-12-31" style="width:126px;"><br>
+	<input type="submit">
+</form>
+
+</body>
+</html>
+

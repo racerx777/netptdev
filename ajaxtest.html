@@ -1,0 +1,97 @@
+<html>
+<nead>
+<script type="text/javascript">
+/*
+The showCD() function does the following:
+
+    * Check if a CD is selected
+    * Create an XMLHttpRequest object
+    * Create the function to be executed when the server response is ready
+    * Send the request off to a file on the server
+    * Notice that a parameter (q) is added to the URL (with the content of the dropdown list)
+*/
+function showCD(str) {
+if (str=="") {
+  document.getElementById("txtHint").innerHTML="";
+  return;
+  }
+if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+  var xmlhttp=new XMLHttpRequest();
+  }
+else {// code for IE6, IE5
+  var xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+  }
+xmlhttp.onreadystatechange=function()
+  {
+  if (xmlhttp.readyState==4 && xmlhttp.status==200)
+    {
+    document.getElementById("txtHint").innerHTML=xmlhttp.responseText;
+    }
+  }
+xmlhttp.open("GET","getcd.php?q="+str,true);
+xmlhttp.send();
+}
+
+function getXMLHttp() {
+  var xmlHttp
+  try {
+    //Firefox, Opera 8.0+, Safari
+    xmlHttp = new XMLHttpRequest();
+  }
+  catch(e)
+  {
+    //Internet Explorer
+    try
+    {
+      xmlHttp = new ActiveXObject("Msxml2.XMLHTTP");
+    }
+    catch(e)
+    {
+      try
+      {
+        xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+      }
+      catch(e)
+      {
+        alert("Your browser does not support AJAX!")
+        return false;
+      }
+    }
+  }
+  return xmlHttp;
+}
+
+function MakeRequest()
+{
+  var xmlHttp = getXMLHttp();
+ 
+  xmlHttp.onreadystatechange = function()
+  {
+    if(xmlHttp.readyState == 4)
+    {
+      HandleResponse(xmlHttp.responseText);
+    }
+  }
+
+  xmlHttp.open("GET", "ajax.php", true);
+  xmlHttp.send(null);
+}
+function HandleResponse(response)
+{
+  document.getElementById('ResponseDiv').innerHTML = response;
+}
+</script>
+</head>
+<body>
+<form>
+  Select a CD:
+  <select name="cds" onChange="showCD(this.value)">
+    <option value="">Select a CD:</option>
+    <option value="Bob Dylan">Bob Dylan</option>
+    <option value="Bonnie Tyler">Bonnie Tyler</option>
+    <option value="Dolly Parton">Dolly Parton</option>
+  </select>
+</form>
+<div id="txtHint"><b>CD info will be listed here...</b></div>
+</body>
+</html>

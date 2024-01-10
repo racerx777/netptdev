@@ -1,0 +1,30 @@
+<blueshoes>
+  <bs:index>
+    
+    <bs:source>
+      <bs:type>db</type>
+      <bs:dsn>-default-</bs:dsn>
+      <bs:database>-default-</bs:database>
+      <bs:table>ChartComment</bs:table>
+    </bs:source>
+    
+    <bs:minLength>3</bs:minLength>
+    <bs:maxLength>30</bs:maxLength>
+    
+    <bs:fields>
+      <bs:field name="ID">
+        <bs:index>false</bs:index>
+        <bs:weight>0</bs:weight>
+      </bs:field>
+      <bs:field name="textEn">
+        <bs:index>true</bs:index>
+        <bs:weight>60</bs:weight>
+      </bs:field>
+      <bs:field name="textDe">
+        <bs:index>true</bs:index>
+        <bs:weight>60</bs:weight>
+      </bs:field>
+    </bs:fields>
+  
+  </bs:index>
+</blueshoes>
